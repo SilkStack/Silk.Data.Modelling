@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>John Carruthers</Authors>
+    <Company />
+    <Product>SilkStack</Product>
+    <Description>Silk.DataModelling is a library for modelling data structures for .NET.
+
+Part of the SilkStack project.</Description>
+  </PropertyGroup>
+
+</Project>
