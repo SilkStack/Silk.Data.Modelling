@@ -3,7 +3,10 @@
 	/// <summary>
 	/// Represents a view of a data structure, derived from a Model.
 	/// </summary>
-	public interface IView { }
+	public interface IView
+	{
+		string Name { get; }
+	}
 
 	/// <summary>
 	/// Represents a view of a data structure, derived from a Model.

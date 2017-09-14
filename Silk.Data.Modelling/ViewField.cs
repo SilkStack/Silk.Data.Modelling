@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Silk.Data.Modelling
 {
+	[DebuggerDisplay("{Name} {DataType}")]
 	public class ViewField : IViewField
 	{
 		public string Name { get; }

@@ -11,6 +11,13 @@ namespace Silk.Data.Modelling.Tests
 		public void CreateUntypedView()
 		{
 			var view = _model.CreateView();
+			Assert.IsNotNull(view);
+			Assert.AreEqual(_model.Name, view.Name);
+			Assert.AreEqual(1, view.Fields.Length);
+
+			var idField = view.Fields[0];
+			Assert.AreEqual(nameof(SourceModel.Id), idField.Name);
+			Assert.AreEqual(typeof(int), idField.DataType);
 		}
 
 		[TestMethod]
@@ -27,6 +34,7 @@ namespace Silk.Data.Modelling.Tests
 
 		private class SourceModel
 		{
+
 			public int Id { get; set; }
 		}
 

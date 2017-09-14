@@ -1,4 +1,4 @@
-﻿namespace Silk.Data.Modelling
+﻿namespace Silk.Data.Modelling.Conventions
 {
 	/// <summary>
 	/// Defines a convention used for creating views.
@@ -11,7 +11,7 @@
 		/// <param name="model"></param>
 		/// <param name="field"></param>
 		/// <param name="viewDefinition"></param>
-		public virtual void MakeModelFields(Model model, ModelField field, ViewDefinition viewDefinition)
+		public virtual void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{
 		}
 
