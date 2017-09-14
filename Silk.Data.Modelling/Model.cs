@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Silk.Data.Modelling
@@ -30,6 +31,38 @@ namespace Silk.Data.Modelling
 			Metadata = metadata.ToArray();
 			foreach (var field in Fields)
 				field.ParentModel = this;
+		}
+
+		public IView<ViewField> CreateView(params ViewConvention[] viewConventions)
+		{
+			var viewDefinition = new ViewDefinition(this);
+			foreach (var field in Fields)
+			{
+				foreach (var viewConvention in viewConventions)
+				{
+					viewConvention.MakeModelFields(this, field, viewDefinition);
+				}
+			}
+			foreach (var viewConvention in viewConventions)
+			{
+				viewConvention.FinalizeModel(viewDefinition);
+			}
+			return new DefaultView(viewDefinition.Name, GetDefaultViewFields(viewDefinition.FieldDefinitions));
+		}
+
+		public TView CreateView<TView>(Func<ViewDefinition, TView> viewBuilder, params ViewConvention[] viewConventions)
+			where TView : IView
+		{
+			return default(TView);
+		}
+
+		private IEnumerable<ViewField> GetDefaultViewFields(IEnumerable<ViewFieldDefinition> fieldDefinitions)
+		{
+			foreach (var viewDefinition in fieldDefinitions)
+			{
+				yield return new ViewField(viewDefinition.Name, viewDefinition.DataType,
+					viewDefinition.Metadata);
+			}
 		}
 	}
 }

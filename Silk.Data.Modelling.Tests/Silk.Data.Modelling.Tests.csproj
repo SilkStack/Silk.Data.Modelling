@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Silk.DataModelling\Silk.DataModelling.csproj" />
+    <ProjectReference Include="..\Silk.Data.Modelling\Silk.Data.Modelling.csproj" />
   </ItemGroup>
 
 </Project>
