@@ -20,5 +20,16 @@ namespace Silk.Data.Modelling
 				}
 			}
 		}
+
+		public static Task MapToViewAsync<TField, TSource>(this IView<TField, TSource> view,
+			TSource obj, IContainer viewContainer)
+			where TField : IViewField
+		{
+			var modelReadWriter = new ObjectReadWriter(view.Model)
+			{
+				Instance = obj
+			};
+			return view.MapToViewAsync(modelReadWriter, viewContainer);
+		}
 	}
 }

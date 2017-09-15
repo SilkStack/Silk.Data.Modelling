@@ -6,7 +6,8 @@ namespace Silk.Data.Modelling.Tests
 	[TestClass]
 	public class MappingTests
 	{
-		private TypedModel _nonGenericModel = TypeModeller.GetModelOf<SimpleClassWithPublicProperties>();
+		private TypedModel<SimpleClassWithPublicProperties> _genericModel = TypeModeller.GetModelOf<SimpleClassWithPublicProperties>();
+		private TypedModel _nonGenericModel => _genericModel;
 
 		[TestMethod]
 		public async Task MapDefaultView()
@@ -24,6 +25,28 @@ namespace Silk.Data.Modelling.Tests
 			};
 			var container = new MemoryContainer(_nonGenericModel, view);
 			await view.MapToViewAsync(readWriter, container)
+				.ConfigureAwait(false);
+			var data = container.Data;
+			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Integer)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.String)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Object)));
+			Assert.AreEqual(instance.Integer, data[nameof(SimpleClassWithPublicProperties.Integer)]);
+			Assert.AreEqual(instance.String, data[nameof(SimpleClassWithPublicProperties.String)]);
+			Assert.ReferenceEquals(instance.Object, data[nameof(SimpleClassWithPublicProperties.Object)]);
+		}
+
+		[TestMethod]
+		public async Task MapTypedView()
+		{
+			var view = _genericModel.CreateTypedView();
+			var instance = new SimpleClassWithPublicProperties
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object()
+			};
+			var container = new MemoryContainer(_genericModel, view);
+			await view.MapToViewAsync(instance, container)
 				.ConfigureAwait(false);
 			var data = container.Data;
 			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Integer)));
