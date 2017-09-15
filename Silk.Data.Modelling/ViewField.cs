@@ -25,5 +25,16 @@ namespace Silk.Data.Modelling
 			Metadata = metadata.ToArray();
 			ModelBinding = binding;
 		}
+
+		public static ViewField FromDefinition(ViewFieldDefinition definition)
+		{
+			return new ViewField(definition.Name, definition.DataType, definition.Metadata,
+				definition.ModelBinding);
+		}
+
+		public static IEnumerable<ViewField> FromDefinitions(IEnumerable<ViewFieldDefinition> definitions)
+		{
+			return definitions.Select(q => FromDefinition(q));
+		}
 	}
 }
