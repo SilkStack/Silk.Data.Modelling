@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Bindings;
+using System;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
@@ -12,8 +13,10 @@ namespace Silk.Data.Modelling.Conventions
 		{
 			if (!IsSimpleType(field.DataType) || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
 				return;
+			//  todo: decide how I want to honor CanRead and CanWrite
 			viewDefinition.FieldDefinitions.Add(
-				new ViewFieldDefinition(field.Name, null)
+				new ViewFieldDefinition(field.Name,
+					new BidirectionalAssignmentBinding(field.Name))
 				{
 					DataType = field.DataType
 				});

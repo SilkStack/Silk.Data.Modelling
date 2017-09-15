@@ -20,17 +20,20 @@ namespace Silk.Data.Modelling
 
 	public class TypedDefaultView<TSource> : DefaultView, IView<ViewField, TSource>
 	{
+		public new TypedModel<TSource> Model { get; }
+
 		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
-			Model model)
+			TypedModel<TSource> model)
 			: base(name, fields, model)
 		{
+			Model = model;
 		}
 	}
 
-	public class TypedDefaultView<TSource, TView> : DefaultView, IView<ViewField, TSource, TView>
+	public class TypedDefaultView<TSource, TView> : TypedDefaultView<TSource>, IView<ViewField, TSource, TView>
 	{
 		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
-			Model model)
+			TypedModel<TSource> model)
 			: base(name, fields, model)
 		{
 		}

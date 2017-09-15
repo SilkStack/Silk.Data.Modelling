@@ -28,7 +28,7 @@ namespace Silk.Data.Modelling
 			foreach (var viewDefinition in fieldDefinitions)
 			{
 				yield return new ViewField(viewDefinition.Name, viewDefinition.DataType,
-					viewDefinition.Metadata, viewDefinition.Binding);
+					viewDefinition.Metadata, viewDefinition.ModelBinding);
 			}
 		}
 	}

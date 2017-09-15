@@ -30,6 +30,7 @@
 	public interface IView<TField, TSource> : IView<TField>
 		where TField : IViewField
 	{
+		new TypedModel<TSource> Model { get; }
 	}
 
 	public interface IView<TField, TSource, TView> : IView<TField, TSource>

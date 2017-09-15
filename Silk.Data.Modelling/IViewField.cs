@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Bindings;
+using System;
 
 namespace Silk.Data.Modelling
 {
@@ -25,6 +26,6 @@ namespace Silk.Data.Modelling
 		/// <summary>
 		/// Gets the binding for the view field.
 		/// </summary>
-		IViewFieldBinding Binding { get; }
+		IModelBinding ModelBinding { get; }
 	}
 }

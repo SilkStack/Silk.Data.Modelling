@@ -53,6 +53,8 @@ namespace Silk.Data.Modelling.Tests
 			public string String { get; set; }
 			public Guid Guid { get; set; }
 			public char Char { get; set; }
+
+			public object DontMapObject { get; set; }
 		}
 
 		private class ComplexTypePoco
@@ -77,6 +79,7 @@ namespace Silk.Data.Modelling.Tests
 			public string SimpleAString { get; set; }
 			public Guid SimpleAGuid { get; set; }
 			public char SimpleAChar { get; set; }
+			public object SimpleADontMapObject { get; set; }
 
 			public sbyte SimpleBSByte { get; set; }
 			public byte SimpleBByte { get; set; }
@@ -92,6 +95,7 @@ namespace Silk.Data.Modelling.Tests
 			public string SimpleBString { get; set; }
 			public Guid SimpleBGuid { get; set; }
 			public char SimpleBChar { get; set; }
+			public object SimpleBDontMapObject { get; set; }
 		}
 	}
 }

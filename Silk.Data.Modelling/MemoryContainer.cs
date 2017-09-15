@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling
+﻿using System.Collections.Generic;
+
+namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Stores a graph in memory.
@@ -10,10 +12,17 @@
 
 		public IView View { get; }
 
+		public Dictionary<string, object> Data { get; } = new Dictionary<string, object>();
+
 		public MemoryContainer(TypedModel model, IView view)
 		{
 			Model = model;
 			View = view;
+		}
+
+		public void SetValue(IViewField field, object value)
+		{
+			Data[field.Name] = value;
 		}
 	}
 }

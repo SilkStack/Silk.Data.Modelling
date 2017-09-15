@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Bindings;
+using System;
 using System.Collections.Generic;
 
 namespace Silk.Data.Modelling
@@ -26,12 +27,12 @@ namespace Silk.Data.Modelling
 		/// <summary>
 		/// Gets or sets the binding for the view field.
 		/// </summary>
-		public IViewFieldBinding Binding { get; set; }
+		public IModelBinding ModelBinding { get; set; }
 
-		public ViewFieldDefinition(string name, IViewFieldBinding binding)
+		public ViewFieldDefinition(string name, IModelBinding binding)
 		{
 			Name = name;
-			Binding = binding;
+			ModelBinding = binding;
 		}
 	}
 }
