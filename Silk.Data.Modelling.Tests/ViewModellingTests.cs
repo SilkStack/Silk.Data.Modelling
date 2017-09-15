@@ -23,13 +23,27 @@ namespace Silk.Data.Modelling.Tests
 		[TestMethod]
 		public void CreateTypedView()
 		{
-			var view = _model.CreateView(viewDefinition => new TypedDefaultView<SourceModel>(viewDefinition.Name, null));
+			var view = _model.CreateTypedView();
+			Assert.IsNotNull(view);
+			Assert.AreEqual(_model.Name, view.Name);
+			Assert.AreEqual(1, view.Fields.Length);
+
+			var idField = view.Fields[0];
+			Assert.AreEqual(nameof(SourceModel.Id), idField.Name);
+			Assert.AreEqual(typeof(int), idField.DataType);
 		}
 
 		[TestMethod]
 		public void CreateTypedViewWithViewType()
 		{
-			var view = _model.CreateView(viewDefinition => new TypedDefaultView<SourceModel, ViewModel>(viewDefinition.Name, null));
+			var view = _model.CreateTypedView<SourceModel, ViewModel>();
+			Assert.IsNotNull(view);
+			Assert.AreEqual(_model.Name, view.Name);
+			Assert.AreEqual(1, view.Fields.Length);
+
+			var idField = view.Fields[0];
+			Assert.AreEqual(nameof(SourceModel.Id), idField.Name);
+			Assert.AreEqual(typeof(int), idField.DataType);
 		}
 
 		private class SourceModel
