@@ -13,6 +13,9 @@ namespace Silk.Data.Modelling.Conventions
 		{
 			if (!IsSimpleType(field.DataType) || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
 				return;
+			var bindField = model.Fields.FirstOrDefault(q => q.Name == field.Name && q.DataType == field.DataType);
+			if (bindField == null)
+				return;
 			//  todo: decide how I want to honor CanRead and CanWrite
 			viewDefinition.FieldDefinitions.Add(
 				new ViewFieldDefinition(field.Name,

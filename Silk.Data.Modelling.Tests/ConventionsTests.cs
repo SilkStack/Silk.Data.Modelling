@@ -18,6 +18,16 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		[TestMethod]
+		public void CopyReferencesConvention()
+		{
+			var model = TypeModeller.GetModelOf<SimpleTypePoco>();
+			var view = model.CreateView(new CopyReferencesConvention());
+			Assert.IsNotNull(view);
+			Assert.AreEqual(model.Name, view.Name);
+			Assert.AreEqual(2, view.Fields.Length);
+		}
+
+		[TestMethod]
 		public void DontFlattenWithoutTargetModel()
 		{
 			var model = TypeModeller.GetModelOf<ComplexTypePoco>();

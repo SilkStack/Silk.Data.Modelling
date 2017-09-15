@@ -28,9 +28,10 @@ namespace Silk.Data.Modelling.Tests
 			var data = container.Data;
 			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Integer)));
 			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.String)));
-			Assert.AreEqual(false, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Object)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Object)));
 			Assert.AreEqual(instance.Integer, data[nameof(SimpleClassWithPublicProperties.Integer)]);
 			Assert.AreEqual(instance.String, data[nameof(SimpleClassWithPublicProperties.String)]);
+			Assert.ReferenceEquals(instance.Object, data[nameof(SimpleClassWithPublicProperties.Object)]);
 		}
 
 		private class SimpleClassWithPublicProperties
