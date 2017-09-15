@@ -7,26 +7,31 @@ namespace Silk.Data.Modelling
 	{
 		public string Name { get; }
 		public ViewField[] Fields { get; }
+		public Model Model { get; }
 
-		public DefaultView(string name, IEnumerable<ViewField> fields)
+		public DefaultView(string name, IEnumerable<ViewField> fields,
+			Model model)
 		{
 			Name = name;
 			Fields = fields.ToArray();
+			Model = model;
 		}
 	}
 
 	public class TypedDefaultView<TSource> : DefaultView, IView<ViewField, TSource>
 	{
-		public TypedDefaultView(string name, IEnumerable<ViewField> fields)
-			: base(name, fields)
+		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
+			Model model)
+			: base(name, fields, model)
 		{
 		}
 	}
 
 	public class TypedDefaultView<TSource, TView> : DefaultView, IView<ViewField, TSource, TView>
 	{
-		public TypedDefaultView(string name, IEnumerable<ViewField> fields)
-			: base(name, fields)
+		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
+			Model model)
+			: base(name, fields, model)
 		{
 		}
 	}

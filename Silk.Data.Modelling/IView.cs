@@ -5,7 +5,14 @@
 	/// </summary>
 	public interface IView
 	{
+		/// <summary>
+		/// Gets the name of the field.
+		/// </summary>
 		string Name { get; }
+		/// <summary>
+		/// Gets the model the view is based on.
+		/// </summary>
+		Model Model { get; }
 	}
 
 	/// <summary>

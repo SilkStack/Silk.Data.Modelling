@@ -21,5 +21,10 @@ namespace Silk.Data.Modelling
 		/// Gets an array of metadata for the field.
 		/// </summary>
 		object[] Metadata { get; }
+
+		/// <summary>
+		/// Gets the binding for the view field.
+		/// </summary>
+		IViewFieldBinding Binding { get; }
 	}
 }

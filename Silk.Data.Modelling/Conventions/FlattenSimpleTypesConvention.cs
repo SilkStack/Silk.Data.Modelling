@@ -18,7 +18,7 @@ namespace Silk.Data.Modelling.Conventions
 				if (sourceField != null && sourceField.DataType == field.DataType)
 				{
 					viewDefinition.FieldDefinitions.Add(
-						new ViewFieldDefinition(field.Name)
+						new ViewFieldDefinition(field.Name, null)
 						{
 							DataType = field.DataType
 						});

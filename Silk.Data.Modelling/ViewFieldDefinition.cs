@@ -23,9 +23,15 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		public List<object> Metadata { get; } = new List<object>();
 
-		public ViewFieldDefinition(string name)
+		/// <summary>
+		/// Gets or sets the binding for the view field.
+		/// </summary>
+		public IViewFieldBinding Binding { get; set; }
+
+		public ViewFieldDefinition(string name, IViewFieldBinding binding)
 		{
 			Name = name;
+			Binding = binding;
 		}
 	}
 }

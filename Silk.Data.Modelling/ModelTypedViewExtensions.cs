@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling
 		public static TypedDefaultView<TSource> CreateTypedView<TSource>(this TypedModel<TSource> model, params ViewConvention[] viewConventions)
 		{
 			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
-					GetDefaultViewFields(viewDefinition.FieldDefinitions)),
+					GetDefaultViewFields(viewDefinition.FieldDefinitions), model),
 				viewConventions);
 		}
 
@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling
 			params ViewConvention[] viewConventions)
 		{
 			return model.CreateView(viewDefinition => new TypedDefaultView<TSource, TView>(viewDefinition.Name,
-					GetDefaultViewFields(viewDefinition.FieldDefinitions)),
+					GetDefaultViewFields(viewDefinition.FieldDefinitions), model),
 				viewConventions);
 		}
 
@@ -28,7 +28,7 @@ namespace Silk.Data.Modelling
 			foreach (var viewDefinition in fieldDefinitions)
 			{
 				yield return new ViewField(viewDefinition.Name, viewDefinition.DataType,
-					viewDefinition.Metadata);
+					viewDefinition.Metadata, viewDefinition.Binding);
 			}
 		}
 	}

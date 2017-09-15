@@ -14,11 +14,15 @@ namespace Silk.Data.Modelling
 
 		public object[] Metadata { get; }
 
-		public ViewField(string name, Type dataType, IEnumerable<object> metadata)
+		public IViewFieldBinding Binding { get; }
+
+		public ViewField(string name, Type dataType, IEnumerable<object> metadata,
+			IViewFieldBinding binding)
 		{
 			Name = name;
 			DataType = dataType;
 			Metadata = metadata.ToArray();
+			Binding = binding;
 		}
 	}
 }
