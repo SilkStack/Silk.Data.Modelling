@@ -22,5 +22,12 @@ namespace Silk.Data.Modelling
 					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model),
 				viewConventions);
 		}
+
+		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView>(
+			this TypedModel<TSource>.Modeller<TView> modeller,
+			params ViewConvention[] viewConventions)
+		{
+			return modeller.Model.CreateTypedView<TSource, TView>(viewConventions);
+		}
 	}
 }

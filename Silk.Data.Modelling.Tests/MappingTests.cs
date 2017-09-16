@@ -57,7 +57,53 @@ namespace Silk.Data.Modelling.Tests
 			Assert.ReferenceEquals(instance.Object, data[nameof(SimpleClassWithPublicProperties.Object)]);
 		}
 
+		[TestMethod]
+		public async Task MapTypedViewToObject()
+		{
+			var view = _genericModel
+				.GetModeller<SimpleMappedClass>()
+				.CreateTypedView();
+			var instance = new SimpleClassWithPublicProperties
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object()
+			};
+			var container = await view.MapToViewAsync(instance)
+				.ConfigureAwait(false);
+			Assert.AreEqual(instance.Integer, container.Integer);
+			Assert.AreEqual(instance.String, container.String);
+			Assert.ReferenceEquals(instance.Object, container.Object);
+		}
+
+		[TestMethod]
+		public async Task MapTypedViewToObjectInstance()
+		{
+			var view = _genericModel
+				.GetModeller<SimpleMappedClass>()
+				.CreateTypedView();
+			var instance = new SimpleClassWithPublicProperties
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object()
+			};
+			var container = new SimpleMappedClass();
+			await view.MapToViewAsync(instance, container)
+				.ConfigureAwait(false);
+			Assert.AreEqual(instance.Integer, container.Integer);
+			Assert.AreEqual(instance.String, container.String);
+			Assert.ReferenceEquals(instance.Object, container.Object);
+		}
+
 		private class SimpleClassWithPublicProperties
+		{
+			public int Integer { get; set; }
+			public string String { get; set; }
+			public object Object { get; set; }
+		}
+
+		private class SimpleMappedClass
 		{
 			public int Integer { get; set; }
 			public string String { get; set; }

@@ -31,5 +31,24 @@ namespace Silk.Data.Modelling
 			: base(typeof(T), name, fields, metadata)
 		{
 		}
+
+		public Modeller<TView> GetModeller<TView>()
+		{
+			return new Modeller<TView>(this);
+		}
+
+		/// <summary>
+		/// Doesn't actually do anything. Is an extension point for extension methods.
+		/// </summary>
+		/// <typeparam name="TView"></typeparam>
+		public class Modeller<TView>
+		{
+			public TypedModel<T> Model { get; }
+
+			public Modeller(TypedModel<T> model)
+			{
+				Model = model;
+			}
+		}
 	}
 }

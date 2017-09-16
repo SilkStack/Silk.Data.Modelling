@@ -13,6 +13,10 @@
 		/// Gets the model the view is based on.
 		/// </summary>
 		Model Model { get; }
+		/// <summary>
+		/// Gets an array of fields present on the view.
+		/// </summary>
+		IViewField[] Fields { get; }
 	}
 
 	/// <summary>
@@ -24,7 +28,7 @@
 		/// <summary>
 		/// Gets an array of fields present on the view.
 		/// </summary>
-		TField[] Fields { get; }
+		new TField[] Fields { get; }
 	}
 
 	public interface IView<TField, TSource> : IView<TField>

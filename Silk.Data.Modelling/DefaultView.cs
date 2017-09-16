@@ -8,6 +8,7 @@ namespace Silk.Data.Modelling
 		public string Name { get; }
 		public ViewField[] Fields { get; }
 		public Model Model { get; }
+		IViewField[] IView.Fields => Fields;
 
 		public DefaultView(string name, IEnumerable<ViewField> fields,
 			Model model)
