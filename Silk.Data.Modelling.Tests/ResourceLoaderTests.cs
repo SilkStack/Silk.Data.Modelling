@@ -31,6 +31,42 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(viewInstance.Object2Value, modelInstance.Object2.Value);
 		}
 
+		[TestMethod]
+		public async Task ResourceLoaderSupportsEnumerable()
+		{
+			var model = TypeModeller.GetModelOf<Model>();
+			var view = model.GetModeller<View>().CreateTypedView(new SubObjectSupport());
+
+			var viewInstances = new View[]
+			{
+				new View
+				{
+					Object1Value = 10,
+					Object2Value = 50
+				},
+				new View
+				{
+					Object1Value = 10,
+					Object2Value = 50
+				},
+				new View
+				{
+					Object1Value = 15,
+					Object2Value = 25
+				}
+			};
+			SubObjectResourceLoader.RunCount = 0;
+			var modelInstances = await view.MapToModelAsync(viewInstances);
+			Assert.AreEqual(1, SubObjectResourceLoader.RunCount);
+			for (var i = 0; i < modelInstances.Length; i++)
+			{
+				Assert.IsNotNull(modelInstances[i].Object1);
+				Assert.IsNotNull(modelInstances[i].Object2);
+				Assert.AreEqual(viewInstances[i].Object1Value, modelInstances[i].Object1.Value);
+				Assert.AreEqual(viewInstances[i].Object2Value, modelInstances[i].Object2.Value);
+			}
+		}
+
 		private class SubObject
 		{
 			public int Value { get; }
@@ -102,6 +138,8 @@ namespace Silk.Data.Modelling.Tests
 		{
 			private readonly List<string> _fieldNames = new List<string>();
 
+			public static int RunCount { get; set; }
+
 			public void AddField(string fieldName)
 			{
 				_fieldNames.Add(fieldName);
@@ -109,12 +147,18 @@ namespace Silk.Data.Modelling.Tests
 
 			public Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext)
 			{
+				RunCount++;
+				var builtObjects = new List<int>();
 				foreach (var container in containers)
 				{
 					foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
 					{
 						var value = (int)container.GetValue(field);
-						mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
+						if (!builtObjects.Contains(value))
+						{
+							mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
+							builtObjects.Add(value);
+						}
 					}
 				}
 				return Task.CompletedTask;
