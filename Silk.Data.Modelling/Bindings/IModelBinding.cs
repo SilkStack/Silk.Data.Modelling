@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Silk.Data.Modelling.Bindings
 {
@@ -18,7 +17,7 @@ namespace Silk.Data.Modelling.Bindings
 		/// </summary>
 		/// <param name="modelReadWriter"></param>
 		/// <returns></returns>
-		Task<object> ReadFromModelAsync(IModelReadWriter modelReadWriter);
+		object ReadFromModel(IModelReadWriter modelReadWriter);
 
 		/// <summary>
 		/// Writes the given value to the bound model field.
@@ -26,7 +25,7 @@ namespace Silk.Data.Modelling.Bindings
 		/// <param name="modelReadWriter"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		Task WriteToModelAsync(IModelReadWriter modelReadWriter, object value);
+		void WriteToModel(IModelReadWriter modelReadWriter, object value);
 	}
 
 	[Flags]

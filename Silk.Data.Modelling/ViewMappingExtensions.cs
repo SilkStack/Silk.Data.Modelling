@@ -13,10 +13,8 @@ namespace Silk.Data.Modelling
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ModelToView) == BindingDirection.ModelToView)
 				{
-					var value = await viewField.ModelBinding
-						.ReadFromModelAsync(modelReadWriter)
-						.ConfigureAwait(false);
-					viewContainer.SetValue(viewField, value);
+					viewContainer.SetValue(viewField, viewField.ModelBinding
+						.ReadFromModel(modelReadWriter));
 				}
 			}
 		}
@@ -60,9 +58,8 @@ namespace Silk.Data.Modelling
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 				{
-					var value = viewContainer.GetValue(viewField);
-					await viewField.ModelBinding.WriteToModelAsync(modelReadWriter, value)
-						.ConfigureAwait(false);
+					viewField.ModelBinding.WriteToModel(modelReadWriter,
+						viewContainer.GetValue(viewField));
 				}
 			}
 		}

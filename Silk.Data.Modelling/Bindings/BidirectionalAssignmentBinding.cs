@@ -18,7 +18,7 @@ namespace Silk.Data.Modelling.Bindings
 			FieldPath = fieldPath;
 		}
 
-		public Task<object> ReadFromModelAsync(IModelReadWriter modelReadWriter)
+		public object ReadFromModel(IModelReadWriter modelReadWriter)
 		{
 			foreach (var pathComponent in FieldPath)
 			{
@@ -29,10 +29,10 @@ namespace Silk.Data.Modelling.Bindings
 				if (modelReadWriter == null)
 					throw new InvalidOperationException($"Couldn't get field \"{field.Name}\".");
 			}
-			return Task.FromResult(modelReadWriter.Value);
+			return modelReadWriter.Value;
 		}
 
-		public Task WriteToModelAsync(IModelReadWriter modelReadWriter, object value)
+		public void WriteToModel(IModelReadWriter modelReadWriter, object value)
 		{
 			foreach (var pathComponent in FieldPath)
 			{
@@ -44,7 +44,6 @@ namespace Silk.Data.Modelling.Bindings
 					throw new InvalidOperationException($"Couldn't get field \"{field.Name}\".");
 			}
 			modelReadWriter.Value = value;
-			return Task.CompletedTask;
 		}
 	}
 }
