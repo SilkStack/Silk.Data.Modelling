@@ -25,7 +25,7 @@ namespace Silk.Data.Modelling.Bindings
 		/// <param name="modelReadWriter"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		void WriteToModel(IModelReadWriter modelReadWriter, object value);
+		void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext);
 	}
 
 	[Flags]

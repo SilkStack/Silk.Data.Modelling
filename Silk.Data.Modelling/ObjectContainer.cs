@@ -37,7 +37,7 @@ namespace Silk.Data.Modelling
 				throw new InvalidOperationException("Field does not exist on view.");
 			var property = DataType.GetProperty(field.Name);
 			if (property == null)
-				throw new InvalidOperationException("Field cannot be set on view.");
+				throw new InvalidOperationException("Field cannot be got on view.");
 			return property.GetValue(Instance);
 		}
 	}

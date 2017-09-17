@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Silk.Data.Modelling.Bindings
 {
@@ -32,7 +31,7 @@ namespace Silk.Data.Modelling.Bindings
 			return modelReadWriter.Value;
 		}
 
-		public void WriteToModel(IModelReadWriter modelReadWriter, object value)
+		public void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
 		{
 			foreach (var pathComponent in FieldPath)
 			{

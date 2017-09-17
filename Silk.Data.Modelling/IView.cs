@@ -17,6 +17,10 @@
 		/// Gets an array of fields present on the view.
 		/// </summary>
 		IViewField[] Fields { get; }
+		/// <summary>
+		/// Gets an array of resource loaders.
+		/// </summary>
+		IResourceLoader[] ResourceLoaders { get; }
 	}
 
 	/// <summary>

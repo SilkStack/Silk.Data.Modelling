@@ -9,13 +9,15 @@ namespace Silk.Data.Modelling
 		public ViewField[] Fields { get; }
 		public Model Model { get; }
 		IViewField[] IView.Fields => Fields;
+		public IResourceLoader[] ResourceLoaders { get; }
 
 		public DefaultView(string name, IEnumerable<ViewField> fields,
-			Model model)
+			Model model, IEnumerable<IResourceLoader> resourceLoaders)
 		{
 			Name = name;
 			Fields = fields.ToArray();
 			Model = model;
+			ResourceLoaders = resourceLoaders.ToArray();
 		}
 	}
 
@@ -24,8 +26,8 @@ namespace Silk.Data.Modelling
 		public new TypedModel<TSource> Model { get; }
 
 		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
-			TypedModel<TSource> model)
-			: base(name, fields, model)
+			TypedModel<TSource> model, IEnumerable<IResourceLoader> resourceLoaders)
+			: base(name, fields, model, resourceLoaders)
 		{
 			Model = model;
 		}
@@ -34,8 +36,8 @@ namespace Silk.Data.Modelling
 	public class TypedDefaultView<TSource, TView> : TypedDefaultView<TSource>, IView<ViewField, TSource, TView>
 	{
 		public TypedDefaultView(string name, IEnumerable<ViewField> fields,
-			TypedModel<TSource> model)
-			: base(name, fields, model)
+			TypedModel<TSource> model, IEnumerable<IResourceLoader> resourceLoaders)
+			: base(name, fields, model, resourceLoaders)
 		{
 		}
 	}

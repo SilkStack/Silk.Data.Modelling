@@ -69,7 +69,7 @@ namespace Silk.Data.Modelling
 			var viewDefinition = CreateViewDefinition(viewConventions);
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
-				this);
+				this, viewDefinition.ResourceLoaders);
 		}
 
 		public IView<ViewField> CreateView<TView>(params ViewConvention[] viewConventions)
@@ -77,7 +77,7 @@ namespace Silk.Data.Modelling
 			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf<TView>());
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
-				this);
+				this, viewDefinition.ResourceLoaders);
 		}
 
 		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, params ViewConvention[] viewConventions)

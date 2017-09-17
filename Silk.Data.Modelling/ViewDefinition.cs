@@ -19,6 +19,11 @@ namespace Silk.Data.Modelling
 
 		public Model Model { get; }
 
+		/// <summary>
+		/// Gets a collection of resource loaders that will load resources before a mapping operation.
+		/// </summary>
+		public List<IResourceLoader> ResourceLoaders { get; } = new List<IResourceLoader>();
+
 		public ViewDefinition(Model model)
 		{
 			Model = model;

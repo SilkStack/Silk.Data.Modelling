@@ -54,12 +54,19 @@ namespace Silk.Data.Modelling
 			IModelReadWriter modelReadWriter, IContainer viewContainer)
 			where TField : IViewField
 		{
+			var containerArray = new IContainer[] { viewContainer };
+			var mappingContext = new MappingContext();
+			foreach (var resouceLoader in view.ResourceLoaders)
+			{
+				await resouceLoader.LoadResourcesAsync(containerArray, mappingContext)
+					.ConfigureAwait(false);
+			}
 			foreach (var viewField in view.Fields)
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 				{
 					viewField.ModelBinding.WriteToModel(modelReadWriter,
-						viewContainer.GetValue(viewField));
+						viewContainer.GetValue(viewField), mappingContext);
 				}
 			}
 		}
