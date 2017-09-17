@@ -47,6 +47,26 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		[TestMethod]
+		public async Task MapTypedViewToModelObjectInstance()
+		{
+			var view = _genericModel
+				.GetModeller<SimpleMappedClass>()
+				.CreateTypedView();
+			var container = new SimpleMappedClass
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object()
+			};
+			var instance = new SimpleClassWithPublicProperties();
+			await view.MapToModelAsync(instance, container)
+				.ConfigureAwait(false);
+			Assert.AreEqual(container.Integer, instance.Integer);
+			Assert.AreEqual(container.String, instance.String);
+			Assert.ReferenceEquals(container.Object, instance.Object);
+		}
+
+		[TestMethod]
 		public async Task MapTypedViewToModelObject()
 		{
 			var view = _genericModel
@@ -66,23 +86,41 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		[TestMethod]
-		public async Task MapTypedViewToModelObjectInstance()
+		public async Task MapTypedViewToModelObjectArray()
 		{
 			var view = _genericModel
 				.GetModeller<SimpleMappedClass>()
 				.CreateTypedView();
-			var container = new SimpleMappedClass
+			var containers = new SimpleMappedClass[]
 			{
-				Integer = 5,
-				String = "Hello World",
-				Object = new object()
+				new SimpleMappedClass
+				{
+					Integer = 5,
+					String = "Hello World",
+					Object = new object()
+				},
+				new SimpleMappedClass
+				{
+					Integer = 15,
+					String = "Foo",
+					Object = new object()
+				},
+				new SimpleMappedClass
+				{
+					Integer = 25,
+					String = "Bar",
+					Object = new object()
+				}
 			};
-			var instance = new SimpleClassWithPublicProperties();
-			await view.MapToModelAsync(instance, container)
+			var instances = await view.MapToModelAsync(containers)
 				.ConfigureAwait(false);
-			Assert.AreEqual(container.Integer, instance.Integer);
-			Assert.AreEqual(container.String, instance.String);
-			Assert.ReferenceEquals(container.Object, instance.Object);
+			Assert.AreEqual(containers.Length, instances.Length);
+			for (var i = 0; i < containers.Length; i++)
+			{
+				Assert.AreEqual(containers[i].Integer, instances[i].Integer);
+				Assert.AreEqual(containers[i].String, instances[i].String);
+				Assert.ReferenceEquals(containers[i].Object, instances[i].Object);
+			}
 		}
 
 		private class SimpleClassWithPublicProperties
