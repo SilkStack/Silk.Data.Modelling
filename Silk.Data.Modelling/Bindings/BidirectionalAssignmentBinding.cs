@@ -34,7 +34,17 @@ namespace Silk.Data.Modelling.Bindings
 
 		public Task WriteToModelAsync(IModelReadWriter modelReadWriter, object value)
 		{
-			throw new System.NotImplementedException();
+			foreach (var pathComponent in FieldPath)
+			{
+				var field = modelReadWriter.Model.Fields.FirstOrDefault(q => q.Name == pathComponent);
+				if (field == null)
+					throw new InvalidOperationException("Invalid field path.");
+				modelReadWriter = modelReadWriter.GetField(field);
+				if (modelReadWriter == null)
+					throw new InvalidOperationException($"Couldn't get field \"{field.Name}\".");
+			}
+			modelReadWriter.Value = value;
+			return Task.CompletedTask;
 		}
 	}
 }

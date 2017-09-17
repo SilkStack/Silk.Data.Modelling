@@ -21,5 +21,12 @@
 		/// <param name="field"></param>
 		/// <param name="value"></param>
 		void SetValue(IViewField field, object value);
+
+		/// <summary>
+		/// Gets the value of a field.
+		/// </summary>
+		/// <param name="field"></param>
+		/// <returns></returns>
+		object GetValue(IViewField field);
 	}
 }

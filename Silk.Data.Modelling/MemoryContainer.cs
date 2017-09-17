@@ -24,5 +24,11 @@ namespace Silk.Data.Modelling
 		{
 			Data[field.Name] = value;
 		}
+
+		public object GetValue(IViewField field)
+		{
+			Data.TryGetValue(field.Name, out var value);
+			return value;
+		}
 	}
 }

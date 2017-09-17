@@ -29,5 +29,16 @@ namespace Silk.Data.Modelling
 				throw new InvalidOperationException("Field cannot be set on view.");
 			property.SetValue(Instance, value);
 		}
+
+		public object GetValue(IViewField field)
+		{
+			//  todo: replace reflection with cached expressions
+			if (!View.Fields.Contains(field))
+				throw new InvalidOperationException("Field does not exist on view.");
+			var property = DataType.GetProperty(field.Name);
+			if (property == null)
+				throw new InvalidOperationException("Field cannot be set on view.");
+			return property.GetValue(Instance);
+		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Silk.Data.Modelling.Tests
 {
 	[TestClass]
-	public class MappingTests
+	public class ViewMappingTests
 	{
 		private TypedModel<SimpleClassWithPublicProperties> _genericModel = TypeModeller.GetModelOf<SimpleClassWithPublicProperties>();
 		private TypedModel _nonGenericModel => _genericModel;
@@ -19,10 +19,7 @@ namespace Silk.Data.Modelling.Tests
 				String = "Hello World",
 				Object = new object()
 			};
-			var readWriter = new ObjectReadWriter(_nonGenericModel)
-			{
-				Instance = instance
-			};
+			var readWriter = new ObjectReadWriter(_nonGenericModel, instance);
 			var container = new MemoryContainer(_nonGenericModel, view);
 			await view.MapToViewAsync(readWriter, container)
 				.ConfigureAwait(false);

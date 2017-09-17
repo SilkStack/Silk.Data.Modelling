@@ -11,9 +11,9 @@
 		Model Model { get; }
 
 		/// <summary>
-		/// Gets the object the modelreadwriter is reading to and writing from.
+		/// Gets or sets the field's value.
 		/// </summary>
-		object Value { get; }
+		object Value { get; set; }
 
 		/// <summary>
 		/// Gets a modelreadwriter for the provided field.
