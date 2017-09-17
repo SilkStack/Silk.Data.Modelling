@@ -5,12 +5,13 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21DE5656-611D-4CEF-B441-23B40B5D0644}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silk.Data.Modelling", "Silk.Data.Modelling\Silk.Data.Modelling.csproj", "{22304457-E476-42FF-9081-77615A9935F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Silk.Data.Modelling", "Silk.Data.Modelling\Silk.Data.Modelling.csproj", "{22304457-E476-42FF-9081-77615A9935F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silk.Data.Modelling.Tests", "Silk.Data.Modelling.Tests\Silk.Data.Modelling.Tests.csproj", "{4133CE31-B608-41A9-BD84-672A874BE8E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Silk.Data.Modelling.Tests", "Silk.Data.Modelling.Tests\Silk.Data.Modelling.Tests.csproj", "{4133CE31-B608-41A9-BD84-672A874BE8E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
