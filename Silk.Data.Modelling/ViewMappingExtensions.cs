@@ -59,21 +59,22 @@ namespace Silk.Data.Modelling
 		public static async Task MapToViewAsync(this IView view,
 			IEnumerable<IModelReadWriter> modelReadWriters, ICollection<IContainer> viewContainers)
 		{
-			using (var readWriterEnum = modelReadWriters.GetEnumerator())
+			var modelReadWritersArray = modelReadWriters.ToArray();
+			var readWriterEnum = modelReadWritersArray.GetEnumerator();
 			using (var containerEnum = viewContainers.GetEnumerator())
 			{
 				var mappingContext = new MappingContext(BindingDirection.ModelToView);
 
 				foreach (var resouceLoader in view.ResourceLoaders)
 				{
-					await resouceLoader.LoadResourcesAsync(modelReadWriters, mappingContext)
+					await resouceLoader.LoadResourcesAsync(modelReadWritersArray, mappingContext)
 						.ConfigureAwait(false);
 				}
 
 				while (readWriterEnum.MoveNext() &&
 					containerEnum.MoveNext())
 				{
-					var modelReadWriter = readWriterEnum.Current;
+					var modelReadWriter = readWriterEnum.Current as IModelReadWriter;
 					var viewContainer = containerEnum.Current;
 					foreach (var viewField in view.Fields)
 					{
