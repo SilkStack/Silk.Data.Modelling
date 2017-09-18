@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Bindings;
 using Silk.Data.Modelling.Conventions;
+using Silk.Data.Modelling.ResourceLoaders;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -103,7 +104,8 @@ namespace Silk.Data.Modelling.Tests
 				var fieldName = field.Name.Replace("Value", "");
 				var bindField = model.Fields.First(q => q.Name == fieldName);
 
-				viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name, new SubObjectBinding(bindField))
+				viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
+					new SubObjectBinding(new[] { bindField.Name }, new[] { field.Name }))
 				{
 					DataType = field.DataType
 				});
@@ -111,26 +113,20 @@ namespace Silk.Data.Modelling.Tests
 			}
 		}
 
-		private class SubObjectBinding : IModelBinding
+		private class SubObjectBinding : ModelBinding
 		{
-			private readonly TypedModelField _bindField;
+			public override BindingDirection Direction => BindingDirection.ViewToModel;
 
-			public BindingDirection Direction => BindingDirection.ViewToModel;
-
-			public SubObjectBinding(TypedModelField bindField)
+			public SubObjectBinding(string[] modelFieldPath, string[] viewFieldPath)
+				: base(modelFieldPath, viewFieldPath)
 			{
-				_bindField = bindField;
 			}
 
-			public object ReadFromModel(IModelReadWriter modelReadWriter)
+			public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
 			{
-				throw new System.NotSupportedException();
-			}
-
-			public void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
-			{
-				modelReadWriter = modelReadWriter.GetField(_bindField);
-				modelReadWriter.Value = mappingContext.Resources.Retrieve($"subObject:{value}");
+				base.WriteToModel(modelReadWriter,
+					mappingContext.Resources.Retrieve($"subObject:{value}"),
+					mappingContext);
 			}
 		}
 
@@ -162,6 +158,11 @@ namespace Silk.Data.Modelling.Tests
 					}
 				}
 				return Task.CompletedTask;
+			}
+
+			public Task LoadResourcesAsync(IEnumerable<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
+			{
+				throw new System.NotImplementedException();
 			}
 		}
 	}

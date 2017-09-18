@@ -14,7 +14,8 @@ namespace Silk.Data.Modelling
 		{
 			new CopySimpleTypesConvention(),
 			new FlattenSimpleTypesConvention(),
-			new CopyReferencesConvention()
+			new CopyReferencesConvention(),
+			new MapReferenceTypesConvention()
 		};
 
 		/// <summary>
@@ -72,6 +73,14 @@ namespace Silk.Data.Modelling
 				this, viewDefinition.ResourceLoaders);
 		}
 
+		public IView<ViewField> CreateView(Type viewType, params ViewConvention[] viewConventions)
+		{
+			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf(viewType));
+			return new DefaultView(viewDefinition.Name,
+				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
+				this, viewDefinition.ResourceLoaders);
+		}
+
 		public IView<ViewField> CreateView<TView>(params ViewConvention[] viewConventions)
 		{
 			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf<TView>());
@@ -84,6 +93,13 @@ namespace Silk.Data.Modelling
 			where T : IView
 		{
 			var viewDefinition = CreateViewDefinition(viewConventions);
+			return viewBuilder(viewDefinition);
+		}
+
+		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, Type viewType, params ViewConvention[] viewConventions)
+			where T : IView
+		{
+			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf(viewType));
 			return viewBuilder(viewDefinition);
 		}
 

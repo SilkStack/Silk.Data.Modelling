@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Conventions
 			//  todo: decide how I want to honor CanRead and CanWrite
 			viewDefinition.FieldDefinitions.Add(
 				new ViewFieldDefinition(field.Name,
-					new BidirectionalAssignmentBinding(field.Name))
+					new BidirectionalAssignmentBinding(new[] { bindField.Name }, new[] { field.Name }))
 				{
 					DataType = field.DataType
 				});

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Silk.Data.Modelling
 {
@@ -8,15 +9,34 @@ namespace Silk.Data.Modelling
 	public class ResourceObjectCollection
 	{
 		private readonly Dictionary<string, object> _resourceObjects = new Dictionary<string, object>();
+		private readonly ConditionalWeakTable<object, Dictionary<string, object>> _objectResourceObjects = new ConditionalWeakTable<object, Dictionary<string, object>>();
 
 		public void Store(string key, object value)
 		{
 			_resourceObjects[key] = value;
 		}
 
+		public void Store(object forObject, string key, object value)
+		{
+			if (!_objectResourceObjects.TryGetValue(forObject, out var resourceObjects))
+			{
+				resourceObjects = new Dictionary<string, object>();
+				_objectResourceObjects.Add(forObject, resourceObjects);
+			}
+			resourceObjects[key] = value;
+		}
+
 		public object Retrieve(string key)
 		{
 			_resourceObjects.TryGetValue(key, out var value);
+			return value;
+		}
+
+		public object Retrieve(object forObject, string key)
+		{
+			if (!_objectResourceObjects.TryGetValue(forObject, out var resourceObjects))
+				return null;
+			resourceObjects.TryGetValue(key, out var value);
 			return value;
 		}
 	}

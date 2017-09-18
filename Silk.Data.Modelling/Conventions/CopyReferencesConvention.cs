@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Conventions
 			if (bindField.DataType == field.DataType)
 			{
 				viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-					new BidirectionalAssignmentBinding(field.Name))
+					new BidirectionalAssignmentBinding(new[] { bindField.Name }, new[] { field.Name }))
 				{
 					DataType = field.DataType
 				});

@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling
+﻿using Silk.Data.Modelling.ResourceLoaders;
+
+namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Represents a view of a data structure, derived from a Model.

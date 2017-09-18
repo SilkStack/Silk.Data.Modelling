@@ -15,10 +15,10 @@ namespace Silk.Data.Modelling
 
 		public object[] Metadata { get; }
 
-		public IModelBinding ModelBinding { get; }
+		public ModelBinding ModelBinding { get; }
 
 		public ViewField(string name, Type dataType, IEnumerable<object> metadata,
-			IModelBinding binding)
+			ModelBinding binding)
 		{
 			Name = name;
 			DataType = dataType;

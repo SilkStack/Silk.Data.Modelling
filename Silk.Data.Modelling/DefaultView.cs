@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Silk.Data.Modelling.ResourceLoaders;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Silk.Data.Modelling

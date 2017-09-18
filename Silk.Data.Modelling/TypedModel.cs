@@ -7,7 +7,7 @@ namespace Silk.Data.Modelling
 	/// <summary>
 	/// Represents the data structure of a CLR type.
 	/// </summary>
-	public class TypedModel : Model
+	public abstract class TypedModel : Model
 	{
 		public Type DataType { get; }
 

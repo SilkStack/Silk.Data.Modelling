@@ -1,4 +1,5 @@
 ﻿using Silk.Data.Modelling.Conventions;
+using System;
 
 namespace Silk.Data.Modelling
 {
@@ -12,6 +13,14 @@ namespace Silk.Data.Modelling
 			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
 					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
 				viewConventions);
+		}
+
+		public static TypedDefaultView<TSource> CreateTypedView<TSource>(this TypedModel<TSource> model,
+			Type viewType, params ViewConvention[] viewConventions)
+		{
+			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
+					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
+				viewType, viewConventions);
 		}
 
 		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView>(this TypedModel<TSource> model,

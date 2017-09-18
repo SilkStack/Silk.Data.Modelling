@@ -26,6 +26,6 @@ namespace Silk.Data.Modelling
 		/// <summary>
 		/// Gets the binding for the view field.
 		/// </summary>
-		IModelBinding ModelBinding { get; }
+		ModelBinding ModelBinding { get; }
 	}
 }
