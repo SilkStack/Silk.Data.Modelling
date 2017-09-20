@@ -149,7 +149,7 @@ namespace Silk.Data.Modelling.Tests
 				{
 					foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
 					{
-						var value = (int)container.GetValue(field);
+						var value = (int)container.GetValue(new string[] { field.Name });
 						if (!builtObjects.Contains(value))
 						{
 							mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));

@@ -75,6 +75,31 @@ namespace Silk.Data.Modelling.Tests
 			}
 		}
 
+		[TestMethod]
+		public async Task MapSubViewToSubModel()
+		{
+			var model = TypeModeller.GetModelOf<Model>();
+			var view = model.GetModeller<View>().CreateTypedView(new MapReferenceTypesConvention());
+			var viewInstance = new View
+			{
+				Item1 = new SubView
+				{
+					Value = 5
+				},
+				Item2 = new SubView
+				{
+					Value = 10
+				}
+			};
+			var modelInstance = await view.MapToModelAsync(viewInstance)
+				.ConfigureAwait(false);
+			Assert.IsNotNull(modelInstance);
+			Assert.IsNotNull(modelInstance.Item1);
+			Assert.IsNotNull(modelInstance.Item2);
+			Assert.AreEqual(viewInstance.Item1.Value, modelInstance.Item1.Value);
+			Assert.AreEqual(viewInstance.Item2.Value, modelInstance.Item2.Value);
+		}
+
 		private class Model
 		{
 			public SubModel Item1 { get; set; }

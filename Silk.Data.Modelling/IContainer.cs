@@ -20,13 +20,13 @@
 		/// </summary>
 		/// <param name="field"></param>
 		/// <param name="value"></param>
-		void SetValue(IViewField field, object value);
+		void SetValue(string[] fieldPath, object value);
 
 		/// <summary>
 		/// Gets the value of a field.
 		/// </summary>
 		/// <param name="field"></param>
 		/// <returns></returns>
-		object GetValue(IViewField field);
+		object GetValue(string[] fieldPath);
 	}
 }

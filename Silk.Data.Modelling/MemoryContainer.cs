@@ -20,14 +20,14 @@ namespace Silk.Data.Modelling
 			View = view;
 		}
 
-		public void SetValue(IViewField field, object value)
+		public void SetValue(string[] fieldPath, object value)
 		{
-			Data[field.Name] = value;
+			Data[string.Join(".", fieldPath)] = value;
 		}
 
-		public object GetValue(IViewField field)
+		public object GetValue(string[] fieldPath)
 		{
-			Data.TryGetValue(field.Name, out var value);
+			Data.TryGetValue(string.Join(".", fieldPath), out var value);
 			return value;
 		}
 	}

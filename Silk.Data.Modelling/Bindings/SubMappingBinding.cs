@@ -2,7 +2,7 @@
 {
 	public class SubMappingBinding : ModelBinding
 	{
-		public override BindingDirection Direction => BindingDirection.ModelToView;
+		public override BindingDirection Direction => BindingDirection.Bidirectional;
 
 		public SubMappingBinding(string[] modelFieldPath, string[] viewFieldPath)
 			: base(modelFieldPath, viewFieldPath)
@@ -14,11 +14,9 @@
 			return mappingContext.Resources.Retrieve(modelReadWriter, $"subMapped:{string.Join(".", ModelFieldPath)}");
 		}
 
-		public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
+		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
 		{
-			//base.WriteToModel(modelReadWriter,
-			//	mappingContext.Resources.Retrieve($"subMapping:{string.Join(".", ModelFieldPath)}"),
-			//	mappingContext);
+			return mappingContext.Resources.Retrieve(container, $"subMapped:{string.Join(".", ModelFieldPath)}");
 		}
 	}
 }

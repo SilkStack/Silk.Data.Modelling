@@ -29,6 +29,16 @@ namespace Silk.Data.Modelling.Bindings
 			ViewFieldPath = viewFieldPath;
 		}
 
+		public virtual void WriteToContainer(IContainer container, object value, MappingContext mappingContext)
+		{
+			container.SetValue(ViewFieldPath, value);
+		}
+
+		public virtual object ReadFromContainer(IContainer container, MappingContext mappingContext)
+		{
+			return container.GetValue(ViewFieldPath);
+		}
+
 		/// <summary>
 		/// Reads the binding value from the provided modelreadwriter.
 		/// </summary>

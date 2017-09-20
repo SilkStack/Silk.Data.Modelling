@@ -20,8 +20,9 @@ namespace Silk.Data.Modelling
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ModelToView) == BindingDirection.ModelToView)
 				{
-					viewContainer.SetValue(viewField, viewField.ModelBinding
-						.ReadFromModel(modelReadWriter, mappingContext));
+					viewField.ModelBinding.WriteToContainer(viewContainer,
+						viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext),
+						mappingContext);
 				}
 			}
 		}
@@ -80,8 +81,9 @@ namespace Silk.Data.Modelling
 					{
 						if ((viewField.ModelBinding.Direction & BindingDirection.ModelToView) == BindingDirection.ModelToView)
 						{
-							viewContainer.SetValue(viewField, viewField.ModelBinding
-								.ReadFromModel(modelReadWriter, mappingContext));
+							viewField.ModelBinding.WriteToContainer(viewContainer,
+								viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext),
+								mappingContext);
 						}
 					}
 				}
@@ -132,7 +134,8 @@ namespace Silk.Data.Modelling
 				if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 				{
 					viewField.ModelBinding.WriteToModel(modelReadWriter,
-						viewContainer.GetValue(viewField), mappingContext);
+						viewField.ModelBinding.ReadFromContainer(viewContainer, mappingContext),
+						mappingContext);
 				}
 			}
 		}
@@ -188,7 +191,8 @@ namespace Silk.Data.Modelling
 						if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 						{
 							viewField.ModelBinding.WriteToModel(readWriterEnum.Current,
-								containerEnum.Current.GetValue(viewField), mappingContext);
+								viewField.ModelBinding.ReadFromContainer(containerEnum.Current, mappingContext),
+								mappingContext);
 						}
 					}
 				}

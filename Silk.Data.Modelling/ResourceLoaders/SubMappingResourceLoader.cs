@@ -41,9 +41,38 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			_mappings.Add(new Mapping(model, view, viewType));
 		}
 
-		public Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext)
+		public async Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext)
 		{
-			throw new System.NotImplementedException();
+			//  convert to an array to prevent multiple enumerations
+			var containerArray = containers.ToArray();
+			foreach (var mapping in _mappings)
+			{
+				var mappedResourceList = new List<MappedResource>();
+				foreach (var mappingField in mapping.MappingFields)
+				{
+					var modelField = _parentModel.Fields
+						.First(q => q.Name == mappingField.ModelFieldName);
+					foreach (var container in containerArray)
+					{
+						var subContainer = mapping.CreateViewContainer(container.GetValue(new[] { mappingField.ViewFieldName }));
+						var readWriterTuple = mapping.CreateModelReaderAndInstance();
+						mappedResourceList.Add(new MappedResource(container, readWriterTuple.readWriter,
+							subContainer, mappingField, readWriterTuple.instance
+							));
+					}
+				}
+				await mapping.View
+					.MapToModelAsync(mappedResourceList.Select(q => q.ModelReadWriter),
+						mappedResourceList.Select(q => q.ViewContainer).ToArray())
+					.ConfigureAwait(false);
+				foreach (var mappedResource in mappedResourceList)
+				{
+					mappingContext.Resources.Store(
+						mappedResource.StoreForObject,
+						$"subMapped:{mappedResource.MappingField.ModelFieldName}",
+						mappedResource.MappingResult);
+				}
+			}
 		}
 
 		public async Task LoadResourcesAsync(IEnumerable<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
@@ -59,7 +88,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 						.First(q => q.Name == mappingField.ModelFieldName);
 					foreach (var modelReaderWriter in modelReadWriterArray)
 					{
-						var containerTuple = mapping.CreateViewContainers();
+						var containerTuple = mapping.CreateViewContainerAndInstance();
 						var readWriter = mapping.CreateModelReader();
 						readWriter.Value = modelReaderWriter.GetField(modelField).Value;
 						mappedResourceList.Add(new MappedResource(
@@ -75,7 +104,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 				foreach (var mappedResource in mappedResourceList)
 				{
 					mappingContext.Resources.Store(
-						mappedResource.ParentReadWriter,
+						mappedResource.StoreForObject,
 						$"subMapped:{mappedResource.MappingField.ModelFieldName}",
 						mappedResource.MappingResult);
 				}
@@ -84,17 +113,17 @@ namespace Silk.Data.Modelling.ResourceLoaders
 
 		private class MappedResource
 		{
-			public IModelReadWriter ParentReadWriter { get; }
+			public object StoreForObject { get; }
 			public IModelReadWriter ModelReadWriter { get; }
 			public IContainer ViewContainer { get; }
 			public MappingField MappingField { get; }
 			public object MappingResult { get; }
 
-			public MappedResource(IModelReadWriter parentReadWriter,
+			public MappedResource(object storeForObject,
 				IModelReadWriter modelReadWriter, IContainer viewContainer,
 				MappingField mappingField, object mappingResult)
 			{
-				ParentReadWriter = parentReadWriter;
+				StoreForObject = storeForObject;
 				ModelReadWriter = modelReadWriter;
 				ViewContainer = viewContainer;
 				MappingField = mappingField;
@@ -111,7 +140,9 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			public Func<object> ViewFactory { get; }
 			public Func<object> ModelFactory { get; }
 			public Func<IModelReadWriter> CreateModelReader { get; }
-			public Func<(IContainer container,object instance)> CreateViewContainers { get; }
+			public Func<object, IContainer> CreateViewContainer { get; }
+			public Func<(IContainer container,object instance)> CreateViewContainerAndInstance { get; }
+			public Func<(IModelReadWriter readWriter, object instance)> CreateModelReaderAndInstance { get; }
 			public List<MappingField> MappingFields { get; } = new List<MappingField>();
 
 			public Mapping(TypedModel model, IView view, Type viewType)
@@ -127,13 +158,25 @@ namespace Silk.Data.Modelling.ResourceLoaders
 				//  todo: replace reflection with cached expressions
 				var containerType = typeof(ObjectContainer<>).MakeGenericType(ViewType);
 				var instanceProperty = containerType.GetProperty("Instance");
-				CreateViewContainers = () =>
+				CreateViewContainer = obj =>
+				{
+					var container = Activator.CreateInstance(containerType, new object[] { Model, View }) as IContainer;
+					instanceProperty.SetValue(container, obj);
+					return container;
+				};
+				CreateViewContainerAndInstance = () =>
 				{
 					var container = Activator.CreateInstance(containerType, new object[] { Model, View }) as IContainer;
 					var instance = ViewFactory();
 					instanceProperty.SetValue(container, instance);
 
 					return (container, instance);
+				};
+				CreateModelReaderAndInstance = () =>
+				{
+					var modelInstance = ModelFactory();
+					var modelReader = new ObjectReadWriter(Model, modelInstance);
+					return (modelReader, modelInstance);
 				};
 			}
 
