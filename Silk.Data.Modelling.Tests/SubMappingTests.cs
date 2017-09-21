@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapSubModelToSubView()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new MapReferenceTypesConvention());
+			var view = model.GetModeller<View>().CreateTypedView();
 			var modelInstance = new Model
 			{
 				Item1 = new SubModel
@@ -36,7 +36,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapSubModelToSubViewArray()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new MapReferenceTypesConvention());
+			var view = model.GetModeller<View>().CreateTypedView();
 			var modelInstances = new Model[]
 			{
 				new Model
@@ -79,7 +79,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapSubViewToSubModel()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new MapReferenceTypesConvention());
+			var view = model.GetModeller<View>().CreateTypedView();
 			var viewInstance = new View
 			{
 				Item1 = new SubView
@@ -104,7 +104,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapSubViewToSubModelArray()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new MapReferenceTypesConvention());
+			var view = model.GetModeller<View>().CreateTypedView();
 			var viewInstances = new View[]
 			{
 				new View

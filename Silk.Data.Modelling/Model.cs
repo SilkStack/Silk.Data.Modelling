@@ -49,7 +49,7 @@ namespace Silk.Data.Modelling
 
 			if (viewConventions == null || viewConventions.Length == 0)
 				viewConventions = _defaultConventions;
-			var viewDefinition = new ViewDefinition(this);
+			var viewDefinition = new ViewDefinition(this, viewConventions);
 			foreach (var field in targetModel.Fields)
 			{
 				foreach (var viewConvention in viewConventions)

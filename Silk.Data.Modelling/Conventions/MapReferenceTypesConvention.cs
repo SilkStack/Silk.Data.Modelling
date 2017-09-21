@@ -23,8 +23,8 @@ namespace Silk.Data.Modelling.Conventions
 					var subMapper = GetSubMapper(viewDefinition);
 					if (!subMapper.HasMapping(bindField.DataType, field.DataType))
 					{
-						//  todo: use the same view conventions as the the caller to build sub-views
-						subMapper.AddMapping(bindField.DataTypeModel, field.DataType);
+						subMapper.AddMapping(bindField.DataTypeModel, field.DataType,
+							viewDefinition.ViewConventions);
 					}
 					subMapper.AddMappedField(bindField.Name, field.Name, bindField.DataType, field.DataType);
 					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,

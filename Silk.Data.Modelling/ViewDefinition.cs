@@ -1,4 +1,5 @@
-﻿using Silk.Data.Modelling.ResourceLoaders;
+﻿using Silk.Data.Modelling.Conventions;
+using Silk.Data.Modelling.ResourceLoaders;
 using System.Collections.Generic;
 
 namespace Silk.Data.Modelling
@@ -21,14 +22,20 @@ namespace Silk.Data.Modelling
 		public Model Model { get; }
 
 		/// <summary>
+		/// Gets the view conventions being used to build the view definition.
+		/// </summary>
+		public ViewConvention[] ViewConventions { get; }
+
+		/// <summary>
 		/// Gets a collection of resource loaders that will load resources before a mapping operation.
 		/// </summary>
 		public List<IResourceLoader> ResourceLoaders { get; } = new List<IResourceLoader>();
 
-		public ViewDefinition(Model model)
+		public ViewDefinition(Model model, ViewConvention[] viewConventions)
 		{
 			Model = model;
 			Name = model.Name;
+			ViewConventions = viewConventions;
 		}
 	}
 }
