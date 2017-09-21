@@ -16,10 +16,18 @@ namespace Silk.Data.Modelling.Conventions
 			var bindField = model.Fields.FirstOrDefault(q => q.Name == field.Name && q.DataType == field.DataType);
 			if (bindField == null)
 				return;
-			//  todo: decide how I want to honor CanRead and CanWrite
+
+			var bindingDirection = BindingDirection.None;
+			if (field.CanWrite && bindField.CanRead)
+				bindingDirection |= BindingDirection.ModelToView;
+			if (field.CanRead && bindField.CanWrite)
+				bindingDirection |= BindingDirection.ViewToModel;
+			if (bindingDirection == BindingDirection.None)
+				return;
+
 			viewDefinition.FieldDefinitions.Add(
 				new ViewFieldDefinition(field.Name,
-					new BidirectionalAssignmentBinding(new[] { bindField.Name }, new[] { field.Name }))
+					new AssignmentBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name }))
 				{
 					DataType = field.DataType
 				});

@@ -18,9 +18,17 @@ namespace Silk.Data.Modelling.Conventions
 				var sourceField = ConventionHelpers.GetField(path, model);
 				if (sourceField != null && sourceField.DataType == field.DataType)
 				{
+					var bindingDirection = BindingDirection.None;
+					if (field.CanWrite && sourceField.CanRead)
+						bindingDirection |= BindingDirection.ModelToView;
+					if (field.CanRead && sourceField.CanWrite)
+						bindingDirection |= BindingDirection.ViewToModel;
+					if (bindingDirection == BindingDirection.None)
+						continue;
+
 					viewDefinition.FieldDefinitions.Add(
 						new ViewFieldDefinition(field.Name,
-						new BidirectionalAssignmentBinding(new[] { sourceField.Name }, path))
+						new AssignmentBinding(bindingDirection, new[] { sourceField.Name }, path))
 						{
 							DataType = field.DataType
 						});

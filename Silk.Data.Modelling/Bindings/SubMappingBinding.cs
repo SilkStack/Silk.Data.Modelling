@@ -2,11 +2,12 @@
 {
 	public class SubMappingBinding : ModelBinding
 	{
-		public override BindingDirection Direction => BindingDirection.Bidirectional;
+		public override BindingDirection Direction { get; }
 
-		public SubMappingBinding(string[] modelFieldPath, string[] viewFieldPath)
+		public SubMappingBinding(BindingDirection bindingDirection, string[] modelFieldPath, string[] viewFieldPath)
 			: base(modelFieldPath, viewFieldPath)
 		{
+			Direction = bindingDirection;
 		}
 
 		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)

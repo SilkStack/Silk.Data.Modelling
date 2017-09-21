@@ -20,6 +20,14 @@ namespace Silk.Data.Modelling.Conventions
 				var bindField = ConventionHelpers.GetField(path, model);
 				if (bindField != null && !bindField.DataType.IsValueType)
 				{
+					var bindingDirection = BindingDirection.None;
+					if (field.CanWrite && bindField.CanRead)
+						bindingDirection |= BindingDirection.ModelToView;
+					if (field.CanRead && bindField.CanWrite)
+						bindingDirection |= BindingDirection.ViewToModel;
+					if (bindingDirection == BindingDirection.None)
+						continue;
+
 					var subMapper = GetSubMapper(viewDefinition);
 					if (!subMapper.HasMapping(bindField.DataType, field.DataType))
 					{
@@ -28,7 +36,7 @@ namespace Silk.Data.Modelling.Conventions
 					}
 					subMapper.AddMappedField(bindField.Name, field.Name, bindField.DataType, field.DataType);
 					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-						new SubMappingBinding(new[] { bindField.Name }, new[] { field.Name }))
+						new SubMappingBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name }))
 					{
 						DataType = field.DataType
 					});
