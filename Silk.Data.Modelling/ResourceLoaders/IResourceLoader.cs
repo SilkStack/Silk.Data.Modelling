@@ -12,12 +12,12 @@ namespace Silk.Data.Modelling.ResourceLoaders
 		/// Load all resources from a set of views into the provided mapping context.
 		/// </summary>
 		/// <returns></returns>
-		Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext);
+		Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext);
 
 		/// <summary>
 		/// Load all resources from a set of models into the provided mapping context.
 		/// </summary>
 		/// <returns></returns>
-		Task LoadResourcesAsync(IEnumerable<IModelReadWriter> modelReadWriters, MappingContext mappingContext);
+		Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext);
 	}
 }

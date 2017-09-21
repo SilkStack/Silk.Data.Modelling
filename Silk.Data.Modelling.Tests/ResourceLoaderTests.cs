@@ -141,7 +141,7 @@ namespace Silk.Data.Modelling.Tests
 				_fieldNames.Add(fieldName);
 			}
 
-			public Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext)
+			public Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
 			{
 				RunCount++;
 				var builtObjects = new List<int>();
@@ -160,7 +160,7 @@ namespace Silk.Data.Modelling.Tests
 				return Task.CompletedTask;
 			}
 
-			public Task LoadResourcesAsync(IEnumerable<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
+			public Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
 			{
 				throw new System.NotImplementedException();
 			}

@@ -41,10 +41,8 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			_mappings.Add(new Mapping(model, view, viewType));
 		}
 
-		public async Task LoadResourcesAsync(IEnumerable<IContainer> containers, MappingContext mappingContext)
+		public async Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
 		{
-			//  convert to an array to prevent multiple enumerations
-			var containerArray = containers.ToArray();
 			foreach (var mapping in _mappings)
 			{
 				var mappedResourceList = new List<MappedResource>();
@@ -52,7 +50,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 				{
 					var modelField = _parentModel.Fields
 						.First(q => q.Name == mappingField.ModelFieldName);
-					foreach (var container in containerArray)
+					foreach (var container in containers)
 					{
 						var subContainer = mapping.CreateViewContainer(container.GetValue(new[] { mappingField.ViewFieldName }));
 						var readWriterTuple = mapping.CreateModelReaderAndInstance();
@@ -62,7 +60,8 @@ namespace Silk.Data.Modelling.ResourceLoaders
 					}
 				}
 				await mapping.View
-					.MapToModelAsync(mappedResourceList.Select(q => q.ModelReadWriter),
+					.MapToModelAsync(
+						mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
 						mappedResourceList.Select(q => q.ViewContainer).ToArray())
 					.ConfigureAwait(false);
 				foreach (var mappedResource in mappedResourceList)
@@ -75,10 +74,8 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			}
 		}
 
-		public async Task LoadResourcesAsync(IEnumerable<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
+		public async Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
 		{
-			//  convert to an array to prevent multiple enumerations
-			var modelReadWriterArray = modelReadWriters.ToArray();
 			foreach (var mapping in _mappings)
 			{
 				var mappedResourceList = new List<MappedResource>();
@@ -86,7 +83,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 				{
 					var modelField = _parentModel.Fields
 						.First(q => q.Name == mappingField.ModelFieldName);
-					foreach (var modelReaderWriter in modelReadWriterArray)
+					foreach (var modelReaderWriter in modelReadWriters)
 					{
 						var containerTuple = mapping.CreateViewContainerAndInstance();
 						var readWriter = mapping.CreateModelReader();
@@ -98,7 +95,8 @@ namespace Silk.Data.Modelling.ResourceLoaders
 					}
 				}
 				await mapping.View
-					.MapToViewAsync(mappedResourceList.Select(q => q.ModelReadWriter),
+					.MapToViewAsync(
+						mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
 						mappedResourceList.Select(q => q.ViewContainer).ToArray())
 					.ConfigureAwait(false);
 				foreach (var mappedResource in mappedResourceList)

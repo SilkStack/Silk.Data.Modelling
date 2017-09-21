@@ -58,24 +58,23 @@ namespace Silk.Data.Modelling
 		}
 
 		public static async Task MapToViewAsync(this IView view,
-			IEnumerable<IModelReadWriter> modelReadWriters, ICollection<IContainer> viewContainers)
+			ICollection<IModelReadWriter> modelReadWriters, ICollection<IContainer> viewContainers)
 		{
-			var modelReadWritersArray = modelReadWriters.ToArray();
-			var readWriterEnum = modelReadWritersArray.GetEnumerator();
+			using (var readWriterEnum = modelReadWriters.GetEnumerator())
 			using (var containerEnum = viewContainers.GetEnumerator())
 			{
 				var mappingContext = new MappingContext(BindingDirection.ModelToView);
 
 				foreach (var resouceLoader in view.ResourceLoaders)
 				{
-					await resouceLoader.LoadResourcesAsync(modelReadWritersArray, mappingContext)
+					await resouceLoader.LoadResourcesAsync(modelReadWriters, mappingContext)
 						.ConfigureAwait(false);
 				}
 
 				while (readWriterEnum.MoveNext() &&
 					containerEnum.MoveNext())
 				{
-					var modelReadWriter = readWriterEnum.Current as IModelReadWriter;
+					var modelReadWriter = readWriterEnum.Current;
 					var viewContainer = containerEnum.Current;
 					foreach (var viewField in view.Fields)
 					{
@@ -94,14 +93,17 @@ namespace Silk.Data.Modelling
 			IEnumerable<TSource> objs, ICollection<IContainer> viewContainers)
 			where TField : IViewField
 		{
-			return view.MapToViewAsync(objs.Select(q => new ObjectReadWriter(view.Model, q)), viewContainers);
+			return view.MapToViewAsync(
+				objs.Select(q => new ObjectReadWriter(view.Model, q)).ToArray(),
+				viewContainers);
 		}
 
 		public static Task MapToViewAsync<TField, TSource, TView>(this IView<TField, TSource, TView> view,
 			IEnumerable<TSource> sourceObjs, IEnumerable<TView> viewObjs)
 			where TField : IViewField
 		{
-			return view.MapToViewAsync(sourceObjs.Select(q => new ObjectReadWriter(view.Model, q)),
+			return view.MapToViewAsync(
+				sourceObjs.Select(q => new ObjectReadWriter(view.Model, q)).ToArray(),
 				viewObjs.Select(q => new ObjectContainer<TView>(view.Model, view) { Instance = q }).ToArray());
 		}
 
@@ -172,7 +174,7 @@ namespace Silk.Data.Modelling
 		}
 
 		public static async Task MapToModelAsync(this IView view,
-			IEnumerable<IModelReadWriter> modelReadWriters, ICollection<IContainer> viewContainers)
+			ICollection<IModelReadWriter> modelReadWriters, ICollection<IContainer> viewContainers)
 		{
 			var mappingContext = new MappingContext(BindingDirection.ViewToModel);
 			foreach (var resouceLoader in view.ResourceLoaders)
@@ -203,7 +205,9 @@ namespace Silk.Data.Modelling
 			IEnumerable<TSource> objs, ICollection<IContainer> viewContainers)
 			where TField : IViewField
 		{
-			return view.MapToModelAsync(objs.Select(q => new ObjectReadWriter(view.Model, q)), viewContainers);
+			return view.MapToModelAsync(
+				objs.Select(q => new ObjectReadWriter(view.Model, q)).ToArray(),
+				viewContainers);
 		}
 
 		public static Task MapToModelAsync<TField, TSource, TView>(this IView<TField, TSource, TView> view,
@@ -211,7 +215,7 @@ namespace Silk.Data.Modelling
 			where TField : IViewField
 		{
 			return view.MapToModelAsync(
-				sourceObjs.Select(q => new ObjectReadWriter(view.Model, q)),
+				sourceObjs.Select(q => new ObjectReadWriter(view.Model, q)).ToArray(),
 				viewObjs.Select(q => new ObjectContainer<TView>(view.Model, view) { Instance = q }).ToArray()
 				);
 		}
