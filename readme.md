@@ -1,18 +1,18 @@
-# Silk.DataModelling
+# Silk.Data.Modelling
 
 ## Overview
 
-Silk.DataModelling is a library for modelling data structures for .NET.
+Silk.Data.Modelling is a library for modelling data structures for .NET.
 
-Using Silk.DataModelling will allow you to use conventions to translate data between different problem domains such as ORM mapping, wire formats or cache servers.
+Using Silk.Data.Modelling will allow you to use conventions to translate data between different problem domains such as ORM mapping, wire formats or cache servers.
 
 ### Platforms
 
-Silk.DataModelling supports netstandard2.0.
+Silk.Data.Modelling supports netstandard2.0.
 
 ### Mapping
 
-Silk.DataModelling provides an extensible API for mapping data between domains, that is, from models to views and back again.
+Silk.Data.Modelling provides an extensible API for mapping data between domains, that is, from models to views and back again.
 
 Library authors are able to provide their own mapping conventions, data sources and even translate data as it's mapped - with full async support!
 
@@ -38,6 +38,11 @@ These can be .NET CLR types, database record rows, JSON objects or anything else
 
 ## Transformations
 
+## Upcoming Features
+
+* Sub-mapping on enumerable fields
+* Support for flattened enumerable fields
+
 ## License
 
-Silk.DataModelling is licensed under the MIT license.
+Silk.Data.Modelling is licensed under the MIT license.
