@@ -21,8 +21,6 @@ namespace Silk.Data.Modelling.Conventions
 					var bindingDirection = BindingDirection.None;
 					if (field.CanWrite && sourceField.CanRead)
 						bindingDirection |= BindingDirection.ModelToView;
-					if (field.CanRead && sourceField.CanWrite)
-						bindingDirection |= BindingDirection.ViewToModel;
 					if (bindingDirection == BindingDirection.None)
 						continue;
 
