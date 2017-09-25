@@ -43,7 +43,7 @@ namespace Silk.Data.Modelling.Tests
 			var model = TypeModeller.GetModelOf<ComplexTypePoco>();
 			var view = model.CreateView<FlattenedPoco>(new FlattenSimpleTypesConvention());
 			Assert.IsNotNull(view);
-			Assert.AreEqual(model.Name, view.Name);
+			Assert.AreEqual(nameof(FlattenedPoco), view.Name);
 			Assert.AreEqual(28, view.Fields.Length);
 		}
 

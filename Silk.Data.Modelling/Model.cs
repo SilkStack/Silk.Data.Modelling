@@ -17,6 +17,7 @@ namespace Silk.Data.Modelling
 			new CopyReferencesConvention(),
 			new MapReferenceTypesConvention()
 		};
+		private static EnumerableConversionsConvention _bindEnumerableConversions = new EnumerableConversionsConvention();
 
 		/// <summary>
 		/// Gets the name of the model.
@@ -42,6 +43,20 @@ namespace Silk.Data.Modelling
 				field.ParentModel = this;
 		}
 
+		public TypedModelField GetField(string[] path)
+		{
+			var currentModel = this;
+			TypedModelField result = null;
+			foreach (var pathSegment in path)
+			{
+				result = currentModel.Fields.FirstOrDefault(q => q.Name == pathSegment);
+				if (result == null)
+					return null;
+				currentModel = result.DataTypeModel;
+			}
+			return result;
+		}
+
 		protected virtual ViewDefinition CreateViewDefinition(ViewConvention[] viewConventions, Model targetModel = null)
 		{
 			if (targetModel == null)
@@ -49,7 +64,7 @@ namespace Silk.Data.Modelling
 
 			if (viewConventions == null || viewConventions.Length == 0)
 				viewConventions = _defaultConventions;
-			var viewDefinition = new ViewDefinition(this, viewConventions);
+			var viewDefinition = new ViewDefinition(this, targetModel, viewConventions);
 			foreach (var field in targetModel.Fields)
 			{
 				foreach (var viewConvention in viewConventions)
@@ -57,6 +72,7 @@ namespace Silk.Data.Modelling
 					viewConvention.MakeModelFields(this, field, viewDefinition);
 				}
 			}
+			_bindEnumerableConversions.FinalizeModel(viewDefinition);
 			foreach (var viewConvention in viewConventions)
 			{
 				viewConvention.FinalizeModel(viewDefinition);

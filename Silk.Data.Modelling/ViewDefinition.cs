@@ -19,7 +19,9 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		public List<ViewFieldDefinition> FieldDefinitions { get; } = new List<ViewFieldDefinition>();
 
-		public Model Model { get; }
+		public Model SourceModel { get; }
+
+		public Model TargetModel { get; }
 
 		/// <summary>
 		/// Gets the view conventions being used to build the view definition.
@@ -31,10 +33,11 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		public List<IResourceLoader> ResourceLoaders { get; } = new List<IResourceLoader>();
 
-		public ViewDefinition(Model model, ViewConvention[] viewConventions)
+		public ViewDefinition(Model sourceModel, Model targetModel, ViewConvention[] viewConventions)
 		{
-			Model = model;
-			Name = model.Name;
+			SourceModel = sourceModel;
+			TargetModel = targetModel;
+			Name = targetModel.Name;
 			ViewConventions = viewConventions;
 		}
 	}

@@ -38,7 +38,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var view = _model.CreateTypedView<SourceModel, ViewModel>();
 			Assert.IsNotNull(view);
-			Assert.AreEqual(_model.Name, view.Name);
+			Assert.AreEqual(nameof(ViewModel), view.Name);
 			Assert.AreEqual(1, view.Fields.Length);
 
 			var idField = view.Fields[0];

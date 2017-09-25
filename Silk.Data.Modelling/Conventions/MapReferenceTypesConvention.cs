@@ -52,7 +52,7 @@ namespace Silk.Data.Modelling.Conventions
 				.FirstOrDefault();
 			if (subMapper == null)
 			{
-				subMapper = new SubMappingResourceLoader(viewDefinition.Model);
+				subMapper = new SubMappingResourceLoader(viewDefinition.SourceModel);
 				viewDefinition.ResourceLoaders.Add(subMapper);
 			}
 			return subMapper;

@@ -57,12 +57,14 @@ namespace Silk.Data.Modelling
 					.Where(q => (q.CanRead && !q.GetMethod.IsStatic) ||
 						(q.CanWrite && !q.SetMethod.IsStatic)))
 			{
-				var fieldType = fieldBaseType.MakeGenericType(property.PropertyType);
+				var (dataType, enumerableBaseType) = property.PropertyType.GetDataAndEnumerableType();
+				var fieldType = fieldBaseType.MakeGenericType(dataType);
 				yield return Activator.CreateInstance(fieldType, new object[]
 				{
 					property.Name,
 					property.CanRead,
-					property.CanWrite
+					property.CanWrite,
+					enumerableBaseType
 				}) as TypedModelField;
 			}
 		}
