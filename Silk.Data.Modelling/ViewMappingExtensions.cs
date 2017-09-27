@@ -20,9 +20,13 @@ namespace Silk.Data.Modelling
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ModelToView) == BindingDirection.ModelToView)
 				{
-					viewField.ModelBinding.WriteToContainer(viewContainer,
-						viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext),
-						mappingContext);
+					var value = viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext);
+					if (value != null)
+					{
+						viewField.ModelBinding.WriteToContainer(viewContainer,
+							value,
+							mappingContext);
+					}
 				}
 			}
 		}
@@ -80,9 +84,13 @@ namespace Silk.Data.Modelling
 					{
 						if ((viewField.ModelBinding.Direction & BindingDirection.ModelToView) == BindingDirection.ModelToView)
 						{
-							viewField.ModelBinding.WriteToContainer(viewContainer,
-								viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext),
-								mappingContext);
+							var value = viewField.ModelBinding.ReadFromModel(modelReadWriter, mappingContext);
+							if (value != null)
+							{
+								viewField.ModelBinding.WriteToContainer(viewContainer,
+									value,
+									mappingContext);
+							}
 						}
 					}
 				}
@@ -135,9 +143,13 @@ namespace Silk.Data.Modelling
 			{
 				if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 				{
-					viewField.ModelBinding.WriteToModel(modelReadWriter,
-						viewField.ModelBinding.ReadFromContainer(viewContainer, mappingContext),
-						mappingContext);
+					var value = viewField.ModelBinding.ReadFromContainer(viewContainer, mappingContext);
+					if (value != null)
+					{
+						viewField.ModelBinding.WriteToModel(modelReadWriter,
+							value,
+							mappingContext);
+					}
 				}
 			}
 		}
@@ -192,9 +204,13 @@ namespace Silk.Data.Modelling
 					{
 						if ((viewField.ModelBinding.Direction & BindingDirection.ViewToModel) == BindingDirection.ViewToModel)
 						{
-							viewField.ModelBinding.WriteToModel(readWriterEnum.Current,
-								viewField.ModelBinding.ReadFromContainer(containerEnum.Current, mappingContext),
-								mappingContext);
+							var value = viewField.ModelBinding.ReadFromContainer(containerEnum.Current, mappingContext);
+							if (value != null)
+							{
+								viewField.ModelBinding.WriteToModel(readWriterEnum.Current,
+									value,
+									mappingContext);
+							}
 						}
 					}
 				}

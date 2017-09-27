@@ -53,7 +53,7 @@ namespace Silk.Data.Modelling.Bindings
 					throw new InvalidOperationException("Invalid field path.");
 				modelReadWriter = modelReadWriter.GetField(field);
 				if (modelReadWriter == null)
-					throw new InvalidOperationException($"Couldn't get field \"{field.Name}\".");
+					return null;
 			}
 			return modelReadWriter.Value;
 		}

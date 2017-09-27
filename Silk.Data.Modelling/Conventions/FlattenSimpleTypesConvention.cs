@@ -26,7 +26,7 @@ namespace Silk.Data.Modelling.Conventions
 
 					viewDefinition.FieldDefinitions.Add(
 						new ViewFieldDefinition(field.Name,
-						new AssignmentBinding(bindingDirection, new[] { sourceField.Name }, path))
+						new AssignmentBinding(bindingDirection, path, new[] { field.Name }))
 						{
 							DataType = field.DataType
 						});

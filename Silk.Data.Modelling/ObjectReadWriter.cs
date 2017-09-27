@@ -25,6 +25,8 @@ namespace Silk.Data.Modelling
 
 		public IModelReadWriter GetField(ModelField modelField)
 		{
+			if (Value == null)
+				return null;
 			//  todo: replace reflection with cached compiled expressions
 			var property = Type.GetProperty(modelField.Name);
 			if (property == null)
@@ -63,6 +65,9 @@ namespace Silk.Data.Modelling
 
 			public IModelReadWriter GetField(ModelField modelField)
 			{
+				if (Value == null)
+					return null;
+
 				//  todo: replace reflection with cached compiled expressions
 				var property = _type.GetProperty(modelField.Name);
 				if (property == null)

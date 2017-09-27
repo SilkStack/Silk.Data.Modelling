@@ -6,14 +6,14 @@ namespace Silk.Data.Modelling.Tests
 	[TestClass]
 	public class ViewMappingTests
 	{
-		private TypedModel<SimpleClassWithPublicProperties> _genericModel = TypeModeller.GetModelOf<SimpleClassWithPublicProperties>();
+		private TypedModel<Model> _genericModel = TypeModeller.GetModelOf<Model>();
 		private TypedModel _nonGenericModel => _genericModel;
 
 		[TestMethod]
 		public async Task MapDefaultView()
 		{
 			var view = _nonGenericModel.CreateView();
-			var instance = new SimpleClassWithPublicProperties
+			var instance = new Model
 			{
 				Integer = 5,
 				String = "Hello World",
@@ -24,19 +24,19 @@ namespace Silk.Data.Modelling.Tests
 			await view.MapToViewAsync(readWriter, container)
 				.ConfigureAwait(false);
 			var data = container.Data;
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Integer)));
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.String)));
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Object)));
-			Assert.AreEqual(instance.Integer, data[nameof(SimpleClassWithPublicProperties.Integer)]);
-			Assert.AreEqual(instance.String, data[nameof(SimpleClassWithPublicProperties.String)]);
-			Assert.ReferenceEquals(instance.Object, data[nameof(SimpleClassWithPublicProperties.Object)]);
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Integer)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.String)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Object)));
+			Assert.AreEqual(instance.Integer, data[nameof(Model.Integer)]);
+			Assert.AreEqual(instance.String, data[nameof(Model.String)]);
+			Assert.ReferenceEquals(instance.Object, data[nameof(Model.Object)]);
 		}
 
 		[TestMethod]
 		public async Task MapTypedView()
 		{
 			var view = _genericModel.CreateTypedView();
-			var instance = new SimpleClassWithPublicProperties
+			var instance = new Model
 			{
 				Integer = 5,
 				String = "Hello World",
@@ -46,27 +46,49 @@ namespace Silk.Data.Modelling.Tests
 			await view.MapToViewAsync(instance, container)
 				.ConfigureAwait(false);
 			var data = container.Data;
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Integer)));
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.String)));
-			Assert.AreEqual(true, data.ContainsKey(nameof(SimpleClassWithPublicProperties.Object)));
-			Assert.AreEqual(instance.Integer, data[nameof(SimpleClassWithPublicProperties.Integer)]);
-			Assert.AreEqual(instance.String, data[nameof(SimpleClassWithPublicProperties.String)]);
-			Assert.ReferenceEquals(instance.Object, data[nameof(SimpleClassWithPublicProperties.Object)]);
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Integer)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.String)));
+			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Object)));
+			Assert.AreEqual(instance.Integer, data[nameof(Model.Integer)]);
+			Assert.AreEqual(instance.String, data[nameof(Model.String)]);
+			Assert.ReferenceEquals(instance.Object, data[nameof(Model.Object)]);
 		}
 
 		[TestMethod]
 		public async Task MapTypedViewToObjectInstance()
 		{
 			var view = _genericModel
-				.GetModeller<SimpleMappedClass>()
+				.GetModeller<View>()
 				.CreateTypedView();
-			var instance = new SimpleClassWithPublicProperties
+			var instance = new Model
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object(),
+				Sub = new SubModel(10)
+			};
+			var container = new View();
+			await view.MapToViewAsync(instance, container)
+				.ConfigureAwait(false);
+			Assert.AreEqual(instance.Integer, container.Integer);
+			Assert.AreEqual(instance.String, container.String);
+			Assert.ReferenceEquals(instance.Object, container.Object);
+			Assert.AreEqual(instance.Sub.Integer, container.SubInteger);
+		}
+
+		[TestMethod]
+		public async Task MapTypedViewToObjectInstanceWithNullSubModel()
+		{
+			var view = _genericModel
+				.GetModeller<View>()
+				.CreateTypedView();
+			var instance = new Model
 			{
 				Integer = 5,
 				String = "Hello World",
 				Object = new object()
 			};
-			var container = new SimpleMappedClass();
+			var container = new View();
 			await view.MapToViewAsync(instance, container)
 				.ConfigureAwait(false);
 			Assert.AreEqual(instance.Integer, container.Integer);
@@ -78,9 +100,9 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapTypedViewToObject()
 		{
 			var view = _genericModel
-				.GetModeller<SimpleMappedClass>()
+				.GetModeller<View>()
 				.CreateTypedView();
-			var instance = new SimpleClassWithPublicProperties
+			var instance = new Model
 			{
 				Integer = 5,
 				String = "Hello World",
@@ -97,23 +119,23 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapTypedViewToObjectArray()
 		{
 			var view = _genericModel
-				.GetModeller<SimpleMappedClass>()
+				.GetModeller<View>()
 				.CreateTypedView();
-			var instances = new SimpleClassWithPublicProperties[]
+			var instances = new Model[]
 			{
-				new SimpleClassWithPublicProperties
+				new Model
 				{
 					Integer = 5,
 					String = "Hello World",
 					Object = new object()
 				},
-				new SimpleClassWithPublicProperties
+				new Model
 				{
 					Integer = 15,
 					String = "Foo",
 					Object = new object()
 				},
-				new SimpleClassWithPublicProperties
+				new Model
 				{
 					Integer = 25,
 					String = "Bar",
@@ -131,18 +153,30 @@ namespace Silk.Data.Modelling.Tests
 			}
 		}
 
-		private class SimpleClassWithPublicProperties
+		private class Model
 		{
 			public int Integer { get; set; }
 			public string String { get; set; }
 			public object Object { get; set; }
+			public SubModel Sub { get; set; }
 		}
 
-		private class SimpleMappedClass
+		public class SubModel
+		{
+			public int Integer { get; }
+
+			public SubModel(int i)
+			{
+				Integer = i;
+			}
+		}
+
+		private class View
 		{
 			public int Integer { get; set; }
 			public string String { get; set; }
 			public object Object { get; set; }
+			public int SubInteger { get; set; }
 		}
 	}
 }
