@@ -1,4 +1,6 @@
 ﻿using Silk.Data.Modelling.Bindings;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
@@ -14,13 +16,32 @@ namespace Silk.Data.Modelling.Conventions
 				var targetField = viewDefinition.TargetModel.GetField(
 					field.ModelBinding.ViewFieldPath
 					);
-				if (sourceField != null && sourceField.IsEnumerable &&
-					targetField != null && targetField.IsEnumerable)
+				if (sourceField != null && (sourceField.IsEnumerable || IsEnumerablePath(viewDefinition.SourceModel, field.ModelBinding.ModelFieldPath)) &&
+					targetField != null && (targetField.IsEnumerable || IsEnumerablePath(viewDefinition.TargetModel, field.ModelBinding.ViewFieldPath)))
 				{
+					var sourceEnumerableType = sourceField.EnumerableType;
+					if (sourceEnumerableType == null)
+						sourceEnumerableType = typeof(IEnumerable<>).MakeGenericType(sourceField.DataType);
+					var targetEnumerableType = targetField.EnumerableType;
+					if (targetEnumerableType == null)
+						targetEnumerableType = typeof(IEnumerable<>).MakeGenericType(targetField.DataType);
 					field.ModelBinding = new EnumerableBinding(field.ModelBinding,
-						sourceField.EnumerableType, targetField.EnumerableType);
+						sourceEnumerableType, targetEnumerableType);
 				}
 			}
+		}
+
+		private bool IsEnumerablePath(Model model, string[] path)
+		{
+			var currentPath = new string[0];
+			foreach (var pathComponent in path)
+			{
+				currentPath = currentPath.Concat(new[] { pathComponent }).ToArray();
+				var field = model.GetField(currentPath);
+				if (field.IsEnumerable)
+					return true;
+			}
+			return false;
 		}
 	}
 }

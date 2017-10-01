@@ -153,6 +153,34 @@ namespace Silk.Data.Modelling.Tests
 			}
 		}
 
+		[TestMethod]
+		public async Task FlattenEnumerable()
+		{
+			var model = TypeModeller.GetModelOf<ModelWithArray>();
+			var view = model.GetModeller<ViewWithArray>().CreateTypedView();
+
+			var modelInstance = new ModelWithArray
+			{
+				Subs = new []
+				{
+					new SubModel(1),
+					new SubModel(2),
+					new SubModel(3),
+					new SubModel(4),
+					new SubModel(5),
+				}
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance)
+				.ConfigureAwait(false);
+
+			Assert.IsNotNull(viewInstance.SubsInteger);
+			Assert.AreEqual(modelInstance.Subs.Length, viewInstance.SubsInteger.Length);
+			for (var i = 0; i < modelInstance.Subs.Length; i++)
+			{
+				Assert.AreEqual(modelInstance.Subs[i].Integer, viewInstance.SubsInteger[i]);
+			}
+		}
+
 		private class Model
 		{
 			public int Integer { get; set; }
@@ -161,7 +189,12 @@ namespace Silk.Data.Modelling.Tests
 			public SubModel Sub { get; set; }
 		}
 
-		public class SubModel
+		private class ModelWithArray
+		{
+			public SubModel[] Subs { get; set; }
+		}
+
+		private class SubModel
 		{
 			public int Integer { get; }
 
@@ -177,6 +210,11 @@ namespace Silk.Data.Modelling.Tests
 			public string String { get; set; }
 			public object Object { get; set; }
 			public int SubInteger { get; set; }
+		}
+
+		private class ViewWithArray
+		{
+			public int[] SubsInteger { get; set; }
 		}
 	}
 }

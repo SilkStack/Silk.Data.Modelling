@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Silk.Data.Modelling
 {
@@ -31,13 +34,20 @@ namespace Silk.Data.Modelling
 			var property = Type.GetProperty(modelField.Name);
 			if (property == null)
 				return null;
+			if (modelField is TypedModelField typedField &&
+				typedField.IsEnumerable)
+			{
+				return new ObjectField(typedField.EnumerableType, typedField.DataTypeModel,
+					() => property.GetValue(Value), value => property.SetValue(Value, value));
+			}
 			return new ObjectField(property.PropertyType, modelField.ParentModel,
 				() => property.GetValue(Value), value => property.SetValue(Value, value));
 		}
 
 		private class ObjectField : IModelReadWriter
 		{
-			private readonly Type _type;
+			private readonly Type _dataType;
+			private readonly Type _enumType;
 			private readonly Func<object> _getter;
 			private readonly Action<object> _setter;
 
@@ -57,7 +67,7 @@ namespace Silk.Data.Modelling
 
 			public ObjectField(Type type, Model model, Func<object> getter, Action<object> setter)
 			{
-				_type = type;
+				(_dataType, _enumType) = type.GetDataAndEnumerableType();
 				_getter = getter;
 				_setter = setter;
 				Model = model;
@@ -67,13 +77,26 @@ namespace Silk.Data.Modelling
 			{
 				if (Value == null)
 					return null;
-
+				
 				//  todo: replace reflection with cached compiled expressions
-				var property = _type.GetProperty(modelField.Name);
+				var property = _dataType.GetProperty(modelField.Name);
 				if (property == null)
 					return null;
+				if (_enumType != null)
+				{
+					return new ObjectField(property.PropertyType, modelField.ParentModel,
+						() => GetEnumProperty(property, Value as IEnumerable), value => { });
+				}
 				return new ObjectField(property.PropertyType, modelField.ParentModel,
 					() => property.GetValue(Value), value => property.SetValue(Value, value));
+			}
+
+			private static IEnumerable<object> GetEnumProperty(PropertyInfo property, IEnumerable sourceEnum)
+			{
+				foreach (var value in sourceEnum)
+				{
+					yield return property.GetValue(value);
+				}
 			}
 		}
 	}
