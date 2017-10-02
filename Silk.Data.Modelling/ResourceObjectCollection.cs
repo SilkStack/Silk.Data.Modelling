@@ -23,7 +23,24 @@ namespace Silk.Data.Modelling
 				resourceObjects = new Dictionary<string, object>();
 				_objectResourceObjects.Add(forObject, resourceObjects);
 			}
-			resourceObjects[key] = value;
+			if (resourceObjects.TryGetValue(key, out var existingObject))
+			{
+				if (existingObject is List<object> list)
+				{
+					list.Add(value);
+				}
+				else
+				{
+					list = new List<object>();
+					list.Add(existingObject);
+					list.Add(value);
+					resourceObjects[key] = list;
+				}
+			}
+			else
+			{
+				resourceObjects[key] = value;
+			}
 		}
 
 		public object Retrieve(string key)

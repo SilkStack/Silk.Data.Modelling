@@ -43,13 +43,13 @@ namespace Silk.Data.Modelling.Bindings
 
 		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
 		{
-			var containerEnum = base.ReadFromContainer(container, mappingContext) as IEnumerable;
+			var containerEnum = _baseBinding.ReadFromContainer(container, mappingContext) as IEnumerable;
 			return _modelEnumerableBuilder.CreateFromSource(containerEnum);
 		}
 
 		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
 		{
-			var modelEnum = base.ReadFromModel(modelReadWriter, mappingContext) as IEnumerable;
+			var modelEnum = _baseBinding.ReadFromModel(modelReadWriter, mappingContext) as IEnumerable;
 			return _viewEnumerableBuilder.CreateFromSource(modelEnum);
 		}
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Silk.Data.Modelling.Conventions;
 using System.Threading.Tasks;
 
 namespace Silk.Data.Modelling.Tests
@@ -144,7 +143,124 @@ namespace Silk.Data.Modelling.Tests
 			}
 		}
 
+		[TestMethod]
+		public async Task MapModelWithArrayOfSubModels()
+		{
+			var model = TypeModeller.GetModelOf<ModelWithArray>();
+			var view = model.GetModeller<ViewWithArray>().CreateTypedView();
+
+			var modelInstance = new ModelWithArray
+			{
+				Items = new[]
+				{
+					new SubModel
+					{
+						Value = 1
+					},
+					new SubModel
+					{
+						Value = 2
+					},
+					new SubModel
+					{
+						Value = 3
+					},
+					new SubModel
+					{
+						Value = 4
+					},
+					new SubModel
+					{
+						Value = 5
+					}
+				}
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance)
+				.ConfigureAwait(false);
+			Assert.IsNotNull(viewInstance);
+			Assert.IsNotNull(viewInstance.Items);
+			Assert.AreEqual(modelInstance.Items.Length, viewInstance.Items.Length);
+			for(var i = 0; i < modelInstance.Items.Length; i++)
+			{
+				Assert.AreEqual(modelInstance.Items[i].Value, viewInstance.Items[i].Value);
+			}
+		}
+
+		[TestMethod]
+		public async Task MapViewWithArrayOfSubViews()
+		{
+			var model = TypeModeller.GetModelOf<ModelWithArray>();
+			var view = model.GetModeller<ViewWithArray>().CreateTypedView();
+
+			var viewInstance = new ViewWithArray
+			{
+				Items = new[]
+				{
+					new SubView
+					{
+						Value = 1
+					},
+					new SubView
+					{
+						Value = 2
+					},
+					new SubView
+					{
+						Value = 3
+					},
+					new SubView
+					{
+						Value = 4
+					},
+					new SubView
+					{
+						Value = 5
+					}
+				}
+			};
+			var modelInstance = await view.MapToModelAsync(viewInstance)
+				.ConfigureAwait(false);
+			Assert.IsNotNull(modelInstance);
+			Assert.IsNotNull(modelInstance.Items);
+			Assert.AreEqual(viewInstance.Items.Length, modelInstance.Items.Length);
+			for (var i = 0; i < viewInstance.Items.Length; i++)
+			{
+				Assert.AreEqual(viewInstance.Items[i].Value, modelInstance.Items[i].Value);
+			}
+		}
+
+		[TestMethod]
+		public async Task SupportMultipleSubMappings()
+		{
+			var model = TypeModeller.GetModelOf<ModelWith2SubModels>();
+			var view = model.GetModeller<ViewWith2SubViews>().CreateTypedView();
+
+			var modelInstance = new ModelWith2SubModels
+			{
+				Item1 = new SubModel { Value = 1 },
+				Item2 = new SubModel { Value = 2 }
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance)
+				.ConfigureAwait(false);
+			Assert.IsNotNull(viewInstance);
+			Assert.IsNotNull(viewInstance.Item1);
+			Assert.IsNotNull(viewInstance.Item2);
+			Assert.AreEqual(modelInstance.Item1.Value, viewInstance.Item1.Value);
+			Assert.AreEqual(modelInstance.Item2.Value, viewInstance.Item2.Value);
+		}
+
 		private class Model
+		{
+			public SubModel Item1 { get; set; }
+			public SubModel Item2 { get; set; }
+		}
+
+		private class ModelWithArray
+		{
+			public SubModel[] Items { get; set; }
+		}
+
+		private class ModelWith2SubModels
 		{
 			public SubModel Item1 { get; set; }
 			public SubModel Item2 { get; set; }
@@ -161,7 +277,23 @@ namespace Silk.Data.Modelling.Tests
 			public SubView Item2 { get; set; }
 		}
 
+		private class ViewWithArray
+		{
+			public SubView[] Items { get; set; }
+		}
+
+		private class ViewWith2SubViews
+		{
+			public SubView Item1 { get; set; }
+			public SubView2 Item2 { get; set; }
+		}
+
 		private class SubView
+		{
+			public int Value { get; set; }
+		}
+
+		private class SubView2
 		{
 			public int Value { get; set; }
 		}

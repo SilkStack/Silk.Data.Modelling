@@ -1,5 +1,6 @@
 ﻿using Silk.Data.Modelling.Conventions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,11 +53,26 @@ namespace Silk.Data.Modelling.ResourceLoaders
 						.First(q => q.Name == mappingField.ModelFieldName);
 					foreach (var container in containers)
 					{
-						var subContainer = mapping.CreateViewContainer(container.GetValue(new[] { mappingField.ViewFieldName }));
-						var readWriterTuple = mapping.CreateModelReaderAndInstance();
-						mappedResourceList.Add(new MappedResource(container, readWriterTuple.readWriter,
-							subContainer, mappingField, readWriterTuple.instance
-							));
+						var value = container.GetValue(new[] { mappingField.ViewFieldName });
+						if (value is IEnumerable enumerable)
+						{
+							foreach (var item in enumerable)
+							{
+								var subContainer = mapping.CreateViewContainer(item);
+								var readWriterTuple = mapping.CreateModelReaderAndInstance();
+								mappedResourceList.Add(new MappedResource(container, readWriterTuple.readWriter,
+									subContainer, mappingField, readWriterTuple.instance
+									));
+							}
+						}
+						else
+						{
+							var subContainer = mapping.CreateViewContainer(value);
+							var readWriterTuple = mapping.CreateModelReaderAndInstance();
+							mappedResourceList.Add(new MappedResource(container, readWriterTuple.readWriter,
+								subContainer, mappingField, readWriterTuple.instance
+								));
+						}
 					}
 				}
 				await mapping.View
@@ -85,13 +101,31 @@ namespace Silk.Data.Modelling.ResourceLoaders
 						.First(q => q.Name == mappingField.ModelFieldName);
 					foreach (var modelReaderWriter in modelReadWriters)
 					{
-						var containerTuple = mapping.CreateViewContainerAndInstance();
-						var readWriter = mapping.CreateModelReader();
-						readWriter.Value = modelReaderWriter.GetField(modelField).Value;
-						mappedResourceList.Add(new MappedResource(
-							modelReaderWriter, readWriter,
-							containerTuple.container, mappingField, containerTuple.instance
-							));
+						var value = modelReaderWriter.GetField(modelField).Value;
+
+						if (value is IEnumerable enumerable)
+						{
+							foreach (var item in enumerable)
+							{
+								var containerTuple = mapping.CreateViewContainerAndInstance();
+								var readWriter = mapping.CreateModelReader();
+								readWriter.Value = item;
+								mappedResourceList.Add(new MappedResource(
+									modelReaderWriter, readWriter,
+									containerTuple.container, mappingField, containerTuple.instance
+									));
+							}
+						}
+						else
+						{
+							var containerTuple = mapping.CreateViewContainerAndInstance();
+							var readWriter = mapping.CreateModelReader();
+							readWriter.Value = value;
+							mappedResourceList.Add(new MappedResource(
+								modelReaderWriter, readWriter,
+								containerTuple.container, mappingField, containerTuple.instance
+								));
+						}
 					}
 				}
 				await mapping.View

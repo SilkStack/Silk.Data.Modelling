@@ -41,7 +41,9 @@ namespace Silk.Data.Modelling
 					() => property.GetValue(Value), value => property.SetValue(Value, value));
 			}
 			return new ObjectField(property.PropertyType, modelField.ParentModel,
-				() => property.GetValue(Value), value => property.SetValue(Value, value));
+				() => {
+					return property.GetValue(Value);
+					}, value => property.SetValue(Value, value));
 		}
 
 		private class ObjectField : IModelReadWriter
