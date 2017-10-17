@@ -49,7 +49,8 @@ namespace Silk.Data.Modelling.Conventions
 				type == typeof(Decimal) ||
 				type == typeof(string) ||
 				type == typeof(Guid) ||
-				type == typeof(char)
+				type == typeof(char) ||
+				type == typeof(bool)
 				;
 		}
 	}
