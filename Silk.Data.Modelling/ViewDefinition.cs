@@ -33,6 +33,11 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		public List<IResourceLoader> ResourceLoaders { get; } = new List<IResourceLoader>();
 
+		/// <summary>
+		/// User data that can be utilized by view conventions to store data.
+		/// </summary>
+		public List<object> UserData { get; } = new List<object>();
+
 		public ViewDefinition(Model sourceModel, Model targetModel, ViewConvention[] viewConventions)
 		{
 			SourceModel = sourceModel;
