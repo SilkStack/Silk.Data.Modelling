@@ -25,11 +25,18 @@
 		/// </summary>
 		public string Name { get; }
 
-		public ModelField(string name, bool canRead, bool canWrite)
+		/// <summary>
+		/// Gets an array of metadata on the field.
+		/// </summary>
+		public object[] Metadata { get; }
+
+		public ModelField(string name, bool canRead, bool canWrite,
+			object[] metadata)
 		{
 			Name = name;
 			CanRead = canRead;
 			CanWrite = canWrite;
+			Metadata = metadata;
 		}
 	}
 }

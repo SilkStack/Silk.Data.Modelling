@@ -64,6 +64,7 @@ namespace Silk.Data.Modelling
 					property.Name,
 					property.CanRead,
 					property.CanWrite,
+					property.GetCustomAttributes(false),
 					enumerableBaseType
 				}) as TypedModelField;
 			}

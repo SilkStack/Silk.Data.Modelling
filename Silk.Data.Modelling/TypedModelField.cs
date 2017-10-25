@@ -37,8 +37,8 @@ namespace Silk.Data.Modelling
 		}
 
 		public TypedModelField(string name, bool canRead, bool canWrite, Type dataType,
-			Type enumerableType = null)
-			: base(name, canRead, canWrite)
+			object[] metadata, Type enumerableType = null)
+			: base(name, canRead, canWrite, metadata)
 		{
 			DataType = dataType;
 			IsEnumerable = enumerableType != null;
@@ -54,8 +54,8 @@ namespace Silk.Data.Modelling
 		public new TypedModel<T> DataTypeModel => (TypedModel<T>)InternalDataTypeModel;
 
 		public TypedModelField(string name, bool canRead, bool canWrite,
-			Type enumerableType = null) 
-			: base(name, canRead, canWrite, typeof(T), enumerableType)
+			object[] metadata, Type enumerableType = null) 
+			: base(name, canRead, canWrite, typeof(T), metadata, enumerableType)
 		{
 		}
 	}
