@@ -57,7 +57,7 @@ namespace Silk.Data.Modelling
 			return result;
 		}
 
-		protected virtual ViewDefinition CreateViewDefinition(ViewConvention[] viewConventions, Model targetModel = null)
+		protected virtual ViewDefinition CreateViewDefinition(ViewConvention[] viewConventions, object[] userData, Model targetModel = null)
 		{
 			if (targetModel == null)
 				targetModel = this;
@@ -65,6 +65,8 @@ namespace Silk.Data.Modelling
 			if (viewConventions == null || viewConventions.Length == 0)
 				viewConventions = _defaultConventions;
 			var viewDefinition = new ViewDefinition(this, targetModel, viewConventions);
+			if (userData != null)
+				viewDefinition.UserData.AddRange(userData);
 			foreach (var field in targetModel.Fields)
 			{
 				foreach (var viewConvention in viewConventions)
@@ -83,7 +85,7 @@ namespace Silk.Data.Modelling
 
 		public IView<ViewField> CreateView(params ViewConvention[] viewConventions)
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions);
+			var viewDefinition = CreateViewDefinition(viewConventions, null);
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
@@ -91,7 +93,7 @@ namespace Silk.Data.Modelling
 
 		public IView<ViewField> CreateView(Type viewType, params ViewConvention[] viewConventions)
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf(viewType));
+			var viewDefinition = CreateViewDefinition(viewConventions, null, TypeModeller.GetModelOf(viewType));
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
@@ -99,7 +101,7 @@ namespace Silk.Data.Modelling
 
 		public IView<ViewField> CreateView<TView>(params ViewConvention[] viewConventions)
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf<TView>());
+			var viewDefinition = CreateViewDefinition(viewConventions, null, TypeModeller.GetModelOf<TView>());
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
@@ -108,21 +110,42 @@ namespace Silk.Data.Modelling
 		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, params ViewConvention[] viewConventions)
 			where T : IView
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions);
+			var viewDefinition = CreateViewDefinition(viewConventions, null);
 			return viewBuilder(viewDefinition);
 		}
 
 		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, Type viewType, params ViewConvention[] viewConventions)
 			where T : IView
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf(viewType));
+			var viewDefinition = CreateViewDefinition(viewConventions, null, TypeModeller.GetModelOf(viewType));
 			return viewBuilder(viewDefinition);
 		}
 
 		public T CreateView<T, TView>(Func<ViewDefinition, T> viewBuilder, params ViewConvention[] viewConventions)
 			where T : IView
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, TypeModeller.GetModelOf<TView>());
+			var viewDefinition = CreateViewDefinition(viewConventions, null, TypeModeller.GetModelOf<TView>());
+			return viewBuilder(viewDefinition);
+		}
+
+		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, object[] userData, params ViewConvention[] viewConventions)
+			where T : IView
+		{
+			var viewDefinition = CreateViewDefinition(viewConventions, userData);
+			return viewBuilder(viewDefinition);
+		}
+
+		public T CreateView<T>(Func<ViewDefinition, T> viewBuilder, Type viewType, object[] userData, params ViewConvention[] viewConventions)
+			where T : IView
+		{
+			var viewDefinition = CreateViewDefinition(viewConventions, userData, TypeModeller.GetModelOf(viewType));
+			return viewBuilder(viewDefinition);
+		}
+
+		public T CreateView<T, TView>(Func<ViewDefinition, T> viewBuilder, object[] userData, params ViewConvention[] viewConventions)
+			where T : IView
+		{
+			var viewDefinition = CreateViewDefinition(viewConventions, userData, TypeModeller.GetModelOf<TView>());
 			return viewBuilder(viewDefinition);
 		}
 	}
