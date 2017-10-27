@@ -15,6 +15,11 @@ namespace Silk.Data.Modelling
 		public string Name { get; set; }
 
 		/// <summary>
+		/// Gets or sets the name of the field on the original model.
+		/// </summary>
+		public string ModelFieldName { get; set; }
+
+		/// <summary>
 		/// Gets or sets the data type of the field.
 		/// </summary>
 		public Type DataType { get; set; }
@@ -29,10 +34,12 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		public ModelBinding ModelBinding { get; set; }
 
-		public ViewFieldDefinition(string name, ModelBinding binding)
+		public ViewFieldDefinition(string name, ModelBinding binding,
+			string modelFieldName = null)
 		{
 			Name = name;
 			ModelBinding = binding;
+			ModelFieldName = modelFieldName;
 		}
 	}
 }
