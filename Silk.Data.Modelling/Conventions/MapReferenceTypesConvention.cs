@@ -36,7 +36,8 @@ namespace Silk.Data.Modelling.Conventions
 					}
 					subMapper.AddMappedField(bindField.Name, field.Name, bindField.DataType, field.DataType);
 					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-						new SubMappingBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name }))
+						new SubMappingBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name },
+						new[] { subMapper }))
 					{
 						DataType = field.DataType
 					});

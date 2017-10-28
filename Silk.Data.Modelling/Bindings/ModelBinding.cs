@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.ResourceLoaders;
+using System;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Bindings
@@ -23,10 +24,23 @@ namespace Silk.Data.Modelling.Bindings
 		/// </summary>
 		public string[] ViewFieldPath { get; }
 
+		/// <summary>
+		/// Gets required resource loaders.
+		/// </summary>
+		public IResourceLoader[] ResourceLoaders { get; }
+
 		public ModelBinding(string[] modelFieldPath, string[] viewFieldPath)
 		{
 			ModelFieldPath = modelFieldPath;
 			ViewFieldPath = viewFieldPath;
+		}
+
+		public ModelBinding(string[] modelFieldPath, string[] viewFieldPath,
+			IResourceLoader[] resourceLoaders)
+		{
+			ModelFieldPath = modelFieldPath;
+			ViewFieldPath = viewFieldPath;
+			ResourceLoaders = resourceLoaders;
 		}
 
 		public virtual void WriteToContainer(IContainer container, object value, MappingContext mappingContext)
