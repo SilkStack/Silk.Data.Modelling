@@ -17,7 +17,7 @@ namespace Silk.Data.Modelling.Bindings
 
 		public EnumerableBinding(ModelBinding baseBinding,
 			Type modelEnumerableType, Type viewEnumerableType) :
-			base(baseBinding.ModelFieldPath, baseBinding.ViewFieldPath)
+			base(baseBinding.ModelFieldPath, baseBinding.ViewFieldPath, baseBinding.ResourceLoaders)
 		{
 			_modelEnumerableType = modelEnumerableType;
 			_viewEnumerableType = viewEnumerableType;
