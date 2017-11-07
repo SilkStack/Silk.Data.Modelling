@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Silk.Data.Modelling
 {
@@ -25,20 +24,23 @@ namespace Silk.Data.Modelling
 			//  todo: how to support field paths with more than 1 element?
 			var property = DataType.GetProperty(fieldPath[0]);
 			if (property == null)
-				throw new InvalidOperationException("Field cannot be set on view.");
+				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", fieldPath)} ({fieldPath[0]}).");
 			property.SetValue(Instance, value);
 		}
 
 		public object GetValue(string[] fieldPath)
 		{
 			//  todo: replace reflection with cached expressions
+			if (Instance == null)
+				return null;
+
 			object ret = null;
 			var dataType = DataType;
 			foreach (var pathComponent in fieldPath)
 			{
 				var property = dataType.GetProperty(pathComponent);
 				if (property == null)
-					throw new InvalidOperationException("Field cannot be got on view.");
+					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", fieldPath)} ({pathComponent}).");
 				ret = property.GetValue(ret ?? Instance);
 				if (ret == null)
 					break;
