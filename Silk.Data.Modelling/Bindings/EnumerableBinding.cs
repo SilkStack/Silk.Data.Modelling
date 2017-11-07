@@ -43,34 +43,38 @@ namespace Silk.Data.Modelling.Bindings
 
 		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
 		{
-			var containerEnum = _baseBinding.ReadFromContainer(container, mappingContext) as IEnumerable;
+			var containerEnum = _baseBinding.ReadFromContainer(container, mappingContext);
 			return _modelEnumerableBuilder.CreateFromSource(containerEnum);
 		}
 
 		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
 		{
-			var modelEnum = _baseBinding.ReadFromModel(modelReadWriter, mappingContext) as IEnumerable;
+			var modelEnum = _baseBinding.ReadFromModel(modelReadWriter, mappingContext);
 			return _viewEnumerableBuilder.CreateFromSource(modelEnum);
 		}
 
 		private abstract class EnumerableBuilder
 		{
-			public abstract IEnumerable CreateFromSource(IEnumerable source);
+			public abstract IEnumerable CreateFromSource(object source);
 		}
 
 		private class ArrayBuilder<T> : EnumerableBuilder
 		{
-			public override IEnumerable CreateFromSource(IEnumerable source)
+			public override IEnumerable CreateFromSource(object source)
 			{
-				return source.OfType<T>().ToArray();
+				if (source is IEnumerable enumerable)
+					return enumerable.OfType<T>().ToArray();
+				return new T[] { (T)source };
 			}
 		}
 
 		private class ListBuilder<T> : EnumerableBuilder
 		{
-			public override IEnumerable CreateFromSource(IEnumerable source)
+			public override IEnumerable CreateFromSource(object source)
 			{
-				return source.OfType<T>().ToList();
+				if (source is IEnumerable enumerable)
+					return enumerable.OfType<T>().ToList();
+				return new List<T>() { (T)source };
 			}
 		}
 	}
