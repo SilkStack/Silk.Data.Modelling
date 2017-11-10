@@ -94,6 +94,78 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsTrue(viewInstance.Array.SequenceEqual(modelInstance.Array));
 		}
 
+		[TestMethod]
+		public async Task EnumerablesOfSingleElements()
+		{
+			var model = TypeModeller.GetModelOf<Model>();
+			var view = model.GetModeller<View>().CreateTypedView();
+			var modelInstance = new Model
+			{
+				List = new List<int>()
+				{
+					1
+				},
+				ROCollection = new List<int>()
+				{
+					6
+				},
+				Array = new[]
+				{
+					11
+				}
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance);
+
+			Assert.IsNotNull(viewInstance);
+			Assert.IsNotNull(viewInstance.List);
+			Assert.IsNotNull(viewInstance.ROCollection);
+			Assert.IsNotNull(viewInstance.Array);
+			Assert.IsTrue(modelInstance.List.SequenceEqual(viewInstance.List));
+			Assert.IsTrue(modelInstance.ROCollection.SequenceEqual(viewInstance.ROCollection));
+			Assert.IsTrue(modelInstance.Array.SequenceEqual(viewInstance.Array));
+		}
+
+		[TestMethod]
+		public async Task EmptyEnumerablesAreEmpty()
+		{
+			var model = TypeModeller.GetModelOf<Model>();
+			var view = model.GetModeller<View>().CreateTypedView();
+			var modelInstance = new Model
+			{
+				List = new List<int>(),
+				ROCollection = new List<int>(),
+				Array = new int[0]
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance);
+
+			Assert.IsNotNull(viewInstance);
+			Assert.IsNotNull(viewInstance.List);
+			Assert.IsNotNull(viewInstance.ROCollection);
+			Assert.IsNotNull(viewInstance.Array);
+			Assert.IsTrue(modelInstance.List.SequenceEqual(viewInstance.List));
+			Assert.IsTrue(modelInstance.ROCollection.SequenceEqual(viewInstance.ROCollection));
+			Assert.IsTrue(modelInstance.Array.SequenceEqual(viewInstance.Array));
+		}
+
+		[TestMethod]
+		public async Task NullEnumerablesResultInNull()
+		{
+			var model = TypeModeller.GetModelOf<Model>();
+			var view = model.GetModeller<View>().CreateTypedView();
+			var modelInstance = new Model
+			{
+				List = null,
+				ROCollection = null,
+				Array = null
+			};
+			var viewInstance = await view.MapToViewAsync(modelInstance);
+
+			Assert.IsNotNull(viewInstance);
+			Assert.IsNull(viewInstance.List);
+			Assert.IsNull(viewInstance.ROCollection);
+			Assert.IsNull(viewInstance.Array);
+		}
+
 		private class Model
 		{
 			public List<int> List { get; set; } = new List<int>();

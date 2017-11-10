@@ -62,6 +62,8 @@ namespace Silk.Data.Modelling.Bindings
 		{
 			public override IEnumerable CreateFromSource(object source)
 			{
+				if (source == null)
+					return null;
 				if (source is IEnumerable enumerable)
 					return enumerable.OfType<T>().ToArray();
 				return new T[] { (T)source };
@@ -72,6 +74,8 @@ namespace Silk.Data.Modelling.Bindings
 		{
 			public override IEnumerable CreateFromSource(object source)
 			{
+				if (source == null)
+					return null;
 				if (source is IEnumerable enumerable)
 					return enumerable.OfType<T>().ToList();
 				return new List<T>() { (T)source };
