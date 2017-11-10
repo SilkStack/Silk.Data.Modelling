@@ -54,6 +54,11 @@ namespace Silk.Data.Modelling.ResourceLoaders
 					foreach (var container in containers)
 					{
 						var value = container.GetValue(new[] { mappingField.ViewFieldName });
+						if (value is null)
+						{
+							continue;
+						}
+
 						if (value is IEnumerable enumerable)
 						{
 							foreach (var item in enumerable)
