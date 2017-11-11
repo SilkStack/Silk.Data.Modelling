@@ -19,12 +19,34 @@ namespace Silk.Data.Modelling
 
 		public override T ReadFromPath<T>(string[] path)
 		{
-			throw new NotImplementedException();
+			//  todo: replace reflection with cached expressions
+			if (Instance == null)
+				return default(T);
+
+			object ret = null;
+			var dataType = ModelType;
+			foreach (var pathComponent in path)
+			{
+				var property = dataType.GetProperty(pathComponent);
+				if (property == null)
+					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
+				ret = property.GetValue(ret ?? Instance);
+				if (ret == null)
+					break;
+				dataType = ret.GetType();
+			}
+			return (T)ret;
 		}
 
 		public override void WriteToPath<T>(string[] path, T value)
 		{
-			throw new NotImplementedException();
+			//  note: writing to properties deep in the graph isn't supported here for now
+			//        that functionality is handled by the submapping resource loader and binding
+			//  todo: replace reflection with cached expressions
+			var property = ModelType.GetProperty(path[0]);
+			if (property == null)
+				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
+			property.SetValue(Instance, value);
 		}
 	}
 
@@ -34,20 +56,42 @@ namespace Silk.Data.Modelling
 			: base(view)
 		{
 			ViewType = viewInstance.GetType();
-			ViewInstance = viewInstance;
+			Instance = viewInstance;
 		}
 
 		public Type ViewType { get; }
-		public object ViewInstance { get; }
+		public object Instance { get; }
 
 		public override T ReadFromPath<T>(string[] path)
 		{
-			throw new NotImplementedException();
+			//  todo: replace reflection with cached expressions
+			if (Instance == null)
+				return default(T);
+
+			object ret = null;
+			var dataType = ViewType;
+			foreach (var pathComponent in path)
+			{
+				var property = dataType.GetProperty(pathComponent);
+				if (property == null)
+					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
+				ret = property.GetValue(ret ?? Instance);
+				if (ret == null)
+					break;
+				dataType = ret.GetType();
+			}
+			return (T)ret;
 		}
 
 		public override void WriteToPath<T>(string[] path, T value)
 		{
-			throw new NotImplementedException();
+			//  note: writing to properties deep in the graph isn't supported here for now
+			//        that functionality is handled by the submapping resource loader and binding
+			//  todo: replace reflection with cached expressions
+			var property = ViewType.GetProperty(path[0]);
+			if (property == null)
+				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
+			property.SetValue(Instance, value);
 		}
 	}
 
