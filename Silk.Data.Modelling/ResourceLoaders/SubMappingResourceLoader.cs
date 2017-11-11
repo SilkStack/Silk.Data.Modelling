@@ -80,11 +80,11 @@ namespace Silk.Data.Modelling.ResourceLoaders
 						}
 					}
 				}
-				await mapping.View
-					.MapToModelAsync(
-						mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
-						mappedResourceList.Select(q => q.ViewContainer).ToArray())
-					.ConfigureAwait(false);
+				//await mapping.View
+				//	.MapToModelAsync(
+				//		mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
+				//		mappedResourceList.Select(q => q.ViewContainer).ToArray())
+				//	.ConfigureAwait(false);
 				foreach (var mappedResource in mappedResourceList)
 				{
 					mappingContext.Resources.Store(
@@ -133,11 +133,11 @@ namespace Silk.Data.Modelling.ResourceLoaders
 						}
 					}
 				}
-				await mapping.View
-					.MapToViewAsync(
-						mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
-						mappedResourceList.Select(q => q.ViewContainer).ToArray())
-					.ConfigureAwait(false);
+				//await mapping.View
+				//	.MapToViewAsync(
+				//		mappedResourceList.Select(q => q.ModelReadWriter).ToArray(),
+				//		mappedResourceList.Select(q => q.ViewContainer).ToArray())
+				//	.ConfigureAwait(false);
 				foreach (var mappedResource in mappedResourceList)
 				{
 					mappingContext.Resources.Store(
