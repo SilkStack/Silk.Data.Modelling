@@ -31,4 +31,52 @@ namespace Silk.Data.Modelling
 			return value;
 		}
 	}
+
+	public class MemoryModelReadWriter : ModelReadWriter
+	{
+		public MemoryModelReadWriter(Model model, Dictionary<string,object> store = null)
+			: base(model)
+		{
+			if (store != null)
+				Store = store;
+			else
+				Store = new Dictionary<string, object>();
+		}
+
+		public Dictionary<string, object> Store { get; }
+
+		public override T ReadFromPath<T>(string[] path)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override void WriteToPath<T>(string[] path, T value)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
+
+	public class MemoryViewReadWriter : ViewReadWriter
+	{
+		public MemoryViewReadWriter(IView view, Dictionary<string, object> store = null)
+			: base(view)
+		{
+			if (store != null)
+				Store = store;
+			else
+				Store = new Dictionary<string, object>();
+		}
+
+		public Dictionary<string, object> Store { get; }
+
+		public override T ReadFromPath<T>(string[] path)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override void WriteToPath<T>(string[] path, T value)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
 }
