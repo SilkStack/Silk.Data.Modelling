@@ -43,6 +43,22 @@ namespace Silk.Data.Modelling.Bindings
 			ResourceLoaders = resourceLoaders;
 		}
 
+		public virtual void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
+		{
+			object value;
+			if (from.ContainerType == ContainerType.Model)
+				value = from.ReadFromPath<object>(ModelFieldPath);
+			else
+				value = from.ReadFromPath<object>(ViewFieldPath);
+
+			if (to.ContainerType == ContainerType.Model)
+				to.WriteToPath<object>(ModelFieldPath, value);
+			else
+				to.WriteToPath<object>(ViewFieldPath, value);
+		}
+
+		//  OLD API BELOW
+
 		public virtual void WriteToContainer(IContainer container, object value, MappingContext mappingContext)
 		{
 			container.SetValue(ViewFieldPath, value);

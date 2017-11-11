@@ -5,6 +5,52 @@ using System.Reflection;
 
 namespace Silk.Data.Modelling
 {
+	public class ObjectModelReadWriter : ModelReadWriter
+	{
+		public ObjectModelReadWriter(Model model, object modelInstance)
+			: base(model)
+		{
+			ModelType = modelInstance.GetType();
+			Instance = modelInstance;
+		}
+
+		public Type ModelType { get; }
+		public object Instance { get; }
+
+		public override T ReadFromPath<T>(string[] path)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void WriteToPath<T>(string[] path, T value)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	public class ObjectViewReadWriter : ViewReadWriter
+	{
+		public ObjectViewReadWriter(IView view, object viewInstance)
+			: base(view)
+		{
+			ViewType = viewInstance.GetType();
+			ViewInstance = viewInstance;
+		}
+
+		public Type ViewType { get; }
+		public object ViewInstance { get; }
+
+		public override T ReadFromPath<T>(string[] path)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void WriteToPath<T>(string[] path, T value)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
 	/// <summary>
 	/// Reads/writes to objects.
 	/// </summary>
