@@ -122,12 +122,14 @@ namespace Silk.Data.Modelling.Tests
 			{
 			}
 
-			//public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
-			//{
-			//	base.WriteToModel(modelReadWriter,
-			//		mappingContext.Resources.Retrieve($"subObject:{value}"),
-			//		mappingContext);
-			//}
+			public override void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
+			{
+				var value = ReadValue<int>(from);
+				WriteValue(
+					to,
+					mappingContext.Resources.Retrieve($"subObject:{value}") as SubObject
+					);
+			}
 		}
 
 		private class SubObjectResourceLoader : IResourceLoader
@@ -141,33 +143,24 @@ namespace Silk.Data.Modelling.Tests
 				_fieldNames.Add(fieldName);
 			}
 
-			//public Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
-			//{
-			//	RunCount++;
-			//	var builtObjects = new List<int>();
-			//	foreach (var container in containers)
-			//	{
-			//		foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
-			//		{
-			//			var value = (int)container.GetValue(new string[] { field.Name });
-			//			if (!builtObjects.Contains(value))
-			//			{
-			//				mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
-			//				builtObjects.Add(value);
-			//			}
-			//		}
-			//	}
-			//	return Task.CompletedTask;
-			//}
-
-			//public Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
-			//{
-			//	throw new System.NotImplementedException();
-			//}
-
-			public Task LoadResourcesAsync(ICollection<IContainerReadWriter> sources, MappingContext mappingContext)
+			public Task LoadResourcesAsync(IView view, ICollection<IContainerReadWriter> sources, MappingContext mappingContext)
 			{
-				throw new System.NotImplementedException();
+				RunCount++;
+				var builtObjects = new List<int>();
+				var fields = view.Fields.Where(q => _fieldNames.Contains(q.Name)).ToArray();
+				foreach (var container in sources)
+				{
+					foreach (var field in fields)
+					{
+						var value = field.ModelBinding.ReadValue<int>(container);
+						if (!builtObjects.Contains(value))
+						{
+							mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
+							builtObjects.Add(value);
+						}
+					}
+				}
+				return Task.CompletedTask;
 			}
 		}
 	}

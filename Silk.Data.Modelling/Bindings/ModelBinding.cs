@@ -1,6 +1,5 @@
 ﻿using Silk.Data.Modelling.ResourceLoaders;
 using System;
-using System.Linq;
 
 namespace Silk.Data.Modelling.Bindings
 {
@@ -43,70 +42,26 @@ namespace Silk.Data.Modelling.Bindings
 			ResourceLoaders = resourceLoaders;
 		}
 
-		public virtual void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
+		public T ReadValue<T>(IContainerReadWriter from)
 		{
-			object value;
 			if (from.ContainerType == ContainerType.Model)
-				value = from.ReadFromPath<object>(ModelFieldPath);
-			else
-				value = from.ReadFromPath<object>(ViewFieldPath);
+				return from.ReadFromPath<T>(ModelFieldPath);
+			return from.ReadFromPath<T>(ViewFieldPath);
+		}
 
+		public void WriteValue<T>(IContainerReadWriter to, T value)
+		{
 			if (to.ContainerType == ContainerType.Model)
 				to.WriteToPath<object>(ModelFieldPath, value);
 			else
 				to.WriteToPath<object>(ViewFieldPath, value);
 		}
 
-		//  OLD API BELOW
-
-		//public virtual void WriteToContainer(IContainer container, object value, MappingContext mappingContext)
-		//{
-		//	container.SetValue(ViewFieldPath, value);
-		//}
-
-		//public virtual object ReadFromContainer(IContainer container, MappingContext mappingContext)
-		//{
-		//	return container.GetValue(ViewFieldPath);
-		//}
-
-		///// <summary>
-		///// Reads the binding value from the provided modelreadwriter.
-		///// </summary>
-		///// <param name="modelReadWriter"></param>
-		///// <returns></returns>
-		//public virtual object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
-		//{
-		//	foreach (var pathComponent in ModelFieldPath)
-		//	{
-		//		var field = modelReadWriter.Model.Fields.FirstOrDefault(q => q.Name == pathComponent);
-		//		if (field == null)
-		//			throw new InvalidOperationException("Invalid field path.");
-		//		modelReadWriter = modelReadWriter.GetField(field);
-		//		if (modelReadWriter == null)
-		//			return null;
-		//	}
-		//	return modelReadWriter.Value;
-		//}
-
-		///// <summary>
-		///// Writes the given value to the bound model field.
-		///// </summary>
-		///// <param name="modelReadWriter"></param>
-		///// <param name="value"></param>
-		///// <returns></returns>
-		//public virtual void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
-		//{
-		//	foreach (var pathComponent in ModelFieldPath)
-		//	{
-		//		var field = modelReadWriter.Model.Fields.FirstOrDefault(q => q.Name == pathComponent);
-		//		if (field == null)
-		//			throw new InvalidOperationException("Invalid field path.");
-		//		modelReadWriter = modelReadWriter.GetField(field);
-		//		if (modelReadWriter == null)
-		//			throw new InvalidOperationException($"Couldn't get field \"{field.Name}\".");
-		//	}
-		//	modelReadWriter.Value = value;
-		//}
+		public virtual void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
+		{
+			object value = ReadValue<object>(from);
+			WriteValue<object>(to, value);
+		}
 	}
 
 	[Flags]

@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ModelToView);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-				await resourceLoader.LoadResourcesAsync(new[] { modelReadWriter }, mappingContext)
+				await resourceLoader.LoadResourcesAsync(view, new[] { modelReadWriter }, mappingContext)
 					.ConfigureAwait(false);
 			}
 
@@ -33,6 +33,7 @@ namespace Silk.Data.Modelling
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
 				await resourceLoader.LoadResourcesAsync(
+					view,
 					modelReadWriters.OfType<IContainerReadWriter>().ToArray(), mappingContext
 					)
 					.ConfigureAwait(false);
@@ -125,7 +126,7 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ViewToModel);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-				await resourceLoader.LoadResourcesAsync(new[] { viewReadWriter }, mappingContext)
+				await resourceLoader.LoadResourcesAsync(view, new[] { viewReadWriter }, mappingContext)
 					.ConfigureAwait(false);
 			}
 
@@ -145,6 +146,7 @@ namespace Silk.Data.Modelling
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
 				await resourceLoader.LoadResourcesAsync(
+					view,
 					viewReadWriters.OfType<IContainerReadWriter>().ToArray(), mappingContext
 					)
 					.ConfigureAwait(false);
