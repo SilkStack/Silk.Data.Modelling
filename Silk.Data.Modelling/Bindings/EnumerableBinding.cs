@@ -41,17 +41,17 @@ namespace Silk.Data.Modelling.Bindings
 			}
 		}
 
-		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
-		{
-			var containerEnum = _baseBinding.ReadFromContainer(container, mappingContext);
-			return _modelEnumerableBuilder.CreateFromSource(containerEnum);
-		}
+		//public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
+		//{
+		//	var containerEnum = _baseBinding.ReadFromContainer(container, mappingContext);
+		//	return _modelEnumerableBuilder.CreateFromSource(containerEnum);
+		//}
 
-		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
-		{
-			var modelEnum = _baseBinding.ReadFromModel(modelReadWriter, mappingContext);
-			return _viewEnumerableBuilder.CreateFromSource(modelEnum);
-		}
+		//public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
+		//{
+		//	var modelEnum = _baseBinding.ReadFromModel(modelReadWriter, mappingContext);
+		//	return _viewEnumerableBuilder.CreateFromSource(modelEnum);
+		//}
 
 		private abstract class EnumerableBuilder
 		{

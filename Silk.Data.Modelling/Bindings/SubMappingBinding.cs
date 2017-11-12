@@ -13,14 +13,14 @@ namespace Silk.Data.Modelling.Bindings
 			Direction = bindingDirection;
 		}
 
-		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
-		{
-			return mappingContext.Resources.Retrieve(modelReadWriter, $"subMapped:{string.Join(".", ModelFieldPath)}");
-		}
+		//public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
+		//{
+		//	return mappingContext.Resources.Retrieve(modelReadWriter, $"subMapped:{string.Join(".", ModelFieldPath)}");
+		//}
 
-		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
-		{
-			return mappingContext.Resources.Retrieve(container, $"subMapped:{string.Join(".", ModelFieldPath)}");
-		}
+		//public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
+		//{
+		//	return mappingContext.Resources.Retrieve(container, $"subMapped:{string.Join(".", ModelFieldPath)}");
+		//}
 	}
 }

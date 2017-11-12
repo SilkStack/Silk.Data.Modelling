@@ -122,12 +122,12 @@ namespace Silk.Data.Modelling.Tests
 			{
 			}
 
-			public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
-			{
-				base.WriteToModel(modelReadWriter,
-					mappingContext.Resources.Retrieve($"subObject:{value}"),
-					mappingContext);
-			}
+			//public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
+			//{
+			//	base.WriteToModel(modelReadWriter,
+			//		mappingContext.Resources.Retrieve($"subObject:{value}"),
+			//		mappingContext);
+			//}
 		}
 
 		private class SubObjectResourceLoader : IResourceLoader
