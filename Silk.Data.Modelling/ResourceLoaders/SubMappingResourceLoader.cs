@@ -148,6 +148,11 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			}
 		}
 
+		public Task LoadResourcesAsync(ICollection<IContainerReadWriter> sources, MappingContext mappingContext)
+		{
+			throw new NotImplementedException();
+		}
+
 		private class MappedResource
 		{
 			public object StoreForObject { get; }

@@ -141,26 +141,31 @@ namespace Silk.Data.Modelling.Tests
 				_fieldNames.Add(fieldName);
 			}
 
-			public Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
-			{
-				RunCount++;
-				var builtObjects = new List<int>();
-				foreach (var container in containers)
-				{
-					foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
-					{
-						var value = (int)container.GetValue(new string[] { field.Name });
-						if (!builtObjects.Contains(value))
-						{
-							mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
-							builtObjects.Add(value);
-						}
-					}
-				}
-				return Task.CompletedTask;
-			}
+			//public Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
+			//{
+			//	RunCount++;
+			//	var builtObjects = new List<int>();
+			//	foreach (var container in containers)
+			//	{
+			//		foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
+			//		{
+			//			var value = (int)container.GetValue(new string[] { field.Name });
+			//			if (!builtObjects.Contains(value))
+			//			{
+			//				mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
+			//				builtObjects.Add(value);
+			//			}
+			//		}
+			//	}
+			//	return Task.CompletedTask;
+			//}
 
-			public Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
+			//public Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
+			//{
+			//	throw new System.NotImplementedException();
+			//}
+
+			public Task LoadResourcesAsync(ICollection<IContainerReadWriter> sources, MappingContext mappingContext)
 			{
 				throw new System.NotImplementedException();
 			}

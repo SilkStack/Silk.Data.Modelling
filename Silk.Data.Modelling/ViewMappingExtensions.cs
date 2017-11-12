@@ -13,7 +13,8 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ModelToView);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-
+				await resourceLoader.LoadResourcesAsync(new[] { modelReadWriter }, mappingContext)
+					.ConfigureAwait(false);
 			}
 
 			foreach (var viewField in view.Fields)
@@ -31,7 +32,10 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ModelToView);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-
+				await resourceLoader.LoadResourcesAsync(
+					modelReadWriters.OfType<IContainerReadWriter>().ToArray(), mappingContext
+					)
+					.ConfigureAwait(false);
 			}
 
 			using (var sourceEnumerator = modelReadWriters.GetEnumerator())
@@ -121,7 +125,8 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ViewToModel);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-
+				await resourceLoader.LoadResourcesAsync(new[] { viewReadWriter }, mappingContext)
+					.ConfigureAwait(false);
 			}
 
 			foreach (var viewField in view.Fields)
@@ -139,7 +144,10 @@ namespace Silk.Data.Modelling
 			var mappingContext = new MappingContext(BindingDirection.ViewToModel);
 			foreach (var resourceLoader in view.ResourceLoaders)
 			{
-
+				await resourceLoader.LoadResourcesAsync(
+					viewReadWriters.OfType<IContainerReadWriter>().ToArray(), mappingContext
+					)
+					.ConfigureAwait(false);
 			}
 
 			using (var sourceEnumerator = modelReadWriters.GetEnumerator())

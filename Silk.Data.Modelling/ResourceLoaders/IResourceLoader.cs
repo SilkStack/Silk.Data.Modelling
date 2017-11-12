@@ -8,16 +8,20 @@ namespace Silk.Data.Modelling.ResourceLoaders
 	/// </summary>
 	public interface IResourceLoader
 	{
-		/// <summary>
-		/// Load all resources from a set of views into the provided mapping context.
-		/// </summary>
-		/// <returns></returns>
-		Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext);
+		Task LoadResourcesAsync(ICollection<IContainerReadWriter> sources, MappingContext mappingContext);
 
-		/// <summary>
-		/// Load all resources from a set of models into the provided mapping context.
-		/// </summary>
-		/// <returns></returns>
-		Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext);
+		//  OLD API
+
+		///// <summary>
+		///// Load all resources from a set of views into the provided mapping context.
+		///// </summary>
+		///// <returns></returns>
+		//Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext);
+
+		///// <summary>
+		///// Load all resources from a set of models into the provided mapping context.
+		///// </summary>
+		///// <returns></returns>
+		//Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext);
 	}
 }
