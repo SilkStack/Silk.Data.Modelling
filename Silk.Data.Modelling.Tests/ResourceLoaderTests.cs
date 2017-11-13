@@ -122,11 +122,13 @@ namespace Silk.Data.Modelling.Tests
 			{
 			}
 
-			public override void WriteToModel(IModelReadWriter modelReadWriter, object value, MappingContext mappingContext)
+			public override void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
 			{
-				base.WriteToModel(modelReadWriter,
-					mappingContext.Resources.Retrieve($"subObject:{value}"),
-					mappingContext);
+				var value = ReadValue<int>(from);
+				WriteValue(
+					to,
+					mappingContext.Resources.Retrieve($"subObject:{value}") as SubObject
+					);
 			}
 		}
 
@@ -141,15 +143,16 @@ namespace Silk.Data.Modelling.Tests
 				_fieldNames.Add(fieldName);
 			}
 
-			public Task LoadResourcesAsync(ICollection<IContainer> containers, MappingContext mappingContext)
+			public Task LoadResourcesAsync(IView view, ICollection<IContainerReadWriter> sources, MappingContext mappingContext)
 			{
 				RunCount++;
 				var builtObjects = new List<int>();
-				foreach (var container in containers)
+				var fields = view.Fields.Where(q => _fieldNames.Contains(q.Name)).ToArray();
+				foreach (var container in sources)
 				{
-					foreach (var field in container.View.Fields.Where(q => _fieldNames.Contains(q.Name)))
+					foreach (var field in fields)
 					{
-						var value = (int)container.GetValue(new string[] { field.Name });
+						var value = field.ModelBinding.ReadValue<int>(container);
 						if (!builtObjects.Contains(value))
 						{
 							mappingContext.Resources.Store($"subObject:{value}", new SubObject(value));
@@ -158,11 +161,6 @@ namespace Silk.Data.Modelling.Tests
 					}
 				}
 				return Task.CompletedTask;
-			}
-
-			public Task LoadResourcesAsync(ICollection<IModelReadWriter> modelReadWriters, MappingContext mappingContext)
-			{
-				throw new System.NotImplementedException();
 			}
 		}
 	}

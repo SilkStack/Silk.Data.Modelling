@@ -2,33 +2,57 @@
 
 namespace Silk.Data.Modelling
 {
-	/// <summary>
-	/// Stores a graph in memory.
-	/// </summary>
-	/// <remarks>Really designed as an example container.</remarks>
-	public class MemoryContainer : IContainer
+	public class MemoryModelReadWriter : ModelReadWriter
 	{
-		public TypedModel Model { get; }
-
-		public IView View { get; }
-
-		public Dictionary<string, object> Data { get; } = new Dictionary<string, object>();
-
-		public MemoryContainer(TypedModel model, IView view)
+		public MemoryModelReadWriter(Model model, Dictionary<string,object> store = null)
+			: base(model)
 		{
-			Model = model;
-			View = view;
+			if (store != null)
+				Store = store;
+			else
+				Store = new Dictionary<string, object>();
 		}
 
-		public void SetValue(string[] fieldPath, object value)
+		public Dictionary<string, object> Store { get; }
+
+		public override T ReadFromPath<T>(string[] path)
 		{
-			Data[string.Join(".", fieldPath)] = value;
+			Store.TryGetValue(string.Join(".", path), out var value);
+			if (value == null)
+				return default(T);
+			return (T)value;
 		}
 
-		public object GetValue(string[] fieldPath)
+		public override void WriteToPath<T>(string[] path, T value)
 		{
-			Data.TryGetValue(string.Join(".", fieldPath), out var value);
-			return value;
+			Store[string.Join(".", path)] = value;
+		}
+	}
+
+	public class MemoryViewReadWriter : ViewReadWriter
+	{
+		public MemoryViewReadWriter(IView view, Dictionary<string, object> store = null)
+			: base(view)
+		{
+			if (store != null)
+				Store = store;
+			else
+				Store = new Dictionary<string, object>();
+		}
+
+		public Dictionary<string, object> Store { get; }
+
+		public override T ReadFromPath<T>(string[] path)
+		{
+			Store.TryGetValue(string.Join(".", path), out var value);
+			if (value == null)
+				return default(T);
+			return (T)value;
+		}
+
+		public override void WriteToPath<T>(string[] path, T value)
+		{
+			Store[string.Join(".", path)] = value;
 		}
 	}
 }

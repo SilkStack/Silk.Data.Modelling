@@ -29,15 +29,14 @@ namespace Silk.Data.Modelling.Conventions
 						continue;
 
 					var subMapper = GetSubMapper(viewDefinition);
-					if (!subMapper.HasMapping(bindField.DataType, field.DataType))
-					{
-						subMapper.AddMapping(bindField.DataTypeModel, field.DataType,
-							viewDefinition.ViewConventions);
-					}
-					subMapper.AddMappedField(bindField.Name, field.Name, bindField.DataType, field.DataType);
-					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-						new SubMappingBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name },
-						new[] { subMapper }))
+					var binding = new SubMappingBinding(
+						bindingDirection,
+						new[] { bindField.Name },
+						new[] { field.Name },
+						new[] { subMapper }
+						);
+					subMapper.AddField(field.Name, binding, bindField.DataType, field.DataType);
+					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name, binding)
 					{
 						DataType = field.DataType
 					});
@@ -53,7 +52,10 @@ namespace Silk.Data.Modelling.Conventions
 				.FirstOrDefault();
 			if (subMapper == null)
 			{
-				subMapper = new SubMappingResourceLoader(viewDefinition.SourceModel);
+				subMapper = new SubMappingResourceLoader(
+					viewDefinition.SourceModel,
+					viewDefinition.ViewConventions
+					);
 				viewDefinition.ResourceLoaders.Add(subMapper);
 			}
 			return subMapper;

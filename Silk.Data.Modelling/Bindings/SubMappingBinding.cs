@@ -13,14 +13,9 @@ namespace Silk.Data.Modelling.Bindings
 			Direction = bindingDirection;
 		}
 
-		public override object ReadFromModel(IModelReadWriter modelReadWriter, MappingContext mappingContext)
+		public override T ReadTransformedValue<T>(IContainerReadWriter from, MappingContext mappingContext)
 		{
-			return mappingContext.Resources.Retrieve(modelReadWriter, $"subMapped:{string.Join(".", ModelFieldPath)}");
-		}
-
-		public override object ReadFromContainer(IContainer container, MappingContext mappingContext)
-		{
-			return mappingContext.Resources.Retrieve(container, $"subMapped:{string.Join(".", ModelFieldPath)}");
+			return (T)mappingContext.Resources.Retrieve(from, string.Join(".", ModelFieldPath));
 		}
 	}
 }

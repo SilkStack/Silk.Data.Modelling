@@ -13,37 +13,37 @@ namespace Silk.Data.Modelling.Tests
 		public async Task MapDefaultViewToModel()
 		{
 			var view = _nonGenericModel.CreateView();
-			var container = new MemoryContainer(_nonGenericModel, view);
-			container.Data[nameof(SimpleClassWithPublicProperties.Integer)] = 5;
-			container.Data[nameof(SimpleClassWithPublicProperties.String)] = "Hello World";
-			container.Data[nameof(SimpleClassWithPublicProperties.Object)] = new object();
+			var container = new MemoryViewReadWriter(view);
+			container.Store[nameof(SimpleClassWithPublicProperties.Integer)] = 5;
+			container.Store[nameof(SimpleClassWithPublicProperties.String)] = "Hello World";
+			container.Store[nameof(SimpleClassWithPublicProperties.Object)] = new object();
 
 			var instance = new SimpleClassWithPublicProperties();
-			var readWriter = new ObjectReadWriter(_nonGenericModel, instance);
+			var readWriter = new ObjectModelReadWriter(_nonGenericModel, instance);
 
 			await view.MapToModelAsync(readWriter, container)
 				.ConfigureAwait(false);
 
-			Assert.AreEqual(container.Data[nameof(SimpleClassWithPublicProperties.Integer)], instance.Integer);
-			Assert.AreEqual(container.Data[nameof(SimpleClassWithPublicProperties.String)], instance.String);
-			Assert.ReferenceEquals(container.Data[nameof(SimpleClassWithPublicProperties.Object)], instance.Object);
+			Assert.AreEqual(container.Store[nameof(SimpleClassWithPublicProperties.Integer)], instance.Integer);
+			Assert.AreEqual(container.Store[nameof(SimpleClassWithPublicProperties.String)], instance.String);
+			Assert.ReferenceEquals(container.Store[nameof(SimpleClassWithPublicProperties.Object)], instance.Object);
 		}
 
 		[TestMethod]
 		public async Task MapTypedViewToModel()
 		{
 			var view = _genericModel.CreateTypedView();
-			var container = new MemoryContainer(_nonGenericModel, view);
-			container.Data[nameof(SimpleClassWithPublicProperties.Integer)] = 5;
-			container.Data[nameof(SimpleClassWithPublicProperties.String)] = "Hello World";
-			container.Data[nameof(SimpleClassWithPublicProperties.Object)] = new object();
+			var container = new MemoryViewReadWriter(view);
+			container.Store[nameof(SimpleClassWithPublicProperties.Integer)] = 5;
+			container.Store[nameof(SimpleClassWithPublicProperties.String)] = "Hello World";
+			container.Store[nameof(SimpleClassWithPublicProperties.Object)] = new object();
 			var instance = new SimpleClassWithPublicProperties();
 
 			await view.MapToModelAsync(instance, container)
 				.ConfigureAwait(false);
-			Assert.AreEqual(container.Data[nameof(SimpleClassWithPublicProperties.Integer)], instance.Integer);
-			Assert.AreEqual(container.Data[nameof(SimpleClassWithPublicProperties.String)], instance.String);
-			Assert.ReferenceEquals(container.Data[nameof(SimpleClassWithPublicProperties.Object)], instance.Object);
+			Assert.AreEqual(container.Store[nameof(SimpleClassWithPublicProperties.Integer)], instance.Integer);
+			Assert.AreEqual(container.Store[nameof(SimpleClassWithPublicProperties.String)], instance.String);
+			Assert.ReferenceEquals(container.Store[nameof(SimpleClassWithPublicProperties.Object)], instance.Object);
 		}
 
 		[TestMethod]

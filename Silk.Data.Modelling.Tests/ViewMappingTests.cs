@@ -19,11 +19,11 @@ namespace Silk.Data.Modelling.Tests
 				String = "Hello World",
 				Object = new object()
 			};
-			var readWriter = new ObjectReadWriter(_nonGenericModel, instance);
-			var container = new MemoryContainer(_nonGenericModel, view);
+			var readWriter = new ObjectModelReadWriter(_nonGenericModel, instance);
+			var container = new MemoryViewReadWriter(view);
 			await view.MapToViewAsync(readWriter, container)
 				.ConfigureAwait(false);
-			var data = container.Data;
+			var data = container.Store;
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Integer)));
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.String)));
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Object)));
@@ -42,10 +42,10 @@ namespace Silk.Data.Modelling.Tests
 				String = "Hello World",
 				Object = new object()
 			};
-			var container = new MemoryContainer(_genericModel, view);
+			var container = new MemoryViewReadWriter(view);
 			await view.MapToViewAsync(instance, container)
 				.ConfigureAwait(false);
-			var data = container.Data;
+			var data = container.Store;
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Integer)));
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.String)));
 			Assert.AreEqual(true, data.ContainsKey(nameof(Model.Object)));
