@@ -13,9 +13,9 @@ namespace Silk.Data.Modelling.Bindings
 			Direction = bindingDirection;
 		}
 
-		public override void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
+		public override T ReadTransformedValue<T>(IContainerReadWriter from, MappingContext mappingContext)
 		{
-			WriteValue<object>(to, mappingContext.Resources.Retrieve(this, string.Join(".", ModelFieldPath)));
+			return (T)mappingContext.Resources.Retrieve(from, string.Join(".", ModelFieldPath));
 		}
 	}
 }

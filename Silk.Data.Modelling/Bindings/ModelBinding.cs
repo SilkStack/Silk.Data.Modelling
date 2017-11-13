@@ -57,9 +57,14 @@ namespace Silk.Data.Modelling.Bindings
 				to.WriteToPath<object>(ViewFieldPath, value);
 		}
 
+		public virtual T ReadTransformedValue<T>(IContainerReadWriter from, MappingContext mappingContext)
+		{
+			return ReadValue<T>(from);
+		}
+
 		public virtual void CopyBindingValue(IContainerReadWriter from, IContainerReadWriter to, MappingContext mappingContext)
 		{
-			object value = ReadValue<object>(from);
+			object value = ReadTransformedValue<object>(from, mappingContext);
 			WriteValue<object>(to, value);
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Bindings;
 using Silk.Data.Modelling.Conventions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,33 +53,28 @@ namespace Silk.Data.Modelling.ResourceLoaders
 			{
 				var modelReadWriters = new List<ModelReadWriter>();
 				var viewReadWriters = new List<ViewReadWriter>();
-				var mappedInstances = new List<object>();
+				var mappingResults = new List<MappingResult>();
 
 				foreach (var source in sources)
 				{
 					foreach (var field in mapping.Fields)
 					{
-						if (mappingContext.BindingDirection == BindingDirection.ViewToModel)
+						var resourceFieldName = string.Join(".", field.Binding.ModelFieldPath);
+						var value = field.Binding.ReadValue<object>(source);
+						if (value is IEnumerable values)
 						{
-							var instance = mapping.CreateModelInstance();
-							mappedInstances.Add(instance);
-							viewReadWriters.Add(
-								new ObjectViewReadWriter(mapping.View, field.Binding.ReadValue<object>(source))
-								);
-							modelReadWriters.Add(
-								new ObjectModelReadWriter(mapping.View.Model, instance)
-								);
+							foreach (var enumValue in values)
+							{
+								AddMapping(mapping, mappingContext, enumValue,
+									field.Binding, modelReadWriters, viewReadWriters,
+									mappingResults, resourceFieldName, source);
+							}
 						}
 						else
 						{
-							var instance = mapping.CreateViewInstance();
-							mappedInstances.Add(instance);
-							modelReadWriters.Add(
-								new ObjectModelReadWriter(mapping.View.Model, field.Binding.ReadValue<object>(source))
-								);
-							viewReadWriters.Add(
-								new ObjectViewReadWriter(mapping.View, instance)
-								);
+							AddMapping(mapping, mappingContext, value,
+								field.Binding, modelReadWriters, viewReadWriters,
+								mappingResults, resourceFieldName, source);
 						}
 					}
 				}
@@ -90,21 +86,60 @@ namespace Silk.Data.Modelling.ResourceLoaders
 					await mapping.View.MapToViewAsync(modelReadWriters, viewReadWriters)
 						.ConfigureAwait(false);
 
-				using (var instanceEnumerator = mappedInstances.GetEnumerator())
+				foreach (var mappingResult in mappingResults)
 				{
-					foreach (var source in sources)
-					{
-						foreach (var field in mapping.Fields)
-						{
-							instanceEnumerator.MoveNext();
-							mappingContext.Resources.Store(
-								field.Binding,
-								string.Join(".", field.Binding.ModelFieldPath),
-								instanceEnumerator.Current
-								);
-						}
-					}
+					mappingContext.Resources.Store(
+						mappingResult.SourceReadWriter,
+						mappingResult.ResourceFieldName,
+						mappingResult.ResultInstance
+						);
 				}
+			}
+		}
+
+		private void AddMapping(Mapping mapping, MappingContext mappingContext,
+			object value, ModelBinding modelBinding,
+			List<ModelReadWriter> modelReadWriters, List<ViewReadWriter> viewReadWriters,
+			List<MappingResult> mappingResults, string resourceFieldName,
+			IContainerReadWriter sourceReadWriter)
+		{
+			if (mappingContext.BindingDirection == BindingDirection.ViewToModel)
+			{
+				var instance = mapping.CreateModelInstance();
+				mappingResults.Add(new MappingResult(sourceReadWriter, resourceFieldName, instance));
+				viewReadWriters.Add(
+					new ObjectViewReadWriter(mapping.View, value)
+					);
+				modelReadWriters.Add(
+					new ObjectModelReadWriter(mapping.View.Model, instance)
+					);
+			}
+			else
+			{
+				var instance = mapping.CreateViewInstance();
+				mappingResults.Add(new MappingResult(sourceReadWriter, resourceFieldName, instance));
+				modelReadWriters.Add(
+					new ObjectModelReadWriter(mapping.View.Model, value)
+					);
+				viewReadWriters.Add(
+					new ObjectViewReadWriter(mapping.View, instance)
+					);
+			}
+		}
+
+		private class MappingResult
+		{
+			public IContainerReadWriter SourceReadWriter { get; }
+			public string ResourceFieldName { get; }
+			public object ResultInstance { get; }
+
+			public MappingResult(IContainerReadWriter sourceReadWriter,
+				string resourceFieldName,
+				object resultInstance)
+			{
+				SourceReadWriter = sourceReadWriter;
+				ResourceFieldName = resourceFieldName;
+				ResultInstance = resultInstance;
 			}
 		}
 
