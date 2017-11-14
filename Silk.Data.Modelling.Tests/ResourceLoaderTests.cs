@@ -92,6 +92,8 @@ namespace Silk.Data.Modelling.Tests
 
 		private class SubObjectSupport : ViewConvention
 		{
+			public override ViewType SupportedViewTypes => ViewType.All;
+
 			public override void MakeModelFields(Modelling.Model model, TypedModelField field, ViewDefinition viewDefinition)
 			{
 				var subObjectLoader = viewDefinition.ResourceLoaders.OfType<SubObjectResourceLoader>().FirstOrDefault();
