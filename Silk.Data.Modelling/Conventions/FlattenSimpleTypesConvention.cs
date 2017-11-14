@@ -8,6 +8,8 @@ namespace Silk.Data.Modelling.Conventions
 {
 	public class FlattenSimpleTypesConvention : ViewConvention
 	{
+		public override ViewType SupportedViewTypes => ViewType.ModelDriven;
+
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{
 			if (!IsSimpleType(field.DataType) || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))

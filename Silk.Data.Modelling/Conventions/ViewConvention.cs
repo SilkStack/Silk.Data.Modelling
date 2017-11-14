@@ -3,8 +3,13 @@
 	/// <summary>
 	/// Defines a convention used for creating views.
 	/// </summary>
-	public class ViewConvention
+	public abstract class ViewConvention
 	{
+		/// <summary>
+		/// View types the view convention should be executed for.
+		/// </summary>
+		public abstract ViewType SupportedViewTypes { get; }
+
 		/// <summary>
 		/// Defines view fields from the given model field.
 		/// </summary>

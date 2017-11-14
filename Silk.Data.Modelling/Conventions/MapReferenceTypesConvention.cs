@@ -9,6 +9,8 @@ namespace Silk.Data.Modelling.Conventions
 	/// </summary>
 	public class MapReferenceTypesConvention : ViewConvention
 	{
+		public override ViewType SupportedViewTypes => ViewType.All;
+
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{
 			if (field.DataType.IsValueType || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name) ||

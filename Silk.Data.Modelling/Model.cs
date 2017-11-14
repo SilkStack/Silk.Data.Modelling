@@ -59,6 +59,7 @@ namespace Silk.Data.Modelling
 
 		protected virtual ViewDefinition CreateViewDefinition(ViewConvention[] viewConventions, object[] userData, Model targetModel = null)
 		{
+			var viewBuildMode = targetModel == null ? ViewType.ConventionDerived : ViewType.ModelDriven;
 			if (targetModel == null)
 				targetModel = this;
 
@@ -71,13 +72,19 @@ namespace Silk.Data.Modelling
 			{
 				foreach (var viewConvention in viewConventions)
 				{
-					viewConvention.MakeModelFields(this, field, viewDefinition);
+					if (viewConvention.SupportedViewTypes.HasFlag(viewBuildMode))
+					{
+						viewConvention.MakeModelFields(this, field, viewDefinition);
+					}
 				}
 			}
 			_bindEnumerableConversions.FinalizeModel(viewDefinition);
 			foreach (var viewConvention in viewConventions)
 			{
-				viewConvention.FinalizeModel(viewDefinition);
+				if (viewConvention.SupportedViewTypes.HasFlag(viewBuildMode))
+				{
+					viewConvention.FinalizeModel(viewDefinition);
+				}
 			}
 
 			return viewDefinition;

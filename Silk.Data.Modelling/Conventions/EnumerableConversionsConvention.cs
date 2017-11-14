@@ -6,6 +6,8 @@ namespace Silk.Data.Modelling.Conventions
 {
 	public class EnumerableConversionsConvention : ViewConvention
 	{
+		public override ViewType SupportedViewTypes => ViewType.All;
+
 		public override void FinalizeModel(ViewDefinition viewDefinition)
 		{
 			foreach (var field in viewDefinition.FieldDefinitions)
