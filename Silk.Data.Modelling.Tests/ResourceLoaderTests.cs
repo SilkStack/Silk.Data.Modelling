@@ -90,9 +90,11 @@ namespace Silk.Data.Modelling.Tests
 			public int Object2Value { get; set; }
 		}
 
-		private class SubObjectSupport : ViewConvention
+		private class SubObjectSupport : ViewConvention<ViewBuilder>
 		{
 			public override ViewType SupportedViewTypes => ViewType.All;
+			public override bool PerformMultiplePasses => false;
+			public override bool SkipIfFieldDefined => true;
 
 			public override void MakeModelFields(Modelling.Model model, TypedModelField field, ViewDefinition viewDefinition)
 			{

@@ -6,9 +6,11 @@ namespace Silk.Data.Modelling.Conventions
 	/// <summary>
 	/// Copies references to objects when types are compatible.
 	/// </summary>
-	public class CopyReferencesConvention : ViewConvention
+	public class CopyReferencesConvention : ViewConvention<ViewBuilder>
 	{
 		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
 
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{

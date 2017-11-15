@@ -7,9 +7,11 @@ namespace Silk.Data.Modelling.Conventions
 	/// <summary>
 	/// Maps reference types that have matching names, or flattened names.
 	/// </summary>
-	public class MapReferenceTypesConvention : ViewConvention
+	public class MapReferenceTypesConvention : ViewConvention<ViewBuilder>
 	{
 		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
 
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{

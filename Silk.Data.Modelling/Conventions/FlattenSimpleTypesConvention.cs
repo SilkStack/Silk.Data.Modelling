@@ -6,9 +6,11 @@ using System.Text;
 
 namespace Silk.Data.Modelling.Conventions
 {
-	public class FlattenSimpleTypesConvention : ViewConvention
+	public class FlattenSimpleTypesConvention : ViewConvention<ViewBuilder>
 	{
 		public override ViewType SupportedViewTypes => ViewType.ModelDriven;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
 
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{

@@ -4,9 +4,11 @@ using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
-	public class EnumerableConversionsConvention : ViewConvention
+	public class EnumerableConversionsConvention : ViewConvention<ViewBuilder>
 	{
 		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
 
 		public override void FinalizeModel(ViewDefinition viewDefinition)
 		{

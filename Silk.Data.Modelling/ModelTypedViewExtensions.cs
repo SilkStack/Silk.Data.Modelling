@@ -8,7 +8,7 @@ namespace Silk.Data.Modelling
 	/// </summary>
 	public static class ModelTypedViewExtensions
 	{
-		public static TypedDefaultView<TSource> CreateTypedView<TSource>(this TypedModel<TSource> model, params ViewConvention[] viewConventions)
+		public static TypedDefaultView<TSource> CreateTypedView<TSource>(this TypedModel<TSource> model, params ViewConvention<ViewBuilder>[] viewConventions)
 		{
 			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
 					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
@@ -16,7 +16,7 @@ namespace Silk.Data.Modelling
 		}
 
 		public static TypedDefaultView<TSource> CreateTypedView<TSource>(this TypedModel<TSource> model,
-			Type viewType, params ViewConvention[] viewConventions)
+			Type viewType, params ViewConvention<ViewBuilder>[] viewConventions)
 		{
 			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
 					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
@@ -24,7 +24,7 @@ namespace Silk.Data.Modelling
 		}
 
 		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView>(this TypedModel<TSource> model,
-			params ViewConvention[] viewConventions)
+			params ViewConvention<ViewBuilder>[] viewConventions)
 		{
 			return model.CreateView<TypedDefaultView<TSource, TView>, TView>(viewDefinition => new TypedDefaultView<TSource, TView>(viewDefinition.Name,
 					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
@@ -33,7 +33,7 @@ namespace Silk.Data.Modelling
 
 		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView>(
 			this TypedModel<TSource>.Modeller<TView> modeller,
-			params ViewConvention[] viewConventions)
+			params ViewConvention<ViewBuilder>[] viewConventions)
 		{
 			return modeller.Model.CreateTypedView<TSource, TView>(viewConventions);
 		}

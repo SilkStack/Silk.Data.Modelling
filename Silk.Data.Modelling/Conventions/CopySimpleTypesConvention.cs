@@ -7,9 +7,11 @@ namespace Silk.Data.Modelling.Conventions
 	/// <summary>
 	/// Copies simple types.
 	/// </summary>
-	public class CopySimpleTypesConvention : ViewConvention
+	public class CopySimpleTypesConvention : ViewConvention<ViewBuilder>
 	{
 		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
 
 		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
 		{
