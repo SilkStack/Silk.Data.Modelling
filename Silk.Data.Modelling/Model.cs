@@ -27,14 +27,14 @@ namespace Silk.Data.Modelling
 		/// <summary>
 		/// Gets the fields present on the model.
 		/// </summary>
-		public TypedModelField[] Fields { get; }
+		public ModelField[] Fields { get; }
 
 		/// <summary>
 		/// Gets metadata present on the model.
 		/// </summary>
 		public object[] Metadata { get; }
 
-		public Model(string name, IEnumerable<TypedModelField> fields, IEnumerable<object> metadata)
+		public Model(string name, IEnumerable<ModelField> fields, IEnumerable<object> metadata)
 		{
 			Name = name;
 			Fields = fields.ToArray();
@@ -43,10 +43,10 @@ namespace Silk.Data.Modelling
 				field.ParentModel = this;
 		}
 
-		public TypedModelField GetField(string[] path)
+		public ModelField GetField(string[] path)
 		{
 			var currentModel = this;
-			TypedModelField result = null;
+			ModelField result = null;
 			foreach (var pathSegment in path)
 			{
 				result = currentModel.Fields.FirstOrDefault(q => q.Name == pathSegment);

@@ -12,7 +12,7 @@ namespace Silk.Data.Modelling.Conventions
 		public override bool PerformMultiplePasses => false;
 		public override bool SkipIfFieldDefined => true;
 
-		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
+		public override void MakeModelFields(Model model, ModelField field, ViewDefinition viewDefinition)
 		{
 			if (field.DataType.IsValueType || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
 				return;

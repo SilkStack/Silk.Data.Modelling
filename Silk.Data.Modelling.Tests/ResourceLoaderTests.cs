@@ -99,7 +99,7 @@ namespace Silk.Data.Modelling.Tests
 			public override bool PerformMultiplePasses => false;
 			public override bool SkipIfFieldDefined => true;
 
-			public override void MakeModelFields(Modelling.Model model, TypedModelField field, ViewDefinition viewDefinition)
+			public override void MakeModelFields(Modelling.Model model, ModelField field, ViewDefinition viewDefinition)
 			{
 				var subObjectLoader = viewDefinition.ResourceLoaders.OfType<SubObjectResourceLoader>().FirstOrDefault();
 				if (subObjectLoader == null)
