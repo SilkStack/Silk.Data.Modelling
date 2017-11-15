@@ -37,5 +37,39 @@ namespace Silk.Data.Modelling
 		{
 			return modeller.Model.CreateTypedView<TSource, TView>(viewConventions);
 		}
+
+		public static TypedDefaultView<TSource> CreateTypedView<TSource, TBuilder>(this TypedModel<TSource> model, params ViewConvention<TBuilder>[] viewConventions)
+			where TBuilder : ViewBuilder
+		{
+			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
+					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
+				viewConventions);
+		}
+
+		public static TypedDefaultView<TSource> CreateTypedView<TSource, TBuilder>(this TypedModel<TSource> model,
+			Type viewType, params ViewConvention<TBuilder>[] viewConventions)
+			where TBuilder : ViewBuilder
+		{
+			return model.CreateView(viewDefinition => new TypedDefaultView<TSource>(viewDefinition.Name,
+					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
+				viewType, viewConventions);
+		}
+
+		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView, TBuilder>(this TypedModel<TSource> model,
+			params ViewConvention<TBuilder>[] viewConventions)
+			where TBuilder : ViewBuilder
+		{
+			return model.CreateView<TypedDefaultView<TSource, TView>, TView, TBuilder>(viewDefinition => new TypedDefaultView<TSource, TView>(viewDefinition.Name,
+					ViewField.FromDefinitions(viewDefinition.FieldDefinitions), model, viewDefinition.ResourceLoaders),
+				viewConventions);
+		}
+
+		public static TypedDefaultView<TSource, TView> CreateTypedView<TSource, TView, TBuilder>(
+			this TypedModel<TSource>.Modeller<TView> modeller,
+			params ViewConvention<TBuilder>[] viewConventions)
+			where TBuilder : ViewBuilder
+		{
+			return modeller.Model.CreateTypedView<TSource, TView, TBuilder>(viewConventions);
+		}
 	}
 }

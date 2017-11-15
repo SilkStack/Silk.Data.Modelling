@@ -90,7 +90,10 @@ namespace Silk.Data.Modelling.Tests
 			public int Object2Value { get; set; }
 		}
 
-		private class SubObjectSupport : ViewConvention<ViewBuilder>
+		private class CustomViewBuilder : ViewBuilder
+		{ }
+
+		private class SubObjectSupport : ViewConvention<CustomViewBuilder>
 		{
 			public override ViewType SupportedViewTypes => ViewType.All;
 			public override bool PerformMultiplePasses => false;
