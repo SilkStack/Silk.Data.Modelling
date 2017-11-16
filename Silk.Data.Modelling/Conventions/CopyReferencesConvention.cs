@@ -12,30 +12,16 @@ namespace Silk.Data.Modelling.Conventions
 		public override bool PerformMultiplePasses => false;
 		public override bool SkipIfFieldDefined => true;
 
-		public override void MakeModelFields(Model model, ModelField field, ViewDefinition viewDefinition)
+		public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
 		{
-			if (field.DataType.IsValueType || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
-				return;
-			var bindField = model.Fields.FirstOrDefault(q => q.Name == field.Name);
-			if (bindField == null)
+			if (field.DataType.IsValueType) return;
+
+			var sourceField = viewBuilder.FindField(field, field.Name,
+				dataType: field.DataType);
+			if (sourceField == null || sourceField.BindingDirection == BindingDirection.None)
 				return;
 
-			var bindingDirection = BindingDirection.None;
-			if (field.CanWrite && bindField.CanRead)
-				bindingDirection |= BindingDirection.ModelToView;
-			if (field.CanRead && bindField.CanWrite)
-				bindingDirection |= BindingDirection.ViewToModel;
-			if (bindingDirection == BindingDirection.None)
-				return;
-
-			if (bindField.DataType == field.DataType)
-			{
-				viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-					new AssignmentBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name }))
-				{
-					DataType = field.DataType
-				});
-			}
+			viewBuilder.DefineAssignedViewField(sourceField);
 		}
 	}
 }

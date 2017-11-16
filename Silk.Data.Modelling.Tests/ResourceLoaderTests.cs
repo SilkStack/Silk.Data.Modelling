@@ -91,7 +91,11 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		private class CustomViewBuilder : ViewBuilder
-		{ }
+		{
+			protected CustomViewBuilder(Modelling.Model sourceModel, Modelling.Model targetModel, ViewConvention[] viewConventions) : base(sourceModel, targetModel, viewConventions)
+			{
+			}
+		}
 
 		private class SubObjectSupport : ViewConvention<CustomViewBuilder>
 		{
