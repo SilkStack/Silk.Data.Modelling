@@ -22,10 +22,30 @@ namespace Silk.Data.Modelling
 
 		public FieldInfo FindField(ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
 		{
-			var model = TargetModel ?? SourceModel;
-			var field = model.Fields
+			var field = SourceModel.Fields
 				.FirstOrDefault(q => FieldSelector(q, name, caseSenitive, dataType));
 			if (field == null)
+				return null;
+
+			return new FieldInfo(field, GetBindingDirection(modelField, field));
+		}
+
+		public FieldInfo FindField(ModelField modelField, string[] path, bool caseSenitive = true, Type dataType = null)
+		{
+			var model = SourceModel;
+			ModelField field = null;
+			foreach (var pathComponent in path)
+			{
+				field = model.Fields.FirstOrDefault(q => FieldSelector(q, pathComponent, caseSenitive, null));
+				if (field == null)
+					break;
+				model = field.DataTypeModel;
+			}
+
+			if (field == null)
+				return null;
+
+			if (dataType != null && field.DataType != dataType)
 				return null;
 
 			return new FieldInfo(field, GetBindingDirection(modelField, field));
