@@ -1,5 +1,4 @@
 ﻿using Silk.Data.Modelling.Bindings;
-using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
