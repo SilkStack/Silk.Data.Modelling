@@ -1,6 +1,4 @@
 ﻿using Silk.Data.Modelling.Bindings;
-using Silk.Data.Modelling.ResourceLoaders;
-using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
@@ -13,56 +11,19 @@ namespace Silk.Data.Modelling.Conventions
 		public override bool PerformMultiplePasses => false;
 		public override bool SkipIfFieldDefined => true;
 
-		public override void MakeModelFields(Model model, ModelField field, ViewDefinition viewDefinition)
+		public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
 		{
-			if (field.DataType.IsValueType || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name) ||
-				!field.DataType.GetConstructors().Any(q => q.GetParameters().Length == 0))
-				return;
 			var checkPaths = ConventionHelpers.GetPaths(field.Name);
 			foreach (var path in checkPaths)
 			{
-				var bindField = ConventionHelpers.GetField(path, model);
-				if (bindField != null && !bindField.DataType.IsValueType)
-				{
-					var bindingDirection = BindingDirection.None;
-					if (field.CanWrite && bindField.CanRead)
-						bindingDirection |= BindingDirection.ModelToView;
-					if (field.CanRead && bindField.CanWrite)
-						bindingDirection |= BindingDirection.ViewToModel;
-					if (bindingDirection == BindingDirection.None)
-						continue;
+				var bindField = viewBuilder.FindField(field, path);
+				if (bindField == null || bindField.BindingDirection == BindingDirection.None ||
+					bindField.Field.DataType.IsValueType)
+					continue;
 
-					var subMapper = GetSubMapper(viewDefinition);
-					var binding = new SubMappingBinding(
-						bindingDirection,
-						new[] { bindField.Name },
-						new[] { field.Name },
-						new[] { subMapper }
-						);
-					subMapper.AddField(field.Name, binding, bindField.DataType, field.DataType);
-					viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name, binding)
-					{
-						DataType = field.DataType
-					});
-					break;
-				}
+				viewBuilder.DefineMappedViewField(field, bindField, path);
+				break;
 			}
-		}
-
-		private SubMappingResourceLoader GetSubMapper(ViewDefinition viewDefinition)
-		{
-			var subMapper = viewDefinition.ResourceLoaders
-				.OfType<SubMappingResourceLoader>()
-				.FirstOrDefault();
-			if (subMapper == null)
-			{
-				subMapper = new SubMappingResourceLoader(
-					viewDefinition.SourceModel,
-					viewDefinition.ViewConventions
-					);
-				viewDefinition.ResourceLoaders.Add(subMapper);
-			}
-			return subMapper;
 		}
 	}
 }
