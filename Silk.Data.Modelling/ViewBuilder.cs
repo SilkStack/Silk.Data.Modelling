@@ -56,9 +56,9 @@ namespace Silk.Data.Modelling
 			var bindingDirection = BindingDirection.None;
 
 			if (modelField.CanRead && viewFieldCandidate.CanWrite)
-				bindingDirection |= BindingDirection.ModelToView;
-			if (viewFieldCandidate.CanRead && modelField.CanWrite)
 				bindingDirection |= BindingDirection.ViewToModel;
+			if (viewFieldCandidate.CanRead && modelField.CanWrite)
+				bindingDirection |= BindingDirection.ModelToView;
 
 			return bindingDirection;
 		}
