@@ -13,6 +13,9 @@ namespace Silk.Data.Modelling.Conventions
 
 		public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
 		{
+			if (field.DataType.IsValueType)
+				return;
+
 			var checkPaths = ConventionHelpers.GetPaths(field.Name);
 			foreach (var path in checkPaths)
 			{
