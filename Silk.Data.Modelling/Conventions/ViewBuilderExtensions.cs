@@ -8,9 +8,11 @@ namespace Silk.Data.Modelling.Conventions
 	public static class ViewBuilderExtensions
 	{
 		public static void DefineAssignedViewField(this ViewBuilder viewBuilder, ViewBuilder.FieldInfo fieldInfo,
-			string[] modelBindingPath = null)
+			string[] modelBindingPath = null, string viewFieldName = null)
 		{
-			viewBuilder.DefineAssignedViewField(fieldInfo.Field.Name, fieldInfo.Field.DataType,
+			if (viewFieldName == null)
+				viewFieldName = fieldInfo.Field.Name;
+			viewBuilder.DefineAssignedViewField(viewFieldName, fieldInfo.Field.DataType,
 				fieldInfo.BindingDirection, modelBindingPath);
 		}
 
