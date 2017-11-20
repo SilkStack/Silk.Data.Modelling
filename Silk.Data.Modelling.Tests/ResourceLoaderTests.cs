@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task CustomResourceLoaderWorks()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new SubObjectSupport());
+			var view = model.GetModeller<View>().CreateTypedView(CustomViewBuilder.Create, new SubObjectSupport());
 
 			var viewInstance = new View
 			{
@@ -36,7 +36,7 @@ namespace Silk.Data.Modelling.Tests
 		public async Task ResourceLoaderSupportsEnumerable()
 		{
 			var model = TypeModeller.GetModelOf<Model>();
-			var view = model.GetModeller<View>().CreateTypedView(new SubObjectSupport());
+			var view = model.GetModeller<View>().CreateTypedView(CustomViewBuilder.Create, new SubObjectSupport());
 
 			var viewInstances = new View[]
 			{
@@ -90,22 +90,40 @@ namespace Silk.Data.Modelling.Tests
 			public int Object2Value { get; set; }
 		}
 
-		private class SubObjectSupport : ViewConvention
+		private class CustomViewBuilder : ViewBuilder
 		{
-			public override void MakeModelFields(Modelling.Model model, TypedModelField field, ViewDefinition viewDefinition)
+			protected CustomViewBuilder(Modelling.Model sourceModel, Modelling.Model targetModel, ViewConvention[] viewConventions) : base(sourceModel, targetModel, viewConventions)
 			{
-				var subObjectLoader = viewDefinition.ResourceLoaders.OfType<SubObjectResourceLoader>().FirstOrDefault();
+			}
+
+			public new static CustomViewBuilder Create(Modelling.Model sourceModel, Modelling.Model targetModel,
+				ViewConvention[] viewConventions)
+			{
+				return new CustomViewBuilder(sourceModel, targetModel, viewConventions);
+			}
+		}
+
+		private class SubObjectSupport : ViewConvention<CustomViewBuilder>
+		{
+			public override ViewType SupportedViewTypes => ViewType.All;
+			public override bool PerformMultiplePasses => false;
+			public override bool SkipIfFieldDefined => true;
+
+			public override void MakeModelField(CustomViewBuilder viewBuilder, ModelField field)
+			{
+				var subObjectLoader = viewBuilder.ViewDefinition.ResourceLoaders
+					.OfType<SubObjectResourceLoader>().FirstOrDefault();
 				if (subObjectLoader == null)
 				{
 					subObjectLoader = new SubObjectResourceLoader();
-					viewDefinition.ResourceLoaders.Add(subObjectLoader);
+					viewBuilder.ViewDefinition.ResourceLoaders.Add(subObjectLoader);
 				}
 
 				var fieldName = field.Name.Replace("Value", "");
-				var bindField = model.Fields.First(q => q.Name == fieldName);
+				var bindField = viewBuilder.FindField(field, fieldName);
 
-				viewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
-					new SubObjectBinding(new[] { bindField.Name }, new[] { field.Name }))
+				viewBuilder.ViewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
+					new SubObjectBinding(new[] { bindField.Field.Name }, new[] { field.Name }))
 				{
 					DataType = field.DataType
 				});

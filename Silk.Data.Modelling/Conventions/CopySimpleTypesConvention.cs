@@ -1,36 +1,28 @@
 ﻿using Silk.Data.Modelling.Bindings;
 using System;
-using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
 	/// <summary>
 	/// Copies simple types.
 	/// </summary>
-	public class CopySimpleTypesConvention : ViewConvention
+	public class CopySimpleTypesConvention : ViewConvention<ViewBuilder>
 	{
-		public override void MakeModelFields(Model model, TypedModelField field, ViewDefinition viewDefinition)
+		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
+
+		public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
 		{
-			if (!IsSimpleType(field.DataType) || viewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
-				return;
-			var bindField = model.Fields.FirstOrDefault(q => q.Name == field.Name && q.DataType == field.DataType);
-			if (bindField == null)
+			if (!IsSimpleType(field.DataType))
 				return;
 
-			var bindingDirection = BindingDirection.None;
-			if (field.CanWrite && bindField.CanRead)
-				bindingDirection |= BindingDirection.ModelToView;
-			if (field.CanRead && bindField.CanWrite)
-				bindingDirection |= BindingDirection.ViewToModel;
-			if (bindingDirection == BindingDirection.None)
+			var sourceField = viewBuilder.FindField(field, field.Name,
+				dataType: field.DataType);
+			if (sourceField == null || sourceField.BindingDirection == BindingDirection.None)
 				return;
 
-			viewDefinition.FieldDefinitions.Add(
-				new ViewFieldDefinition(field.Name,
-					new AssignmentBinding(bindingDirection, new[] { bindField.Name }, new[] { field.Name }))
-				{
-					DataType = field.DataType
-				});
+			viewBuilder.DefineAssignedViewField(sourceField);
 		}
 
 		private static bool IsSimpleType(Type type)

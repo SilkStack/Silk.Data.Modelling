@@ -11,13 +11,13 @@ namespace Silk.Data.Modelling
 	{
 		public Type DataType { get; }
 
-		public new TypedModelField[] Fields { get; }
+		public new ModelField[] Fields { get; }
 
-		public TypedModel(Type dataType, string name, IEnumerable<TypedModelField> fields, IEnumerable<object> metadata) 
+		public TypedModel(Type dataType, string name, IEnumerable<ModelField> fields, IEnumerable<object> metadata) 
 			: base(name, fields, metadata)
 		{
 			DataType = dataType;
-			Fields = base.Fields.OfType<TypedModelField>().ToArray();
+			Fields = base.Fields.OfType<ModelField>().ToArray();
 		}
 	}
 
@@ -27,7 +27,7 @@ namespace Silk.Data.Modelling
 	/// <typeparam name="T"></typeparam>
 	public class TypedModel<T> : TypedModel
 	{
-		public TypedModel(string name, IEnumerable<TypedModelField> fields, IEnumerable<object> metadata)
+		public TypedModel(string name, IEnumerable<ModelField> fields, IEnumerable<object> metadata)
 			: base(typeof(T), name, fields, metadata)
 		{
 		}

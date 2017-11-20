@@ -4,20 +4,24 @@ using System.Linq;
 
 namespace Silk.Data.Modelling.Conventions
 {
-	public class EnumerableConversionsConvention : ViewConvention
+	public class EnumerableConversionsConvention : ViewConvention<ViewBuilder>
 	{
-		public override void FinalizeModel(ViewDefinition viewDefinition)
+		public override ViewType SupportedViewTypes => ViewType.All;
+		public override bool PerformMultiplePasses => false;
+		public override bool SkipIfFieldDefined => true;
+
+		public override void FinalizeModel(ViewBuilder viewBuilder)
 		{
-			foreach (var field in viewDefinition.FieldDefinitions)
+			foreach (var field in viewBuilder.ViewDefinition.FieldDefinitions)
 			{
-				var sourceField = viewDefinition.SourceModel.GetField(
+				var sourceField = viewBuilder.ViewDefinition.SourceModel.GetField(
 					field.ModelBinding.ModelFieldPath
 					);
-				var targetField = viewDefinition.TargetModel.GetField(
+				var targetField = viewBuilder.ViewDefinition.TargetModel.GetField(
 					field.ModelBinding.ViewFieldPath
 					);
-				if (sourceField != null && (sourceField.IsEnumerable || IsEnumerablePath(viewDefinition.SourceModel, field.ModelBinding.ModelFieldPath)) &&
-					targetField != null && (targetField.IsEnumerable || IsEnumerablePath(viewDefinition.TargetModel, field.ModelBinding.ViewFieldPath)))
+				if (sourceField != null && (sourceField.IsEnumerable || IsEnumerablePath(viewBuilder.ViewDefinition.SourceModel, field.ModelBinding.ModelFieldPath)) &&
+					targetField != null && (targetField.IsEnumerable || IsEnumerablePath(viewBuilder.ViewDefinition.TargetModel, field.ModelBinding.ViewFieldPath)))
 				{
 					var sourceEnumerableType = sourceField.EnumerableType;
 					if (sourceEnumerableType == null)

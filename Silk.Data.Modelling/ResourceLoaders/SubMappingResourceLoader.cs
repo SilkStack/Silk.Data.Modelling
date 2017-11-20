@@ -38,7 +38,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 				return mapping;
 			mapping = new Mapping(
 				modelType, viewType,
-				TypeModeller.GetModelOf(modelType).CreateView(viewType, _viewConventions)
+				TypeModeller.GetModelOf(modelType).CreateView(viewType, _viewConventions.OfType<ViewConvention<ViewBuilder>>().ToArray())
 				);
 			_mappings.Add(mapping);
 			return mapping;

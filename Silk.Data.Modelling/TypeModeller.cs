@@ -50,7 +50,7 @@ namespace Silk.Data.Modelling
 			}) as TypedModel;
 		}
 
-		private static IEnumerable<TypedModelField> GetModelFields(Type type)
+		private static IEnumerable<ModelField> GetModelFields(Type type)
 		{
 			var fieldBaseType = typeof(TypedModelField<>);
 			foreach (var property in type.GetProperties()
@@ -66,7 +66,7 @@ namespace Silk.Data.Modelling
 					property.CanWrite,
 					property.GetCustomAttributes(false),
 					enumerableBaseType
-				}) as TypedModelField;
+				}) as ModelField;
 			}
 		}
 

@@ -7,9 +7,9 @@ namespace Silk.Data.Modelling.Conventions
 {
 	public static class ConventionHelpers
 	{
-		public static TypedModelField GetField(string[] path, Model model)
+		public static ModelField GetField(string[] path, Model model)
 		{
-			TypedModelField ret = null;
+			ModelField ret = null;
 			foreach (var pathComponent in path)
 			{
 				ret = model.Fields.FirstOrDefault(q => q.Name == pathComponent);
