@@ -47,6 +47,15 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(28, view.Fields.Length);
 		}
 
+		[TestMethod]
+		public void MultipassConventionRuns()
+		{
+			MultipassConvention.RunCount = 0;
+			var model = TypeModeller.GetModelOf<MultipassPoco>();
+			var view = model.CreateView(new MultipassConvention());
+			Assert.AreEqual(3, MultipassConvention.RunCount);
+		}
+
 		private class SimpleTypePoco
 		{
 			public sbyte SByte { get; set; }
@@ -106,6 +115,29 @@ namespace Silk.Data.Modelling.Tests
 			public Guid SimpleBGuid { get; set; }
 			public char SimpleBChar { get; set; }
 			public object SimpleBDontMapObject { get; set; }
+		}
+
+		private class MultipassPoco
+		{
+			public int SomeField { get; set; }
+		}
+
+		private class MultipassConvention : ViewConvention<ViewBuilder>
+		{
+			public static int RunCount { get; set; }
+
+			public override ViewType SupportedViewTypes => ViewType.All;
+			public override bool PerformMultiplePasses => true;
+			public override bool SkipIfFieldDefined => false;
+
+			public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
+			{
+				if (RunCount >= 3)
+					return;
+				var sourceField = viewBuilder.FindField(field, field.Name);
+				viewBuilder.ViewDefinition.FieldDefinitions.Clear();
+				viewBuilder.DefineAssignedViewField(sourceField, viewFieldName: $"{field.Name}{RunCount++}");
+			}
 		}
 	}
 }

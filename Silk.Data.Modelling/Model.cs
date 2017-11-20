@@ -80,6 +80,31 @@ namespace Silk.Data.Modelling
 				}
 			}
 
+			var manyPassConventions = viewConventions.Where(q => q.PerformMultiplePasses).ToArray();
+			if (manyPassConventions.Length > 0)
+			{
+				var fieldsChanged = true;
+				while (fieldsChanged)
+				{
+					var beforeFieldDefinitions = viewBuilder.ViewDefinition.FieldDefinitions.ToArray();
+
+					foreach (var viewConvention in manyPassConventions)
+					{
+						if (!viewConvention.SupportedViewTypes.HasFlag(viewBuilder.Mode))
+							continue;
+						foreach (var field in fields)
+						{
+							if (viewConvention.SkipIfFieldDefined &&
+								viewBuilder.ViewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
+								continue;
+							viewConvention.MakeModelField(viewBuilder, field);
+						}
+					}
+
+					fieldsChanged = !viewBuilder.ViewDefinition.FieldDefinitions.SequenceEqual(beforeFieldDefinitions);
+				}
+			}
+
 			_bindEnumerableConversions.FinalizeModel(viewBuilder);
 
 			foreach (var viewConvention in viewConventions)
