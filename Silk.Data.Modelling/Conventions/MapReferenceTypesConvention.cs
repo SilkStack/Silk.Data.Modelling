@@ -1,4 +1,5 @@
 ﻿using Silk.Data.Modelling.Bindings;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Conventions
 {
@@ -13,7 +14,7 @@ namespace Silk.Data.Modelling.Conventions
 
 		public override void MakeModelField(ViewBuilder viewBuilder, ModelField field)
 		{
-			if (field.DataType.IsValueType)
+			if (field.DataType.GetTypeInfo().IsValueType)
 				return;
 
 			var checkPaths = ConventionHelpers.GetPaths(field.Name);
@@ -21,7 +22,7 @@ namespace Silk.Data.Modelling.Conventions
 			{
 				var bindField = viewBuilder.FindField(field, path);
 				if (bindField == null || bindField.BindingDirection == BindingDirection.None ||
-					bindField.Field.DataType.IsValueType)
+					bindField.Field.DataType.GetTypeInfo().IsValueType)
 					continue;
 
 				viewBuilder.DefineMappedViewField(field, bindField, path);

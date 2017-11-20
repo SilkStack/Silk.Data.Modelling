@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling
 {
@@ -29,7 +30,7 @@ namespace Silk.Data.Modelling
 			var enumType = EnumType;
 			foreach (var pathComponent in path)
 			{
-				var property = dataType.GetProperty(pathComponent);
+				var property = dataType.GetTypeInfo().GetDeclaredProperty(pathComponent);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
 				if (enumType == null)
@@ -48,7 +49,7 @@ namespace Silk.Data.Modelling
 			//  note: writing to properties deep in the graph isn't supported here for now
 			//        that functionality is handled by the submapping resource loader and binding
 			//  todo: replace reflection with cached expressions
-			var property = ModelType.GetProperty(path[0]);
+			var property = ModelType.GetTypeInfo().GetDeclaredProperty(path[0]);
 			if (property == null)
 				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
 			property.SetValue(Instance, value);
@@ -80,7 +81,7 @@ namespace Silk.Data.Modelling
 			var enumType = EnumType;
 			foreach (var pathComponent in path)
 			{
-				var property = dataType.GetProperty(pathComponent);
+				var property = dataType.GetTypeInfo().GetDeclaredProperty(pathComponent);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
 				if (enumType == null)
@@ -99,7 +100,7 @@ namespace Silk.Data.Modelling
 			//  note: writing to properties deep in the graph isn't supported here for now
 			//        that functionality is handled by the submapping resource loader and binding
 			//  todo: replace reflection with cached expressions
-			var property = ViewType.GetProperty(path[0]);
+			var property = ViewType.GetTypeInfo().GetDeclaredProperty(path[0]);
 			if (property == null)
 				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
 			property.SetValue(Instance, value);

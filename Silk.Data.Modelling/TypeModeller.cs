@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling
 {
@@ -53,7 +54,7 @@ namespace Silk.Data.Modelling
 		private static IEnumerable<ModelField> GetModelFields(Type type)
 		{
 			var fieldBaseType = typeof(TypedModelField<>);
-			foreach (var property in type.GetProperties()
+			foreach (var property in type.GetTypeInfo().DeclaredProperties
 					.Where(q => (q.CanRead && !q.GetMethod.IsStatic) ||
 						(q.CanWrite && !q.SetMethod.IsStatic)))
 			{
@@ -72,7 +73,7 @@ namespace Silk.Data.Modelling
 
 		private static IEnumerable<object> GetModelMetadata(Type type)
 		{
-			return type.GetCustomAttributes(false);
+			return type.GetTypeInfo().GetCustomAttributes(false);
 		}
 	}
 }

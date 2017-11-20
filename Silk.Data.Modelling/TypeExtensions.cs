@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling
 {
@@ -14,13 +15,13 @@ namespace Silk.Data.Modelling
 			if (type == typeof(string))
 				return (type, null);
 
-			var enumerableInterfaceType = type.GetInterfaces()
-				.FirstOrDefault(q => q.IsGenericType && q.GetGenericTypeDefinition() == _enumerableCompareType);
-			if (enumerableInterfaceType == null && type.IsGenericType && type.GetGenericTypeDefinition() == _enumerableCompareType)
+			var enumerableInterfaceType = type.GetTypeInfo().ImplementedInterfaces
+				.FirstOrDefault(q => q.GetTypeInfo().IsGenericType && q.GetGenericTypeDefinition() == _enumerableCompareType);
+			if (enumerableInterfaceType == null && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == _enumerableCompareType)
 				enumerableInterfaceType = type;
 			if (enumerableInterfaceType == null)
 				return (type, null);
-			return (enumerableInterfaceType.GetGenericArguments()[0], type);
+			return (enumerableInterfaceType.GetTypeInfo().GenericTypeArguments[0], type);
 		}
 	}
 }
