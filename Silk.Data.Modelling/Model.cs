@@ -93,42 +93,6 @@ namespace Silk.Data.Modelling
 			return viewBuilder.ViewDefinition;
 		}
 
-		//  OLD API
-
-		protected virtual ViewDefinition CreateViewDefinition<TBuilder>(ViewConvention<TBuilder>[] viewConventions, object[] userData, Model targetModel = null)
-			where TBuilder : ViewBuilder
-		{
-			var viewBuildMode = targetModel == null ? ViewType.ConventionDerived : ViewType.ModelDriven;
-			if (targetModel == null)
-				targetModel = this;
-
-			if (viewConventions == null || viewConventions.Length == 0)
-				viewConventions = _defaultConventions.OfType<ViewConvention<TBuilder>>().ToArray();
-			var viewDefinition = new ViewDefinition(this, targetModel, viewConventions);
-			if (userData != null)
-				viewDefinition.UserData.AddRange(userData);
-			foreach (var field in targetModel.Fields)
-			{
-				foreach (var viewConvention in viewConventions)
-				{
-					if (viewConvention.SupportedViewTypes.HasFlag(viewBuildMode))
-					{
-						viewConvention.MakeModelFields(this, field, viewDefinition);
-					}
-				}
-			}
-			_bindEnumerableConversions.FinalizeModel(viewDefinition);
-			foreach (var viewConvention in viewConventions)
-			{
-				if (viewConvention.SupportedViewTypes.HasFlag(viewBuildMode))
-				{
-					viewConvention.FinalizeModel(viewDefinition);
-				}
-			}
-
-			return viewDefinition;
-		}
-
 		public IView<ViewField> CreateView(params ViewConvention<ViewBuilder>[] viewConventions)
 		{
 			var viewDefinition = CreateViewDefinition(viewConventions, ViewBuilder.Create);
@@ -174,80 +138,60 @@ namespace Silk.Data.Modelling
 			return viewBuilder(viewDefinition);
 		}
 
-		//  REALLY BROKEN API
-
-		public IView<ViewField> CreateView<TBuilder>(params ViewConvention<TBuilder>[] viewConventions)
+		public IView<ViewField> CreateView<TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory,
+			params ViewConvention<TBuilder>[] viewConventions)
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null);
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory);
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
 		}
 
-		public IView<ViewField> CreateView<TBuilder>(Type viewType, params ViewConvention<TBuilder>[] viewConventions)
+		public IView<ViewField> CreateView<TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory, 
+			Type viewType, params ViewConvention<TBuilder>[] viewConventions)
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null, TypeModeller.GetModelOf(viewType));
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory, TypeModeller.GetModelOf(viewType));
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
 		}
 
-		public IView<ViewField> CreateView<TView, TBuilder>(params ViewConvention<TBuilder>[] viewConventions)
+		public IView<ViewField> CreateView<TView, TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory,
+			params ViewConvention<TBuilder>[] viewConventions)
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null, TypeModeller.GetModelOf<TView>());
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory, TypeModeller.GetModelOf<TView>());
 			return new DefaultView(viewDefinition.Name,
 				ViewField.FromDefinitions(viewDefinition.FieldDefinitions),
 				this, viewDefinition.ResourceLoaders);
 		}
 
-		public T CreateView<T, TBuilder>(Func<ViewDefinition, T> viewBuilder, params ViewConvention<TBuilder>[] viewConventions)
+		public T CreateView<T, TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory,
+			Func<ViewDefinition, T> viewBuilder, params ViewConvention<TBuilder>[] viewConventions)
 			where T : IView
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null);
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory);
 			return viewBuilder(viewDefinition);
 		}
 
-		public T CreateView<T, TBuilder>(Func<ViewDefinition, T> viewBuilder, Type viewType, params ViewConvention<TBuilder>[] viewConventions)
+		public T CreateView<T, TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory,
+			Func<ViewDefinition, T> viewBuilder, Type viewType, params ViewConvention<TBuilder>[] viewConventions)
 			where T : IView
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null, TypeModeller.GetModelOf(viewType));
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory, TypeModeller.GetModelOf(viewType));
 			return viewBuilder(viewDefinition);
 		}
 
-		public T CreateView<T, TView, TBuilder>(Func<ViewDefinition, T> viewBuilder, params ViewConvention<TBuilder>[] viewConventions)
+		public T CreateView<T, TView, TBuilder>(Func<Model, Model, ViewConvention[], TBuilder> builderFactory,
+			Func<ViewDefinition, T> viewBuilder, params ViewConvention<TBuilder>[] viewConventions)
 			where T : IView
 			where TBuilder : ViewBuilder
 		{
-			var viewDefinition = CreateViewDefinition(viewConventions, (object[])null, TypeModeller.GetModelOf<TView>());
-			return viewBuilder(viewDefinition);
-		}
-
-		public T CreateView<T, TBuilder>(Func<ViewDefinition, T> viewBuilder, object[] userData, params ViewConvention<TBuilder>[] viewConventions)
-			where T : IView
-			where TBuilder : ViewBuilder
-		{
-			var viewDefinition = CreateViewDefinition(viewConventions, userData);
-			return viewBuilder(viewDefinition);
-		}
-
-		public T CreateView<T, TBuilder>(Func<ViewDefinition, T> viewBuilder, Type viewType, object[] userData, params ViewConvention<TBuilder>[] viewConventions)
-			where T : IView
-			where TBuilder : ViewBuilder
-		{
-			var viewDefinition = CreateViewDefinition(viewConventions, userData, TypeModeller.GetModelOf(viewType));
-			return viewBuilder(viewDefinition);
-		}
-
-		public T CreateView<T, TView, TBuilder>(Func<ViewDefinition, T> viewBuilder, object[] userData, params ViewConvention<TBuilder>[] viewConventions)
-			where T : IView
-			where TBuilder : ViewBuilder
-		{
-			var viewDefinition = CreateViewDefinition(viewConventions, userData, TypeModeller.GetModelOf<TView>());
+			var viewDefinition = CreateViewDefinition(viewConventions, builderFactory, TypeModeller.GetModelOf<TView>());
 			return viewBuilder(viewDefinition);
 		}
 	}
