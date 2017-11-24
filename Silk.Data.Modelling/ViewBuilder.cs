@@ -20,13 +20,15 @@ namespace Silk.Data.Modelling
 			ViewDefinition = new ViewDefinition(sourceModel, targetModel ?? sourceModel, viewConventions);
 		}
 
-		public virtual void DefineField(string viewFieldName, ModelBinding binding, Type fieldDataType)
+		public virtual void DefineField(string viewFieldName, ModelBinding binding, Type fieldDataType,
+			params object[] metadata)
 		{
-			ViewDefinition.FieldDefinitions.Add(
-				new ViewFieldDefinition(viewFieldName, binding)
-				{
-					DataType = fieldDataType
-				});
+			var fieldDefinition = new ViewFieldDefinition(viewFieldName, binding)
+			{
+				DataType = fieldDataType
+			};
+			fieldDefinition.Metadata.AddRange(metadata);
+			ViewDefinition.FieldDefinitions.Add(fieldDefinition);
 		}
 
 		public virtual bool IsFieldDefined(string viewFieldName)

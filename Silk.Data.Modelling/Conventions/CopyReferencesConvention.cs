@@ -21,7 +21,8 @@ namespace Silk.Data.Modelling.Conventions
 			if (sourceField == null || sourceField.BindingDirection == BindingDirection.None)
 				return;
 
-			viewBuilder.DefineAssignedViewField(sourceField);
+			viewBuilder.DefineAssignedViewField(sourceField,
+				metadata: sourceField.Field.Metadata);
 		}
 	}
 }

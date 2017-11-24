@@ -25,7 +25,8 @@ namespace Silk.Data.Modelling.Conventions
 					bindField.Field.DataType.GetTypeInfo().IsValueType)
 					continue;
 
-				viewBuilder.DefineMappedViewField(field, bindField, path);
+				viewBuilder.DefineMappedViewField(field, bindField, path,
+					metadata: bindField.Field.Metadata);
 				break;
 			}
 		}
