@@ -43,7 +43,9 @@ namespace Silk.Data.Modelling.Conventions
 				type == typeof(string) ||
 				type == typeof(Guid) ||
 				type == typeof(char) ||
-				type == typeof(bool)
+				type == typeof(bool) ||
+				type == typeof(DateTime) ||
+				type == typeof(TimeSpan)
 				;
 		}
 	}
