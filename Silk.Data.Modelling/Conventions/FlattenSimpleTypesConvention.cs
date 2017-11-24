@@ -17,7 +17,7 @@ namespace Silk.Data.Modelling.Conventions
 			var checkPaths = ConventionHelpers.GetPaths(field.Name);
 			foreach (var path in checkPaths)
 			{
-				var sourceField = viewBuilder.FindField(field, path,
+				var sourceField = viewBuilder.FindSourceField(field, path,
 					dataType: field.DataType);
 				if (sourceField == null ||
 					sourceField.Field.DataType != field.DataType ||

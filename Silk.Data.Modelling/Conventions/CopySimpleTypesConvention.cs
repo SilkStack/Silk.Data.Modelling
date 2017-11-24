@@ -17,7 +17,7 @@ namespace Silk.Data.Modelling.Conventions
 			if (!IsSimpleType(field.DataType))
 				return;
 
-			var sourceField = viewBuilder.FindField(field, field.Name,
+			var sourceField = viewBuilder.FindSourceField(field, field.Name,
 				dataType: field.DataType);
 			if (sourceField == null || sourceField.BindingDirection == BindingDirection.None)
 				return;

@@ -120,7 +120,7 @@ namespace Silk.Data.Modelling.Tests
 				}
 
 				var fieldName = field.Name.Replace("Value", "");
-				var bindField = viewBuilder.FindField(field, fieldName);
+				var bindField = viewBuilder.FindSourceField(field, fieldName);
 
 				viewBuilder.ViewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(field.Name,
 					new SubObjectBinding(new[] { bindField.Field.Name }, new[] { field.Name }))

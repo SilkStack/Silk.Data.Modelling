@@ -134,7 +134,7 @@ namespace Silk.Data.Modelling.Tests
 			{
 				if (RunCount >= 3)
 					return;
-				var sourceField = viewBuilder.FindField(field, field.Name);
+				var sourceField = viewBuilder.FindSourceField(field, field.Name);
 				viewBuilder.ViewDefinition.FieldDefinitions.Clear();
 				viewBuilder.DefineAssignedViewField(sourceField, viewFieldName: $"{field.Name}{RunCount++}");
 			}

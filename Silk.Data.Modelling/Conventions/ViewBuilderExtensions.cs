@@ -22,11 +22,9 @@ namespace Silk.Data.Modelling.Conventions
 			if (modelBindingPath == null)
 				modelBindingPath = new[] { viewFieldName };
 
-			viewBuilder.ViewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(viewFieldName,
-					new AssignmentBinding(bindingDirection, modelBindingPath, new[] { viewFieldName }))
-			{
-				DataType = fieldDataType
-			});
+			viewBuilder.DefineField(viewFieldName,
+				new AssignmentBinding(bindingDirection, modelBindingPath, new[] { viewFieldName }),
+				fieldDataType);
 		}
 
 		public static void DefineMappedViewField(this ViewBuilder viewBuilder,
@@ -42,10 +40,8 @@ namespace Silk.Data.Modelling.Conventions
 				);
 
 			subMapper.AddField(fieldInfo.Field.Name, binding, fieldInfo.Field.DataType, modelField.DataType);
-			viewBuilder.ViewDefinition.FieldDefinitions.Add(new ViewFieldDefinition(fieldInfo.Field.Name, binding)
-			{
-				DataType = modelField.DataType
-			});
+
+			viewBuilder.DefineField(fieldInfo.Field.Name, binding, modelField.DataType);
 		}
 
 		private static SubMappingResourceLoader GetSubMapper(ViewDefinition viewDefinition)

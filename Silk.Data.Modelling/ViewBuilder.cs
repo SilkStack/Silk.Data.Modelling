@@ -20,7 +20,21 @@ namespace Silk.Data.Modelling
 			ViewDefinition = new ViewDefinition(sourceModel, targetModel ?? sourceModel, viewConventions);
 		}
 
-		public FieldInfo FindField(ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
+		public virtual void DefineField(string viewFieldName, ModelBinding binding, Type fieldDataType)
+		{
+			ViewDefinition.FieldDefinitions.Add(
+				new ViewFieldDefinition(viewFieldName, binding)
+				{
+					DataType = fieldDataType
+				});
+		}
+
+		public virtual bool IsFieldDefined(string viewFieldName)
+		{
+			return ViewDefinition.FieldDefinitions.Any(q => q.Name == viewFieldName);
+		}
+
+		public virtual FieldInfo FindSourceField(ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
 		{
 			var field = SourceModel.Fields
 				.FirstOrDefault(q => FieldSelector(q, name, caseSenitive, dataType));
@@ -30,7 +44,7 @@ namespace Silk.Data.Modelling
 			return new FieldInfo(field, GetBindingDirection(modelField, field));
 		}
 
-		public FieldInfo FindField(ModelField modelField, string[] path, bool caseSenitive = true, Type dataType = null)
+		public virtual FieldInfo FindSourceField(ModelField modelField, string[] path, bool caseSenitive = true, Type dataType = null)
 		{
 			var model = SourceModel;
 			ModelField field = null;

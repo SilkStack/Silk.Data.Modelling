@@ -74,7 +74,7 @@ namespace Silk.Data.Modelling
 				foreach (var field in fields)
 				{
 					if (viewConvention.SkipIfFieldDefined &&
-						viewBuilder.ViewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
+						viewBuilder.IsFieldDefined(field.Name))
 						continue;
 					viewConvention.MakeModelField(viewBuilder, field);
 				}
@@ -95,7 +95,7 @@ namespace Silk.Data.Modelling
 						foreach (var field in fields)
 						{
 							if (viewConvention.SkipIfFieldDefined &&
-								viewBuilder.ViewDefinition.FieldDefinitions.Any(q => q.Name == field.Name))
+								viewBuilder.IsFieldDefined(field.Name))
 								continue;
 							viewConvention.MakeModelField(viewBuilder, field);
 						}
