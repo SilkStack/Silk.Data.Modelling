@@ -12,7 +12,7 @@ namespace Silk.Data.Modelling
 	{
 		private static ViewConvention[] _defaultConventions = new ViewConvention[]
 		{
-			new CopySimpleTypesConvention(),
+			new CopyPrimitiveTypesConvention(),
 			new FlattenSimpleTypesConvention(),
 			new CopyReferencesConvention(),
 			new MapReferenceTypesConvention()

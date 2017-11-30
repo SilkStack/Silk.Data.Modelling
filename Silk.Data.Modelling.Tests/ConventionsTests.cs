@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Tests
 		public void CopySimpleTypesConvention()
 		{
 			var model = TypeModeller.GetModelOf<SimpleTypePoco>();
-			var view = model.CreateView(new CopySimpleTypesConvention());
+			var view = model.CreateView(new CopyPrimitiveTypesConvention());
 			Assert.IsNotNull(view);
 			Assert.AreEqual(model.Name, view.Name);
 			Assert.AreEqual(14, view.Fields.Length);
