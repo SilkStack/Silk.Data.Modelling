@@ -43,7 +43,7 @@ namespace Silk.Data.Modelling
 
 		protected virtual FieldInfo FindSourceField(Model model, ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
 		{
-			var field = SourceModel.Fields
+			var field = model.Fields
 				.FirstOrDefault(q => FieldSelector(q, name, caseSenitive, dataType));
 			if (field == null)
 				return null;
