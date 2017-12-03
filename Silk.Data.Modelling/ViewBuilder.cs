@@ -38,6 +38,11 @@ namespace Silk.Data.Modelling
 
 		public virtual FieldInfo FindSourceField(ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
 		{
+			return FindSourceField(SourceModel, modelField, name, caseSenitive, dataType);
+		}
+
+		protected virtual FieldInfo FindSourceField(Model model, ModelField modelField, string name, bool caseSenitive = true, Type dataType = null)
+		{
 			var field = SourceModel.Fields
 				.FirstOrDefault(q => FieldSelector(q, name, caseSenitive, dataType));
 			if (field == null)
@@ -48,7 +53,11 @@ namespace Silk.Data.Modelling
 
 		public virtual FieldInfo FindSourceField(ModelField modelField, string[] path, bool caseSenitive = true, Type dataType = null)
 		{
-			var model = SourceModel;
+			return FindSourceField(SourceModel, modelField, path, caseSenitive, dataType);
+		}
+
+		protected virtual FieldInfo FindSourceField(Model model, ModelField modelField, string[] path, bool caseSenitive = true, Type dataType = null)
+		{
 			ModelField field = null;
 			foreach (var pathComponent in path)
 			{
