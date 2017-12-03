@@ -16,12 +16,12 @@ namespace Silk.Data.Modelling.Bindings
 		/// <summary>
 		/// Gets the path to the bound value on the model.
 		/// </summary>
-		public string[] ModelFieldPath { get; }
+		public string[] ModelFieldPath { get; set; }
 
 		/// <summary>
 		/// Gets the path fot he bound value on the view.
 		/// </summary>
-		public string[] ViewFieldPath { get; }
+		public string[] ViewFieldPath { get; set; }
 
 		/// <summary>
 		/// Gets required resource loaders.
