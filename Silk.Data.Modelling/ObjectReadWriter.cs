@@ -46,13 +46,31 @@ namespace Silk.Data.Modelling
 
 		public override void WriteToPath<T>(string[] path, T value)
 		{
-			//  note: writing to properties deep in the graph isn't supported here for now
-			//        that functionality is handled by the submapping resource loader and binding
 			//  todo: replace reflection with cached expressions
-			var property = ModelType.GetTypeInfo().GetDeclaredProperty(path[0]);
-			if (property == null)
-				throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
-			property.SetValue(Instance, value);
+			var objType = ModelType;
+			var objInstance = Instance;
+			for (var i = 0; i < path.Length; i++)
+			{
+				var property = objType.GetTypeInfo().GetDeclaredProperty(path[i]);
+				if (property == null)
+					throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
+
+				if (i == path.Length - 1)
+				{
+					property.SetValue(objInstance, value);
+				}
+				else
+				{
+					objType = property.PropertyType;
+					var subObjInstance = property.GetValue(objInstance);
+					if (subObjInstance == null)
+					{
+						subObjInstance = Activator.CreateInstance(objType);
+						property.SetValue(objInstance, subObjInstance);
+					}
+					objInstance = subObjInstance;
+				}
+			}
 		}
 	}
 
