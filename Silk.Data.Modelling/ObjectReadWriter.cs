@@ -21,7 +21,6 @@ namespace Silk.Data.Modelling
 
 		public override T ReadFromPath<T>(string[] path)
 		{
-			//  todo: replace reflection with cached expressions
 			if (Instance == null)
 				return default(T);
 
@@ -30,7 +29,7 @@ namespace Silk.Data.Modelling
 			var enumType = EnumType;
 			foreach (var pathComponent in path)
 			{
-				var property = dataType.GetTypeInfo().GetDeclaredProperty(pathComponent);
+				var property = ReflectionHelper.GetProperty(dataType, pathComponent);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
 				if (enumType == null)
@@ -46,12 +45,11 @@ namespace Silk.Data.Modelling
 
 		public override void WriteToPath<T>(string[] path, T value)
 		{
-			//  todo: replace reflection with cached expressions
 			var objType = ModelType;
 			var objInstance = Instance;
 			for (var i = 0; i < path.Length; i++)
 			{
-				var property = objType.GetTypeInfo().GetDeclaredProperty(path[i]);
+				var property = ReflectionHelper.GetProperty(objType, path[i]);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
 
@@ -90,7 +88,6 @@ namespace Silk.Data.Modelling
 
 		public override T ReadFromPath<T>(string[] path)
 		{
-			//  todo: replace reflection with cached expressions
 			if (Instance == null)
 				return default(T);
 
@@ -99,7 +96,7 @@ namespace Silk.Data.Modelling
 			var enumType = EnumType;
 			foreach (var pathComponent in path)
 			{
-				var property = dataType.GetTypeInfo().GetDeclaredProperty(pathComponent);
+				var property = ReflectionHelper.GetProperty(dataType, pathComponent);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
 				if (enumType == null)
@@ -115,12 +112,11 @@ namespace Silk.Data.Modelling
 
 		public override void WriteToPath<T>(string[] path, T value)
 		{
-			//  todo: replace reflection with cached expressions
 			var objType = ViewType;
 			var objInstance = Instance;
 			for (var i = 0; i < path.Length; i++)
 			{
-				var property = objType.GetTypeInfo().GetDeclaredProperty(path[i]);
+				var property = ReflectionHelper.GetProperty(objType, path[i]);
 				if (property == null)
 					throw new InvalidOperationException($"Field cannot be assigned on view: {string.Join(".", path)} ({path[0]}).");
 

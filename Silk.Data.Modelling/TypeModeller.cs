@@ -54,7 +54,7 @@ namespace Silk.Data.Modelling
 		private static IEnumerable<ModelField> GetModelFields(Type type)
 		{
 			var fieldBaseType = typeof(TypedModelField<>);
-			foreach (var property in type.GetTypeInfo().DeclaredProperties
+			foreach (var property in GetProperties(type)
 					.Where(q => (q.CanRead && !q.GetMethod.IsStatic) ||
 						(q.CanWrite && !q.SetMethod.IsStatic)))
 			{
@@ -69,6 +69,14 @@ namespace Silk.Data.Modelling
 					enumerableBaseType
 				}) as ModelField;
 			}
+		}
+
+		private static IEnumerable<PropertyInfo> GetProperties(Type type)
+		{
+			var typeInfo = type.GetTypeInfo();
+			if (typeInfo.BaseType == null)
+				return typeInfo.DeclaredProperties;
+			return typeInfo.DeclaredProperties.Concat(GetProperties(typeInfo.BaseType));
 		}
 
 		private static IEnumerable<object> GetModelMetadata(Type type)
