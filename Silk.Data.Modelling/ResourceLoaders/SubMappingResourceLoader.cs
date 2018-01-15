@@ -70,7 +70,7 @@ namespace Silk.Data.Modelling.ResourceLoaders
 									mappingResults, resourceFieldName, source);
 							}
 						}
-						else
+						else if (value != null)
 						{
 							AddMapping(mapping, mappingContext, value,
 								field.Binding, modelReadWriters, viewReadWriters,
