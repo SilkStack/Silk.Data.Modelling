@@ -31,7 +31,7 @@ namespace Silk.Data.Modelling
 			{
 				var property = ReflectionHelper.GetProperty(dataType, pathComponent);
 				if (property == null)
-					throw new InvalidOperationException($"Field cannot be retrieved on view: {string.Join(".", path)} ({pathComponent}).");
+					throw new InvalidOperationException($"Field cannot be retrieved on model: {string.Join(".", path)} ({pathComponent}).");
 				if (enumType == null)
 					ret = property.GetValue(ret ?? Instance);
 				else
