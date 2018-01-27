@@ -8,6 +8,8 @@
     <Description>Silk.DataModelling is a library for modelling data structures for .NET.
 
 Part of the SilkStack project.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
