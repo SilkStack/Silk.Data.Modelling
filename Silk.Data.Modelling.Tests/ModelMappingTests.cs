@@ -10,6 +10,24 @@ namespace Silk.Data.Modelling.Tests
 		private TypedModel _nonGenericModel => _genericModel;
 
 		[TestMethod]
+		public async Task SimpleMapperTest()
+		{
+			var mapper = new DefaultConventionsMapper<SimpleClassWithPublicProperties>();
+			var container = new SimpleMappedClass
+			{
+				Integer = 5,
+				String = "Hello World",
+				Object = new object()
+			};
+			var instance = await mapper.MapAsync(container)
+				.ConfigureAwait(false);
+			Assert.IsInstanceOfType(instance, typeof(SimpleClassWithPublicProperties));
+			Assert.AreEqual(container.Integer, instance.Integer);
+			Assert.AreEqual(container.String, instance.String);
+			Assert.ReferenceEquals(container.Object, instance.Object);
+		}
+
+		[TestMethod]
 		public async Task MapDefaultViewToModel()
 		{
 			var view = _nonGenericModel.CreateView();
