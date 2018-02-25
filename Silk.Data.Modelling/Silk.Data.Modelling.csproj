@@ -13,6 +13,12 @@ Part of the SilkStack project.</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="vold\**" />
+    <EmbeddedResource Remove="vold\**" />
+    <None Remove="vold\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>

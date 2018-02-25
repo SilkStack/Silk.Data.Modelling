@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Tests
 {
@@ -6,38 +8,73 @@ namespace Silk.Data.Modelling.Tests
 	public class TypeModellingTests
 	{
 		[TestMethod]
-		public void PublicGetterSetterModelled()
+		public void CanCreateTypeModel()
 		{
-			var model = TypeModeller.GetModelOf<SimpleClassWithPublicProperties>();
+			var model = TypeModel.GetModelOf<EmptyClass>();
 			Assert.IsNotNull(model);
-			Assert.AreEqual(nameof(SimpleClassWithPublicProperties), model.Name);
-			Assert.IsNotNull(model.Fields);
-			Assert.AreEqual(3, model.Fields.Length);
-			foreach (var field in model.Fields)
-			{
-				Assert.AreEqual(true, field.CanRead);
-				Assert.AreEqual(true, field.CanWrite);
-				Assert.ReferenceEquals(model, field.ParentModel);
-				switch (field.Name)
-				{
-					case nameof(SimpleClassWithPublicProperties.Integer):
-						Assert.AreEqual(typeof(int), field.DataType);
-						break;
-					case nameof(SimpleClassWithPublicProperties.String):
-						Assert.AreEqual(typeof(string), field.DataType);
-						break;
-					case nameof(SimpleClassWithPublicProperties.Object):
-						Assert.AreEqual(typeof(object), field.DataType);
-						break;
-				}
-			}
 		}
 
-		private class SimpleClassWithPublicProperties
+		[TestMethod]
+		public void ModelBasicProperties()
 		{
-			public int Integer { get; set; }
-			public string String { get; set; }
-			public object Object { get; set; }
+			var model = TypeModel.GetModelOf<ClassWithProperties>();
+
+			Assert.AreEqual(3, model.Fields.Length);
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.ReadWriteProperty)
+				&& field.CanRead && field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.ReadOnlyProperty)
+				&& field.CanRead && !field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.SetOnlyProperty)
+				&& !field.CanRead && field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+		}
+
+		[TestMethod]
+		public void ModelEnumerableProperties()
+		{
+			var model = TypeModel.GetModelOf<ClassWithEnumerables>();
+
+			Assert.AreEqual(4, model.Fields.Length);
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithEnumerables.Array)
+				&& field.CanRead && !field.CanWrite && field.IsEnumerable && field.ElementType == typeof(int) && field.FieldType == typeof(int[])));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithEnumerables.List)
+				&& field.CanRead && !field.CanWrite && field.IsEnumerable && field.ElementType == typeof(int) && field.FieldType == typeof(List<int>)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithEnumerables.Collection)
+				&& field.CanRead && !field.CanWrite && field.IsEnumerable && field.ElementType == typeof(int) && field.FieldType == typeof(ICollection<int>)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithEnumerables.Enumerable)
+				&& field.CanRead && !field.CanWrite && field.IsEnumerable && field.ElementType == typeof(int) && field.FieldType == typeof(IEnumerable<int>)));
+		}
+
+		[TestMethod]
+		public void ModelRecursiveClasses()
+		{
+			var model = TypeModel.GetModelOf<RecursiveClass>();
+
+			Assert.AreEqual(1, model.Fields.Length);
+			Assert.ReferenceEquals(model, model.Fields[0].FieldTypeModel);
+		}
+
+		private class EmptyClass { }
+
+		private class ClassWithProperties
+		{
+			private int _uselessBackingField;
+
+			public int ReadWriteProperty { get; set; }
+			public int ReadOnlyProperty { get; }
+			public int SetOnlyProperty { set => _uselessBackingField = value; }
+		}
+
+		private class ClassWithEnumerables
+		{
+			public int[] Array { get; }
+			public List<int> List { get; }
+			public ICollection<int> Collection { get; }
+			public IEnumerable<int> Enumerable { get; }
+		}
+
+		private class RecursiveClass
+		{
+			public RecursiveClass Member { get; }
 		}
 	}
 }

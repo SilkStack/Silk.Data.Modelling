@@ -92,11 +92,11 @@ namespace Silk.Data.Modelling.Tests
 
 		private class CustomViewBuilder : ViewBuilder
 		{
-			protected CustomViewBuilder(Modelling.Model sourceModel, Modelling.Model targetModel, ViewConvention[] viewConventions) : base(sourceModel, targetModel, viewConventions)
+			protected CustomViewBuilder(Modelling.IModel sourceModel, Modelling.IModel targetModel, ViewConvention[] viewConventions) : base(sourceModel, targetModel, viewConventions)
 			{
 			}
 
-			public new static CustomViewBuilder Create(Modelling.Model sourceModel, Modelling.Model targetModel,
+			public new static CustomViewBuilder Create(Modelling.IModel sourceModel, Modelling.IModel targetModel,
 				ViewConvention[] viewConventions)
 			{
 				return new CustomViewBuilder(sourceModel, targetModel, viewConventions);
