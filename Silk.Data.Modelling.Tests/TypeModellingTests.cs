@@ -29,6 +29,40 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		[TestMethod]
+		public void ModelInheritedProperties()
+		{
+			var model = TypeModel.GetModelOf<ClassWithInheritedProperties>();
+
+			Assert.AreEqual(3, model.Fields.Length);
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.ReadWriteProperty)
+				&& field.CanRead && field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.ReadOnlyProperty)
+				&& field.CanRead && !field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+			Assert.IsTrue(model.Fields.Any(field => field.FieldName == nameof(ClassWithProperties.SetOnlyProperty)
+				&& !field.CanRead && field.CanWrite && !field.IsEnumerable && field.FieldType == typeof(int)));
+		}
+
+		[TestMethod]
+		public void ModelPrivateSetterPropertiesAsWritable()
+		{
+			var model = TypeModel.GetModelOf<ClassWithPrivateSetters>();
+
+			Assert.AreEqual(1, model.Fields.Length);
+			Assert.IsTrue(model.Fields[0].CanRead);
+			Assert.IsTrue(model.Fields[0].CanWrite);
+		}
+
+		[TestMethod]
+		public void ModelProtectedSetterPropertiesAsWritable()
+		{
+			var model = TypeModel.GetModelOf<ClassWithProtectedSetters>();
+
+			Assert.AreEqual(1, model.Fields.Length);
+			Assert.IsTrue(model.Fields[0].CanRead);
+			Assert.IsTrue(model.Fields[0].CanWrite);
+		}
+
+		[TestMethod]
 		public void ModelEnumerableProperties()
 		{
 			var model = TypeModel.GetModelOf<ClassWithEnumerables>();
@@ -62,6 +96,20 @@ namespace Silk.Data.Modelling.Tests
 			public int ReadWriteProperty { get; set; }
 			public int ReadOnlyProperty { get; }
 			public int SetOnlyProperty { set => _uselessBackingField = value; }
+		}
+
+		private class ClassWithInheritedProperties : ClassWithProperties
+		{
+		}
+
+		private class ClassWithPrivateSetters
+		{
+			public int ReadWriteProperty { get; private set; }
+		}
+
+		private class ClassWithProtectedSetters
+		{
+			public int ReadWriteProperty { get; protected set; }
 		}
 
 		private class ClassWithEnumerables
