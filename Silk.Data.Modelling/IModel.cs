@@ -17,6 +17,7 @@
 	/// </summary>
 	/// <typeparam name="TField">The type of field the model uses.</typeparam>
 	public interface IModel<TField> : IModel
+		where TField : IField
 	{
 		/// <summary>
 		/// Gets an array of fields on the model.
