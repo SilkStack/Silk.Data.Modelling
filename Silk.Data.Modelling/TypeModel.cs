@@ -5,12 +5,9 @@ namespace Silk.Data.Modelling
 	/// <summary>
 	/// A model of a <see cref="Type"/>.
 	/// </summary>
-	public abstract partial class TypeModel : IModel<PropertyField>
+	public abstract partial class TypeModel : ModelBase<IPropertyField>
 	{
 		public abstract Type Type { get; }
-		public abstract PropertyField[] Fields { get; }
-
-		IField[] IModel.Fields => Fields;
 	}
 
 	/// <summary>
@@ -20,9 +17,9 @@ namespace Silk.Data.Modelling
 	{
 		public override Type Type { get; } = typeof(T);
 
-		public override PropertyField[] Fields { get; }
+		public override IPropertyField[] Fields { get; }
 
-		internal TypeModel(PropertyField[] fields)
+		internal TypeModel(IPropertyField[] fields)
 		{
 			Fields = fields;
 		}

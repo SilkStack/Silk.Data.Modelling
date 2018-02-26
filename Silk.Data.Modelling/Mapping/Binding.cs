@@ -1,4 +1,4 @@
-﻿namespace Silk.Data.Modelling
+﻿namespace Silk.Data.Modelling.Mapping
 {
 	/// <summary>
 	/// Binds a value between models.

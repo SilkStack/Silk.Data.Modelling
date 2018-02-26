@@ -40,9 +40,9 @@ namespace Silk.Data.Modelling
 			return new TypeModel<T>(GetPropertyFields(typeof(T)));
 		}
 
-		private static PropertyField[] GetPropertyFields(Type type)
+		private static IPropertyField[] GetPropertyFields(Type type)
 		{
-			var ret = new List<PropertyField>();
+			var ret = new List<IPropertyField>();
 			var baseType = typeof(PropertyField<>);
 			foreach (var property in GetProperties(type)
 					.Where(q => (q.CanRead && !q.GetMethod.IsStatic) ||
@@ -54,7 +54,7 @@ namespace Silk.Data.Modelling
 					Activator.CreateInstance(propertyType, new object[] {
 						property.Name, property.CanRead, property.CanWrite,
 						enumElementType != null, enumElementType
-					}) as PropertyField);
+					}) as IPropertyField);
 			}
 			return ret.ToArray();
 		}

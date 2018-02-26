@@ -43,6 +43,12 @@ namespace Silk.Data.Modelling
 		/// Gets the <see cref="TypeModel"/> of <see cref="FieldType"/>.
 		/// </summary>
 		TypeModel FieldTypeModel { get; }
+
+		/// <summary>
+		/// Performs all relevant calls to the given <see cref="IModelTransformer"/> as part of the model transformation process.
+		/// </summary>
+		/// <param name="transformer"></param>
+		void Transform(IModelTransformer transformer);
 	}
 
 	/// <summary>

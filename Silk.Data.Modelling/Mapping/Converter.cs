@@ -1,4 +1,4 @@
-﻿namespace Silk.Data.Modelling
+﻿namespace Silk.Data.Modelling.Mapping
 {
 	/// <summary>
 	/// Converts from one type to another.

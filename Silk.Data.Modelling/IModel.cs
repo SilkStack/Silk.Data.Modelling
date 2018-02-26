@@ -10,6 +10,12 @@
 		/// Gets an array of fields on the model.
 		/// </summary>
 		IField[] Fields { get; }
+
+		/// <summary>
+		/// Performs all relevant calls to the given <see cref="IModelTransformer"/> to transform the model type.
+		/// </summary>
+		/// <param name="transformer"></param>
+		void Transform(IModelTransformer transformer);
 	}
 
 	/// <summary>
