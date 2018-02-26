@@ -18,6 +18,16 @@ namespace Silk.Data.Modelling.Mapping
 			ToModel = toModel;
 		}
 
+		public bool IsBound(ITargetField field)
+		{
+			return _bindings.Any(q => q.Target == field);
+		}
+
+		public bool IsBound(ISourceField field)
+		{
+			return _bindings.Any(q => q.Source != null && q.Source == field);
+		}
+
 		public BindingBuilder Bind(ITargetField field)
 		{
 			var builder = field.CreateBindingBuilder();
@@ -48,6 +58,9 @@ namespace Silk.Data.Modelling.Mapping
 
 	public abstract class BindingBuilder
 	{
+		public ITargetField Target { get; protected set; }
+		public ISourceField Source { get; protected set; }
+
 		public abstract Binding Binding { get; }
 		public abstract BindingBuilder From(ISourceField sourceField);
 		public abstract BindingBuilder Using<TBinding>()
@@ -58,13 +71,13 @@ namespace Silk.Data.Modelling.Mapping
 	{
 		private Binding _binding;
 
-		public TargetField<T> Target { get; }
-		public ISourceField Source { get; private set; }
+		public new TargetField<T> Target { get; }
 		public override Binding Binding => _binding;
 
 		public BindingBuilder(TargetField<T> targetField)
 		{
 			Target = targetField;
+			base.Target = targetField;
 		}
 
 		public override BindingBuilder From(ISourceField sourceField)
