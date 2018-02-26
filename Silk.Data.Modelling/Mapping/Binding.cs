@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling.Mapping
+﻿using System;
+
+namespace Silk.Data.Modelling.Mapping
 {
 	/// <summary>
 	/// Binds a value between models.
@@ -21,6 +23,16 @@
 		/// <param name="from"></param>
 		/// <param name="to"></param>
 		public abstract void CopyBindingValue(IModelReadWriter from, IModelReadWriter to); 
+	}
+
+	public class CopyBinding : IBindingFactory
+	{
+		public Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField)
+		{
+			if (typeof(TFrom) != typeof(TTo))
+				throw new InvalidOperationException("TFrom and TTo type mismatch.");
+			return new CopyBinding<TFrom>(fromField.FieldPath, toField.FieldPath);
+		}
 	}
 
 	public class CopyBinding<T> : Binding

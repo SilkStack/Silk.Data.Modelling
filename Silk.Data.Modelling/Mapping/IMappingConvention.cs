@@ -2,6 +2,6 @@
 {
 	public interface IMappingConvention
 	{
-		void CreateMappings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder);
+		void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder);
 	}
 }

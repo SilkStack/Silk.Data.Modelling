@@ -14,13 +14,20 @@
 		/// </summary>
 		public IModel ToModel { get; }
 		/// <summary>
-		/// Gets the value bindings for the mapping operation.
+		/// Gets the bindings for the mapping operation.
 		/// </summary>
-		public Binding[] ValueBindings { get; }
+		public Binding[] Bindings { get; }
+
+		public Mapping(IModel fromModel, IModel toModel, Binding[] bindings)
+		{
+			FromModel = fromModel;
+			ToModel = toModel;
+			Bindings = bindings;
+		}
 
 		public void PerformMapping(IModelReadWriter from, IModelReadWriter to)
 		{
-			foreach (var binding in ValueBindings)
+			foreach (var binding in Bindings)
 			{
 				binding.CopyBindingValue(from, to);
 			}
