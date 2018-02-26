@@ -10,7 +10,7 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
 			{
-				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanWrite &&
+				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
 					field.FieldName == toField.FieldName &&
 					field.FieldType == toField.FieldType);
 				if (fromField == null)
