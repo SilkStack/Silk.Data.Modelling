@@ -8,12 +8,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var fromField in fromModel.Fields.Where(q => q.CanRead))
+			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
 			{
-				var toField = toModel.Fields.FirstOrDefault(field => field.CanWrite &&
-					field.FieldName == fromField.FieldName &&
-					field.FieldType == fromField.FieldType);
-				if (toField == null)
+				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanWrite &&
+					field.FieldName == toField.FieldName &&
+					field.FieldType == toField.FieldType);
+				if (fromField == null)
 					continue;
 				builder
 					.Bind(toField)
