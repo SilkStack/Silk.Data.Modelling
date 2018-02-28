@@ -16,7 +16,7 @@
 		/// <typeparam name="T"></typeparam>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		T ReadField<T>(string[] path);
+		T ReadField<T>(string[] path, int offset);
 
 		/// <summary>
 		/// Writes to a given field.
@@ -24,6 +24,6 @@
 		/// <typeparam name="T"></typeparam>
 		/// <param name="path"></param>
 		/// <param name="value"></param>
-		void WriteField<T>(string[] path, T value);
+		void WriteField<T>(string[] path, int offset, T value);
 	}
 }

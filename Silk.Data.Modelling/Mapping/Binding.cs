@@ -44,7 +44,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<T>(ToPath, from.ReadField<T>(FromPath));
+			to.WriteField<T>(ToPath, 0, from.ReadField<T>(FromPath, 0));
 		}
 	}
 
@@ -60,7 +60,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, Converter.Convert(from.ReadField<TFrom>(FromPath)));
+			to.WriteField<TTo>(ToPath, 0, Converter.Convert(from.ReadField<TFrom>(FromPath, 0)));
 		}
 	}
 
