@@ -11,11 +11,17 @@ namespace Silk.Data.Modelling.Mapping
 
 		public IModel FromModel { get; }
 		public IModel ToModel { get; }
+		public IReadOnlyCollection<IMappingConvention> Conventions => _conventions;
+		public MappingStore MappingStore { get; }
+		public MappingBuilderStack BuilderStack { get; }
 
-		public MappingBuilder(IModel fromModel, IModel toModel)
+		public MappingBuilder(IModel fromModel, IModel toModel,
+			MappingStore mappingStore = null, MappingBuilderStack builderStack = null)
 		{
 			FromModel = fromModel;
 			ToModel = toModel;
+			MappingStore = mappingStore ?? new MappingStore();
+			BuilderStack = builderStack ?? new MappingBuilderStack();
 		}
 
 		public bool IsBound(ITargetField field)
@@ -48,11 +54,31 @@ namespace Silk.Data.Modelling.Mapping
 
 		public Mapping BuildMapping()
 		{
-			var sourceModel = FromModel.TransformToSourceModel();
-			var targetModel = ToModel.TransformToTargetModel();
+			var sourceModel = FromModel as SourceModel;
+			if (sourceModel == null)
+				sourceModel = FromModel.TransformToSourceModel();
+			var targetModel = ToModel as TargetModel;
+			if (targetModel == null)
+				targetModel = ToModel.TransformToTargetModel();
+
+			BuilderStack.Push(this);
+
 			foreach (var convention in _conventions)
 				convention.CreateBindings(sourceModel, targetModel, this);
-			return new Mapping(FromModel, ToModel, _bindings.Select(q => q.Binding).ToArray());
+
+			BuilderStack.Pop();
+
+			var mapping = new Mapping(FromModel, ToModel, _bindings.Select(q => q.Binding).ToArray());
+			MappingStore.AddMapping(FromModel, ToModel, mapping);
+			return mapping;
+		}
+	}
+
+	public class MappingBuilderStack : Stack<MappingBuilder>
+	{
+		public bool IsBeingMapped(IModel fromModel, IModel toModel)
+		{
+			return this.Any(q => q.FromModel.Equals(fromModel) && q.ToModel.Equals(toModel));
 		}
 	}
 
@@ -65,6 +91,8 @@ namespace Silk.Data.Modelling.Mapping
 		public abstract BindingBuilder From(ISourceField sourceField);
 		public abstract BindingBuilder Using<TBinding>()
 			where TBinding : IBindingFactory, new();
+		public abstract BindingBuilder Using<TBinding, TOption>(TOption option)
+			where TBinding : IBindingFactory<TOption>, new();
 	}
 
 	public class BindingBuilder<T> : BindingBuilder
@@ -91,6 +119,14 @@ namespace Silk.Data.Modelling.Mapping
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
 			_binding = Source.CreateBinding<T>(new TBinding(), Target);
+			return this;
+		}
+
+		public override BindingBuilder Using<TBinding, TOption>(TOption option)
+		{
+			if (Source == null)
+				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
+			_binding = Source.CreateBinding<T, TOption>(new TBinding(), Target, option);
 			return this;
 		}
 	}

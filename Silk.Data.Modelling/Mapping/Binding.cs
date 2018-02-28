@@ -63,4 +63,44 @@ namespace Silk.Data.Modelling.Mapping
 			to.WriteField<TTo>(ToPath, Converter.Convert(from.ReadField<TFrom>(FromPath)));
 		}
 	}
+
+	public class SubmappingBinding : IBindingFactory<MappingStore>
+	{
+		public Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
+		{
+			return new ConvertBinding<TFrom, TTo>(new MappingConverter<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore),
+				fromField.FieldPath, toField.FieldPath);
+		}
+	}
+
+	public class MappingConverter<TFrom, TTo> : Converter<TFrom, TTo>
+	{
+		private readonly IModel _fromModel;
+		private readonly IModel _toModel;
+
+		public MappingStore MappingStore { get; }
+
+		private Mapping _mapping;
+		public Mapping Mapping
+		{
+			get
+			{
+				if (_mapping == null)
+					MappingStore.TryGetMapping(_fromModel, _toModel, out _mapping);
+				return _mapping;
+			}
+		}
+
+		public MappingConverter(IModel fromModel, IModel toModel, MappingStore mappingStore)
+		{
+			_fromModel = fromModel;
+			_toModel = toModel;
+			MappingStore = mappingStore;
+		}
+
+		public override TTo Convert(TFrom from)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

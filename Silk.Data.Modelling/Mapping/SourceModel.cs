@@ -45,7 +45,8 @@ namespace Silk.Data.Modelling.Mapping
 		string[] FieldPath { get; }
 		ISourceField[] Fields { get; }
 
-		Binding CreateBinding<TFrom>(IBindingFactory bindingFactory, ITargetField toField);
+		Binding CreateBinding<TTo>(IBindingFactory bindingFactory, ITargetField toField);
+		Binding CreateBinding<TTo, TBindingOption>(IBindingFactory<TBindingOption> bindingFactory, ITargetField toField, TBindingOption bindingOption);
 	}
 
 	public class SourceField<T> : FieldBase<T>, ISourceField, IField<T>
@@ -73,9 +74,14 @@ namespace Silk.Data.Modelling.Mapping
 			FieldPath = fieldPath;
 		}
 
-		public Binding CreateBinding<TFrom>(IBindingFactory bindingFactory, ITargetField toField)
+		public Binding CreateBinding<TTo>(IBindingFactory bindingFactory, ITargetField toField)
 		{
-			return bindingFactory.CreateBinding<TFrom, T>(this, toField);
+			return bindingFactory.CreateBinding<T, TTo>(this, toField);
+		}
+
+		public Binding CreateBinding<TTo, TBindingOption>(IBindingFactory<TBindingOption> bindingFactory, ITargetField toField, TBindingOption bindingOption)
+		{
+			return bindingFactory.CreateBinding<T, TTo>(this, toField, bindingOption);
 		}
 	}
 }

@@ -1,0 +1,82 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Silk.Data.Modelling.Mapping;
+using System.Linq;
+
+namespace Silk.Data.Modelling.Tests
+{
+	[TestClass]
+	public class MapReferenceTypesTests
+	{
+		[TestMethod]
+		public void MapReferenceTypesBindsReadWritePropertiesWithIdenticalNames()
+		{
+			var mapping = CreateMapping<SourceParentPoco, TargetParentPoco>();
+			Assert.AreEqual(1, mapping.Bindings.Length);
+
+			var binding = mapping.Bindings[0];
+			Assert.IsInstanceOfType(binding, typeof(ConvertBinding<SourceSubType, TargetSubType>));
+
+			var convertBinding = (ConvertBinding<SourceSubType, TargetSubType>)binding;
+			Assert.IsInstanceOfType(convertBinding.Converter, typeof(MappingConverter<SourceSubType, TargetSubType>));
+
+			var converter = (MappingConverter<SourceSubType, TargetSubType>)convertBinding.Converter;
+			Assert.AreEqual(1, converter.Mapping.Bindings.Length);
+
+			binding = converter.Mapping.Bindings[0];
+			Assert.IsTrue(binding.FromPath.SequenceEqual(new[] { "OneToOneMapping" }));
+			Assert.IsTrue(binding.ToPath.SequenceEqual(new[] { "OneToOneMapping" }));
+		}
+
+		[TestMethod]
+		public void CreatingBindingsOnRecursiveTypesDoesntStackOverflow()
+		{
+			CreateMapping<RecursiveSourceType, RecursiveTargetType>();
+		}
+
+		private Mapping.Mapping CreateMapping<T>()
+		{
+			return CreateMapping<T, T>();
+		}
+
+		private Mapping.Mapping CreateMapping<TFrom, TTo>()
+		{
+			var fromPocoModel = TypeModel.GetModelOf<TFrom>();
+			var toPocoModel = TypeModel.GetModelOf<TTo>();
+
+			var builder = new MappingBuilder(fromPocoModel, toPocoModel);
+			builder.AddConvention(CopySameTypes.Instance);
+			builder.AddConvention(MapReferenceTypes.Instance);
+			return builder.BuildMapping();
+		}
+
+		private class SourceParentPoco
+		{
+			public SourceSubType Member { get; set; }
+		}
+
+		private class SourceSubType
+		{
+			public int OneToOneMapping { get; set; }
+		}
+
+		private class TargetParentPoco
+		{
+			public TargetSubType Member { get; set; }
+		}
+
+		private class TargetSubType
+		{
+			public int OneToOneMapping { get; set; }
+		}
+
+		private class RecursiveSourceType
+		{
+			public RecursiveSourceType Member { get; set; }
+		}
+
+		private class RecursiveTargetType
+		{
+			public RecursiveTargetType Member { get; set; }
+		}
+	}
+}
