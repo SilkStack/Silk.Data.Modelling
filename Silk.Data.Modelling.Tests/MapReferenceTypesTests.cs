@@ -14,15 +14,14 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(1, mapping.Bindings.Length);
 
 			var binding = mapping.Bindings[0];
-			Assert.IsInstanceOfType(binding, typeof(ConvertBinding<SourceSubType, TargetSubType>));
+			Assert.IsInstanceOfType(binding, typeof(SubmappingBinding<SourceSubType, TargetSubType>));
 
-			var convertBinding = (ConvertBinding<SourceSubType, TargetSubType>)binding;
-			Assert.IsInstanceOfType(convertBinding.Converter, typeof(MappingConverter<SourceSubType, TargetSubType>));
+			var submappingBinding = (SubmappingBinding<SourceSubType, TargetSubType>)binding;
+			Assert.IsNotNull(submappingBinding.Mapping);
 
-			var converter = (MappingConverter<SourceSubType, TargetSubType>)convertBinding.Converter;
-			Assert.AreEqual(1, converter.Mapping.Bindings.Length);
+			Assert.AreEqual(1, submappingBinding.Mapping.Bindings.Length);
 
-			binding = converter.Mapping.Bindings[0];
+			binding = submappingBinding.Mapping.Bindings[0];
 			Assert.IsTrue(binding.FromPath.SequenceEqual(new[] { "OneToOneMapping" }));
 			Assert.IsTrue(binding.ToPath.SequenceEqual(new[] { "OneToOneMapping" }));
 		}

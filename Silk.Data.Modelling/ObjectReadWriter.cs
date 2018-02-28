@@ -24,8 +24,10 @@ namespace Silk.Data.Modelling
 			if (offset == path.Length - 1)
 				return _readWriteMethods.GetTypedValue<T>(_instance, field.FieldName);
 
-			
 			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
+			if (subObject == null)
+				return default(T);
+
 			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel);
 			return subReadWriter.ReadField<T>(path, offset + 1);
 		}
@@ -43,6 +45,9 @@ namespace Silk.Data.Modelling
 			}
 
 			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
+			if (subObject == null)
+				return;
+
 			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel);
 			subReadWriter.WriteField<T>(path, offset + 1, value);
 		}

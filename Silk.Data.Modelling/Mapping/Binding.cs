@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -68,12 +69,12 @@ namespace Silk.Data.Modelling.Mapping
 	{
 		public Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
 		{
-			return new ConvertBinding<TFrom, TTo>(new MappingConverter<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore),
+			return new SubmappingBinding<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore,
 				fromField.FieldPath, toField.FieldPath);
 		}
 	}
 
-	public class MappingConverter<TFrom, TTo> : Converter<TFrom, TTo>
+	public class SubmappingBinding<TFrom, TTo> : Binding
 	{
 		private readonly IModel _fromModel;
 		private readonly IModel _toModel;
@@ -91,16 +92,47 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public MappingConverter(IModel fromModel, IModel toModel, MappingStore mappingStore)
+		public SubmappingBinding(IModel fromModel, IModel toModel, MappingStore mappingStore, string[] fromPath, string[] toPath) :
+			base(fromPath, toPath)
 		{
 			_fromModel = fromModel;
 			_toModel = toModel;
 			MappingStore = mappingStore;
 		}
 
-		public override TTo Convert(TFrom from)
+		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			throw new NotImplementedException();
+			Mapping.PerformMapping(
+				new SubmappingModelReadWriter(from, _fromModel, FromPath),
+				new SubmappingModelReadWriter(to, _toModel, ToPath)
+				);
+		}
+
+		private class SubmappingModelReadWriter : IModelReadWriter
+		{
+			public IModel Model { get; }
+			public IModelReadWriter RealReadWriter { get; }
+			public string[] PrefixPath { get; }
+
+			public SubmappingModelReadWriter(IModelReadWriter modelReadWriter, IModel model,
+				string[] prefixPath)
+			{
+				Model = model;
+				RealReadWriter = modelReadWriter;
+				PrefixPath = prefixPath;
+			}
+
+			public T ReadField<T>(string[] path, int offset)
+			{
+				var fixedPath = path.Take(offset).Concat(PrefixPath).Concat(path.Skip(offset)).ToArray();
+				return RealReadWriter.ReadField<T>(fixedPath, offset);
+			}
+
+			public void WriteField<T>(string[] path, int offset, T value)
+			{
+				var fixedPath = path.Take(offset).Concat(PrefixPath).Concat(path.Skip(offset)).ToArray();
+				RealReadWriter.WriteField<T>(fixedPath, offset, value);
+			}
 		}
 	}
 }

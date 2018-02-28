@@ -61,24 +61,12 @@ namespace Silk.Data.Modelling
 
 		public TTo Map<TTo>(object from)
 		{
-			object to = null;
-			var mapping = GetMapping(from.GetType(), typeof(TTo));
-			mapping.PerformMapping(
-				new ObjectReadWriter(from, mapping.FromModel),
-				new ObjectReadWriter(to, mapping.ToModel)
-				);
-			return (TTo)to;
+			throw new NotImplementedException();
 		}
 
 		public TTo Map<TTo, TFrom>(TFrom from)
 		{
-			object to = null;
-			var mapping = GetMapping(typeof(TFrom), typeof(TTo));
-			mapping.PerformMapping(
-				new ObjectReadWriter(from, mapping.FromModel),
-				new ObjectReadWriter(to, mapping.ToModel)
-				);
-			return (TTo)to;
+			throw new NotImplementedException();
 		}
 	}
 }
