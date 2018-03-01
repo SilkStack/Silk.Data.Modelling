@@ -89,10 +89,16 @@ namespace Silk.Data.Modelling.Mapping
 
 		public abstract Binding Binding { get; }
 		public abstract BindingBuilder From(ISourceField sourceField);
-		public abstract BindingBuilder Using<TBinding>()
-			where TBinding : IBindingFactory, new();
-		public abstract BindingBuilder Using<TBinding, TOption>(TOption option)
-			where TBinding : IBindingFactory<TOption>, new();
+
+		public abstract BindingBuilder AssignUsing<TBinding>()
+			where TBinding : IAssignmentBindingFactory, new();
+		public abstract BindingBuilder AssignUsing<TBinding, TOption>(TOption option)
+			where TBinding : IAssignmentBindingFactory<TOption>, new();
+
+		public abstract BindingBuilder MapUsing<TBinding>()
+			where TBinding : IMappingBindingFactory, new();
+		public abstract BindingBuilder MapUsing<TBinding, TOption>(TOption option)
+			where TBinding : IMappingBindingFactory<TOption>, new();
 	}
 
 	public class BindingBuilder<T> : BindingBuilder
@@ -114,7 +120,7 @@ namespace Silk.Data.Modelling.Mapping
 			return this;
 		}
 
-		public override BindingBuilder Using<TBinding>()
+		public override BindingBuilder MapUsing<TBinding>()
 		{
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
@@ -122,11 +128,23 @@ namespace Silk.Data.Modelling.Mapping
 			return this;
 		}
 
-		public override BindingBuilder Using<TBinding, TOption>(TOption option)
+		public override BindingBuilder MapUsing<TBinding, TOption>(TOption option)
 		{
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
 			_binding = Source.CreateBinding<T, TOption>(new TBinding(), Target, option);
+			return this;
+		}
+
+		public override BindingBuilder AssignUsing<TBinding>()
+		{
+			_binding = Target.CreateBinding(new TBinding());
+			return this;
+		}
+
+		public override BindingBuilder AssignUsing<TBinding, TOption>(TOption option)
+		{
+			_binding = Target.CreateBinding(new TBinding(), option);
 			return this;
 		}
 	}

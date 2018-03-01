@@ -29,7 +29,7 @@ namespace Silk.Data.Modelling.Mapping
 				builder
 					.Bind(toField)
 					.From(fromField)
-					.Using<CopyBinding>();
+					.MapUsing<CopyBinding>();
 			}
 
 			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
@@ -52,7 +52,7 @@ namespace Silk.Data.Modelling.Mapping
 				builder
 					.Bind(toField)
 					.From(fromField)
-					.Using<CopyBinding>();
+					.MapUsing<CopyBinding>();
 			}
 		}
 	}

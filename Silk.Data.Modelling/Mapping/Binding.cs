@@ -1,21 +1,90 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Silk.Data.Modelling.Mapping
 {
+	public abstract class Binding
+	{
+		public abstract void PerformBinding(IModelReadWriter from, IModelReadWriter to);
+	}
+
+	/// <summary>
+	/// Assigns a value in the result mapping graph.
+	/// </summary>
+	public abstract class AssignmentBinding : Binding
+	{
+		public string[] ToPath { get; }
+
+		public AssignmentBinding(string[] toPath)
+		{
+			ToPath = toPath;
+		}
+
+		public override void PerformBinding(IModelReadWriter from, IModelReadWriter to)
+		{
+			AssignBindingValue(to);
+		}
+
+		public abstract void AssignBindingValue(IModelReadWriter to);
+	}
+
+	public class CreateInstanceIfNull<T> : AssignmentBinding
+	{
+		private readonly Func<T> _createInstance;
+
+		public CreateInstanceIfNull(ConstructorInfo constructorInfo, string[] toPath) :
+			base(toPath)
+		{
+			_createInstance = CreateCtorMethod(constructorInfo);
+		}
+
+		private Func<T> CreateCtorMethod(ConstructorInfo constructorInfo)
+		{
+			var method = new DynamicMethod("Ctor", typeof(T), new Type[0], true);
+			var ilgen = method.GetILGenerator();
+			ilgen.Emit(OpCodes.Newobj, constructorInfo);
+			ilgen.Emit(OpCodes.Ret);
+			return method.CreateDelegate(typeof(Func<T>)) as Func<T>;
+		}
+
+		public override void AssignBindingValue(IModelReadWriter to)
+		{
+			var nullCheck = to.ReadField<T>(ToPath, 0);
+			if (nullCheck == null)
+			{
+				to.WriteField<T>(ToPath, 0, _createInstance());
+			}
+		}
+	}
+
+	public class CreateInstanceIfNull : IAssignmentBindingFactory<ConstructorInfo>
+	{
+		public AssignmentBinding CreateBinding<TTo>(ITargetField toField, ConstructorInfo bindingOption)
+		{
+			return new CreateInstanceIfNull<TTo>(bindingOption, toField.FieldPath);
+		}
+	}
+
 	/// <summary>
 	/// Binds a value between models.
 	/// </summary>
-	public abstract class Binding
+	public abstract class MappingBinding : Binding
 	{
 		public string[] FromPath { get; }
 
 		public string[] ToPath { get; }
 
-		public Binding(string[] fromPath, string[] toPath)
+		public MappingBinding(string[] fromPath, string[] toPath)
 		{
 			FromPath = fromPath;
 			ToPath = toPath;
+		}
+
+		public override void PerformBinding(IModelReadWriter from, IModelReadWriter to)
+		{
+			CopyBindingValue(from, to);
 		}
 
 		/// <summary>
@@ -23,12 +92,12 @@ namespace Silk.Data.Modelling.Mapping
 		/// </summary>
 		/// <param name="from"></param>
 		/// <param name="to"></param>
-		public abstract void CopyBindingValue(IModelReadWriter from, IModelReadWriter to); 
+		public abstract void CopyBindingValue(IModelReadWriter from, IModelReadWriter to);
 	}
 
-	public class CopyBinding : IBindingFactory
+	public class CopyBinding : IMappingBindingFactory
 	{
-		public Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField)
+		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField)
 		{
 			if (typeof(TFrom) != typeof(TTo))
 				throw new InvalidOperationException("TFrom and TTo type mismatch.");
@@ -36,7 +105,7 @@ namespace Silk.Data.Modelling.Mapping
 		}
 	}
 
-	public class CopyBinding<T> : Binding
+	public class CopyBinding<T> : MappingBinding
 	{
 		public CopyBinding(string[] fromPath, string[] toPath)
 			: base(fromPath, toPath)
@@ -49,7 +118,7 @@ namespace Silk.Data.Modelling.Mapping
 		}
 	}
 
-	public class ConvertBinding<TFrom, TTo> : Binding
+	public class ConvertBinding<TFrom, TTo> : MappingBinding
 	{
 		public Converter<TFrom, TTo> Converter { get; }
 
@@ -65,16 +134,16 @@ namespace Silk.Data.Modelling.Mapping
 		}
 	}
 
-	public class SubmappingBinding : IBindingFactory<MappingStore>
+	public class SubmappingBinding : IMappingBindingFactory<MappingStore>
 	{
-		public Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
+		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
 		{
 			return new SubmappingBinding<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore,
 				fromField.FieldPath, toField.FieldPath);
 		}
 	}
 
-	public class SubmappingBinding<TFrom, TTo> : Binding
+	public class SubmappingBinding<TFrom, TTo> : MappingBinding
 	{
 		private readonly IModel _fromModel;
 		private readonly IModel _toModel;

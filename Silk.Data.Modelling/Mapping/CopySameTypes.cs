@@ -18,7 +18,7 @@ namespace Silk.Data.Modelling.Mapping
 				builder
 					.Bind(toField)
 					.From(fromField)
-					.Using<CopyBinding>();
+					.MapUsing<CopyBinding>();
 			}
 		}
 	}

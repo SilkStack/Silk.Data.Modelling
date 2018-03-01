@@ -34,7 +34,7 @@ namespace Silk.Data.Modelling.Mapping
 				builder
 					.Bind(toField)
 					.From(fromField)
-					.Using<SubmappingBinding, MappingStore>(builder.MappingStore);
+					.MapUsing<SubmappingBinding, MappingStore>(builder.MappingStore);
 			}
 		}
 

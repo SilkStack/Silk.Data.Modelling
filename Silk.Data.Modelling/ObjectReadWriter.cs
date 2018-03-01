@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Silk.Data.Modelling
 {
@@ -8,15 +9,21 @@ namespace Silk.Data.Modelling
 		private object _instance;
 		private ObjectReadWriteHelpers _readWriteMethods;
 
-		public ObjectReadWriter(object instance, IModel model)
+		public ObjectReadWriter(object instance, IModel model, Type objectType)
 		{
 			_instance = instance;
 			Model = model;
-			_readWriteMethods = ObjectReadWriteHelpers.GetForType(instance.GetType());
+			_readWriteMethods = ObjectReadWriteHelpers.GetForType(objectType);
 		}
 
 		public T ReadField<T>(string[] path, int offset)
 		{
+			if (path[offset] == ".")
+				return (T)_instance;
+
+			if (_instance == null)
+				return default(T);
+
 			var field = Model.Fields.FirstOrDefault(q => q.FieldName == path[offset]);
 			if (field == null)
 				throw new System.Exception("Unknown field on model.");
@@ -25,15 +32,21 @@ namespace Silk.Data.Modelling
 				return _readWriteMethods.GetTypedValue<T>(_instance, field.FieldName);
 
 			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
-			if (subObject == null)
-				return default(T);
-
-			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel);
+			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel, field.FieldType);
 			return subReadWriter.ReadField<T>(path, offset + 1);
 		}
 
 		public void WriteField<T>(string[] path, int offset, T value)
 		{
+			if (path[offset] == ".")
+			{
+				_instance = value;
+				return;
+			}
+
+			if (_instance == null)
+				return;
+
 			var field = Model.Fields.FirstOrDefault(q => q.FieldName == path[offset]);
 			if (field == null)
 				throw new System.Exception("Unknown field on model.");
@@ -45,11 +58,11 @@ namespace Silk.Data.Modelling
 			}
 
 			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
-			if (subObject == null)
-				return;
-
-			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel);
+			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel, field.FieldType);
 			subReadWriter.WriteField<T>(path, offset + 1, value);
+
+			if (path[offset + 1] == ".")
+				_readWriteMethods.SetTypedValue<T>(_instance, field.FieldName, value);
 		}
 	}
 }

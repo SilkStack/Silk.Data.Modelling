@@ -12,11 +12,11 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SimplePoccWithReadWriteProperties>();
 			Assert.AreEqual(2, mapping.Bindings.Length);
-			Assert.IsTrue(mapping.Bindings.Any(q => q.FromPath.SequenceEqual(new[] { "Integer" }) &&
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Integer" }) &&
 				q.ToPath.SequenceEqual(new[] { "Integer" }) &&
 				q is CopyBinding<int>
 				));
-			Assert.IsTrue(mapping.Bindings.Any(q => q.FromPath.SequenceEqual(new[] { "String" }) &&
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "String" }) &&
 				q.ToPath.SequenceEqual(new[] { "String" }) &&
 				q is CopyBinding<string>
 				));

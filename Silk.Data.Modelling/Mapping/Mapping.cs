@@ -29,7 +29,7 @@
 		{
 			foreach (var binding in Bindings)
 			{
-				binding.CopyBindingValue(from, to);
+				binding.PerformBinding(from, to);
 			}
 		}
 	}

@@ -31,7 +31,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public TargetModel BuildTargetModel()
 		{
-			return new TargetModel(_fromModel, _fields.ToArray());
+			string[] selfPath;
+			if (_rootPath == null || _rootPath.Length == 0)
+				selfPath = new[] { "." };
+			else
+				selfPath = _rootPath.Concat(new[] { "." }).ToArray();
+			return new TargetModel(_fromModel, _fields.ToArray(), selfPath);
 		}
 	}
 }

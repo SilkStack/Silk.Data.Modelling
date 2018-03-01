@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -12,10 +13,31 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override ITargetField[] Fields { get; }
 
-		public TargetModel(IModel fromModel, ITargetField[] fields)
+		private readonly string[] _selfPath;
+
+		public TargetModel(IModel fromModel, ITargetField[] fields, string[] selfPath)
 		{
 			FromModel = fromModel;
 			Fields = fields;
+
+			_selfPath = selfPath;
+		}
+
+		public ITargetField GetSelf()
+		{
+			var typeModel = FromModel as TypeModel;
+			if (typeModel == null)
+				return null;
+
+			var typeOfSelf = typeModel.Type;
+			return typeof(TargetModel).GetTypeInfo().GetDeclaredMethod("MakeSelfField")
+				.MakeGenericMethod(typeOfSelf).Invoke(this, new object[0]) as ITargetField;
+		}
+
+		private ITargetField MakeSelfField<T>()
+		{
+			var enumerableElementType = typeof(T).GetEnumerableElementType();
+			return new TargetField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath);
 		}
 
 		public ITargetField GetField(params string[] fieldPath)
@@ -45,6 +67,8 @@ namespace Silk.Data.Modelling.Mapping
 		string[] FieldPath { get; }
 		ITargetField[] Fields { get; }
 		BindingBuilder CreateBindingBuilder();
+		Binding CreateBinding(IAssignmentBindingFactory bindingFactory);
+		Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option);
 	}
 
 	public class TargetField<T> : FieldBase<T>, ITargetField, IField<T>
@@ -75,6 +99,16 @@ namespace Silk.Data.Modelling.Mapping
 		public BindingBuilder CreateBindingBuilder()
 		{
 			return new BindingBuilder<T>(this);
+		}
+
+		public Binding CreateBinding(IAssignmentBindingFactory bindingFactory)
+		{
+			return bindingFactory.CreateBinding<T>(this);
+		}
+
+		public Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option)
+		{
+			return bindingFactory.CreateBinding<T>(this, option);
 		}
 	}
 }

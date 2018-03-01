@@ -10,6 +10,7 @@ namespace Silk.Data.Modelling
 		static MappingOptions()
 		{
 			DefaultObjectMappingOptions = new MappingOptions();
+			DefaultObjectMappingOptions.Conventions.Add(CreateInstanceAsNeeded.Instance);
 			DefaultObjectMappingOptions.Conventions.Add(CopySameTypes.Instance);
 			DefaultObjectMappingOptions.Conventions.Add(FlattenSameTypes.Instance);
 			DefaultObjectMappingOptions.Conventions.Add(MapReferenceTypes.Instance);

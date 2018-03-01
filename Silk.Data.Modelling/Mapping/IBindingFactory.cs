@@ -1,12 +1,22 @@
 ﻿namespace Silk.Data.Modelling.Mapping
 {
-	public interface IBindingFactory
+	public interface IAssignmentBindingFactory
 	{
-		Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField);
+		AssignmentBinding CreateBinding<TTo>(ITargetField toField);
 	}
 
-	public interface IBindingFactory<T>
+	public interface IAssignmentBindingFactory<T>
 	{
-		Binding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, T bindingOption);
+		AssignmentBinding CreateBinding<TTo>(ITargetField toField, T bindingOption);
+	}
+
+	public interface IMappingBindingFactory
+	{
+		MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField);
+	}
+
+	public interface IMappingBindingFactory<T>
+	{
+		MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, T bindingOption);
 	}
 }

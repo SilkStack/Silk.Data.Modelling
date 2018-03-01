@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling.Tests
 			var mapping = CreateMapping<SourceRoot, FlatData>();
 			Assert.AreEqual(1, mapping.Bindings.Length);
 
-			var flattenBinding = mapping.Bindings[0];
+			var flattenBinding = (MappingBinding)mapping.Bindings[0];
 			Assert.IsInstanceOfType(flattenBinding, typeof(CopyBinding<int>));
 			Assert.IsTrue(flattenBinding.FromPath.SequenceEqual(new[] { "Data", "Property" }));
 			Assert.IsTrue(flattenBinding.ToPath.SequenceEqual(new[] { "DataProperty" }));

@@ -5,6 +5,7 @@ namespace Silk.Data.Modelling
 {
 	public class ObjectMapper : IObjectMapper
 	{
+		private static readonly string[] _selfPath = new[] { "." };
 		private readonly MappingStore _mappingStore = new MappingStore();
 		private readonly object _syncObject = new object();
 
@@ -45,8 +46,8 @@ namespace Silk.Data.Modelling
 		{
 			var mapping = GetMapping(from.GetType(), to.GetType());
 			mapping.PerformMapping(
-				new ObjectReadWriter(from, mapping.FromModel),
-				new ObjectReadWriter(to, mapping.ToModel)
+				new ObjectReadWriter(from, mapping.FromModel, from.GetType()),
+				new ObjectReadWriter(to, mapping.ToModel, to.GetType())
 				);
 		}
 
@@ -54,19 +55,33 @@ namespace Silk.Data.Modelling
 		{
 			var mapping = GetMapping(typeof(TFrom), typeof(TTo));
 			mapping.PerformMapping(
-				new ObjectReadWriter(from, mapping.FromModel),
-				new ObjectReadWriter(to, mapping.ToModel)
+				new ObjectReadWriter(from, mapping.FromModel, typeof(TFrom)),
+				new ObjectReadWriter(to, mapping.ToModel, typeof(TTo))
 				);
 		}
 
 		public TTo Map<TTo>(object from)
 		{
-			throw new NotImplementedException();
+			var mapping = GetMapping(from.GetType(), typeof(TTo));
+			var toModel = TypeModel.GetModelOf<TTo>();
+			var toWriter = new ObjectReadWriter(null, toModel, typeof(TTo));
+			mapping.PerformMapping(
+				new ObjectReadWriter(from, mapping.FromModel, from.GetType()),
+				toWriter
+				);
+			return toWriter.ReadField<TTo>(_selfPath, 0);
 		}
 
 		public TTo Map<TTo, TFrom>(TFrom from)
 		{
-			throw new NotImplementedException();
+			var mapping = GetMapping(typeof(TFrom), typeof(TTo));
+			var toModel = TypeModel.GetModelOf<TTo>();
+			var toWriter = new ObjectReadWriter(null, toModel, typeof(TTo));
+			mapping.PerformMapping(
+				new ObjectReadWriter(from, mapping.FromModel, typeof(TFrom)),
+				toWriter
+				);
+			return toWriter.ReadField<TTo>(_selfPath, 0);
 		}
 	}
 }

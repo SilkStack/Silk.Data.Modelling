@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling.Tests
 			var mapping = CreateMapping<SourceParentPoco, TargetParentPoco>();
 			Assert.AreEqual(1, mapping.Bindings.Length);
 
-			var binding = mapping.Bindings[0];
+			var binding = (MappingBinding)mapping.Bindings[0];
 			Assert.IsInstanceOfType(binding, typeof(SubmappingBinding<SourceSubType, TargetSubType>));
 
 			var submappingBinding = (SubmappingBinding<SourceSubType, TargetSubType>)binding;
@@ -21,7 +21,7 @@ namespace Silk.Data.Modelling.Tests
 
 			Assert.AreEqual(1, submappingBinding.Mapping.Bindings.Length);
 
-			binding = submappingBinding.Mapping.Bindings[0];
+			binding = (MappingBinding)submappingBinding.Mapping.Bindings[0];
 			Assert.IsTrue(binding.FromPath.SequenceEqual(new[] { "OneToOneMapping" }));
 			Assert.IsTrue(binding.ToPath.SequenceEqual(new[] { "OneToOneMapping" }));
 		}
