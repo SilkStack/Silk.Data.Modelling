@@ -14,6 +14,7 @@ namespace Silk.Data.Modelling.Mapping
 		public override ITargetField[] Fields { get; }
 
 		private readonly string[] _selfPath;
+		private ITargetField _self;
 
 		public TargetModel(IModel fromModel, ITargetField[] fields, string[] selfPath)
 		{
@@ -25,13 +26,17 @@ namespace Silk.Data.Modelling.Mapping
 
 		public ITargetField GetSelf()
 		{
+			if (_self != null)
+				return _self;
+
 			var typeModel = FromModel as TypeModel;
 			if (typeModel == null)
 				return null;
 
 			var typeOfSelf = typeModel.Type;
-			return typeof(TargetModel).GetTypeInfo().GetDeclaredMethod("MakeSelfField")
+			_self = typeof(TargetModel).GetTypeInfo().GetDeclaredMethod("MakeSelfField")
 				.MakeGenericMethod(typeOfSelf).Invoke(this, new object[0]) as ITargetField;
+			return _self;
 		}
 
 		private ITargetField MakeSelfField<T>()

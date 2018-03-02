@@ -15,16 +15,20 @@ namespace Silk.Data.Modelling.Mapping
 			var typeModel = toModel.FromModel as TypeModel;
 			if (typeModel == null)
 				return;
+
+			var selfField = toModel.GetSelf();
+			if (builder.IsBound(selfField))
+				return;
+
 			var ctor = typeModel.Type.GetTypeInfo().DeclaredConstructors
 				.FirstOrDefault(q => q.GetParameters().Length == 0);
-			//  todo: support providing a factory for the type or assuming the member will already be instantiated
 			if (ctor == null)
 			{
 				throw new MappingRequirementException($"A constructor with 0 parameters is required on type {typeModel.Type}.");
 			}
 
 			builder
-				.Bind(toModel.GetSelf())
+				.Bind(selfField)
 				.AssignUsing<CreateInstanceIfNull, ConstructorInfo>(ctor);
 		}
 	}
