@@ -6,22 +6,6 @@ namespace Silk.Data.Modelling.Tests
 	public class ObjectMappingTests
 	{
 		[TestMethod]
-		public void ThrowExceptionWithNoUsableCtor()
-		{
-			var exceptionCaught = false;
-			var mapper = new ObjectMapper();
-			try
-			{
-				mapper.Map<PocoWithComplexCtor>(new object());
-			}
-			catch (MappingRequirementException)
-			{
-				exceptionCaught = true;
-			}
-			Assert.IsTrue(exceptionCaught);
-		}
-
-		[TestMethod]
 		public void InjectSameTypes()
 		{
 			var mapper = new ObjectMapper();
@@ -78,13 +62,6 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsNotNull(output);
 			Assert.IsNotNull(output.Sub);
 			Assert.AreEqual(input.Sub.Property, output.Sub.Property);
-		}
-
-		private class PocoWithComplexCtor
-		{
-			public PocoWithComplexCtor(int value)
-			{
-			}
 		}
 
 		private class SimplePoco
