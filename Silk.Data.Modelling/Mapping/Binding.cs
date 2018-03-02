@@ -49,6 +49,11 @@ namespace Silk.Data.Modelling.Mapping
 			return method.CreateDelegate(typeof(Func<T>)) as Func<T>;
 		}
 
+		public T CreateInstance()
+		{
+			return _createInstance();
+		}
+
 		public override void AssignBindingValue(IModelReadWriter to)
 		{
 			var nullCheck = to.ReadField<T>(ToPath, 0);

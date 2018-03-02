@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Mapping;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Tests
 {
@@ -21,25 +22,111 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsTrue(exceptionCaught);
 		}
 
-		private Mapping.Mapping CreateMapping<T>()
+		[TestMethod]
+		public void HonorExistingSelfBinding()
 		{
-			return CreateMapping<T, T>();
+			var options = MappingOptions.CreateObjectMappingOptions();
+			options.Conventions.Insert(0, new AssignSelf());
+
+			var mapping = CreateMapping<PocoWithComplexCtor>(options);
+			Assert.AreEqual(1, mapping.Bindings.Length);
+			Assert.IsInstanceOfType(mapping.Bindings[0], typeof(AssignFactory.DefaultBinding<PocoWithComplexCtor>));
 		}
 
-		private Mapping.Mapping CreateMapping<TFrom, TTo>()
+		[TestMethod]
+		public void CreateCtorBindingForPublicCtor()
+		{
+			var mapping = CreateMapping<PocoWithPublicCtor>();
+			Assert.AreEqual(1, mapping.Bindings.Length);
+			Assert.IsInstanceOfType(mapping.Bindings[0], typeof(CreateInstanceIfNull<PocoWithPublicCtor>));
+
+			var ctorBinding = (CreateInstanceIfNull<PocoWithPublicCtor>)mapping.Bindings[0];
+			Assert.IsTrue(ctorBinding.ToPath.SequenceEqual(new[] { "." }));
+
+			var instance = ctorBinding.CreateInstance();
+			Assert.IsNotNull(instance);
+		}
+
+		[TestMethod]
+		public void CreateCtorBindingForPrivateCtor()
+		{
+			var mapping = CreateMapping<PocoWithPrivateCtor>();
+			Assert.AreEqual(1, mapping.Bindings.Length);
+			Assert.IsInstanceOfType(mapping.Bindings[0], typeof(CreateInstanceIfNull<PocoWithPrivateCtor>));
+
+			var ctorBinding = (CreateInstanceIfNull<PocoWithPrivateCtor>)mapping.Bindings[0];
+			Assert.IsTrue(ctorBinding.ToPath.SequenceEqual(new[] { "." }));
+
+			var instance = ctorBinding.CreateInstance();
+			Assert.IsNotNull(instance);
+		}
+
+		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
+		{
+			return CreateMapping<T, T>(mappingOptions);
+		}
+
+		private Mapping.Mapping CreateMapping<TFrom, TTo>(MappingOptions mappingOptions = null)
 		{
 			var fromPocoModel = TypeModel.GetModelOf<TFrom>();
 			var toPocoModel = TypeModel.GetModelOf<TTo>();
 
 			var builder = new MappingBuilder(fromPocoModel, toPocoModel);
+			if (mappingOptions != null)
+			{
+				foreach (var convention in mappingOptions.Conventions)
+				{
+					builder.AddConvention(convention);
+				}
+			}
 			builder.AddConvention(CreateInstanceAsNeeded.Instance);
 			return builder.BuildMapping();
+		}
+
+		private class PocoWithPublicCtor
+		{
+			public PocoWithPublicCtor() { }
+		}
+
+		private class PocoWithPrivateCtor
+		{
+			private PocoWithPrivateCtor() { }
 		}
 
 		private class PocoWithComplexCtor
 		{
 			public PocoWithComplexCtor(int value)
 			{
+			}
+		}
+
+		private class AssignSelf : IMappingConvention
+		{
+			public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
+			{
+				builder
+					.Bind(toModel.GetSelf())
+					.AssignUsing<AssignFactory>();
+			}
+		}
+
+		private class AssignFactory : IAssignmentBindingFactory
+		{
+			public AssignmentBinding CreateBinding<TTo>(ITargetField toField)
+			{
+				return new DefaultBinding<TTo>(toField.FieldPath);
+			}
+
+			public class DefaultBinding<T> : AssignmentBinding
+			{
+				public DefaultBinding(string[] toPath) : base(toPath)
+				{
+				}
+
+				public override void AssignBindingValue(IModelReadWriter to)
+				{
+					to.WriteField<T>(ToPath, 0, default(T));
+				}
 			}
 		}
 	}

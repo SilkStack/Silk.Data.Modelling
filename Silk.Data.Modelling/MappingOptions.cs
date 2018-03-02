@@ -6,14 +6,17 @@ namespace Silk.Data.Modelling
 	public class MappingOptions
 	{
 		public static MappingOptions DefaultObjectMappingOptions { get; }
+			= CreateObjectMappingOptions();
 
-		static MappingOptions()
+		public static MappingOptions CreateObjectMappingOptions()
 		{
-			DefaultObjectMappingOptions = new MappingOptions();
-			DefaultObjectMappingOptions.Conventions.Add(CreateInstanceAsNeeded.Instance);
-			DefaultObjectMappingOptions.Conventions.Add(CopySameTypes.Instance);
-			DefaultObjectMappingOptions.Conventions.Add(FlattenSameTypes.Instance);
-			DefaultObjectMappingOptions.Conventions.Add(MapReferenceTypes.Instance);
+			var ret = new MappingOptions();
+			ret.Conventions.Add(new UseObjectMappingOverrides());
+			ret.Conventions.Add(CreateInstanceAsNeeded.Instance);
+			ret.Conventions.Add(CopySameTypes.Instance);
+			ret.Conventions.Add(FlattenSameTypes.Instance);
+			ret.Conventions.Add(MapReferenceTypes.Instance);
+			return ret;
 		}
 
 		public List<IMappingConvention> Conventions { get; }
