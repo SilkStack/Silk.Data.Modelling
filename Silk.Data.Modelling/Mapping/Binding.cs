@@ -24,10 +24,39 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override void PerformBinding(IModelReadWriter from, IModelReadWriter to)
 		{
-			AssignBindingValue(to);
+			AssignBindingValue(from, to);
 		}
 
-		public abstract void AssignBindingValue(IModelReadWriter to);
+		public abstract void AssignBindingValue(IModelReadWriter from, IModelReadWriter to);
+	}
+
+	public class UseFactory<TFrom, TTo> : AssignmentBinding
+	{
+		private readonly Func<TFrom, TTo> _factory;
+
+		public UseFactory(Func<TFrom, TTo> factory, string[] toPath) :
+			base(toPath)
+		{
+			_factory = factory;
+		}
+
+		public TTo CreateInstance(TFrom from)
+		{
+			return _factory(from);
+		}
+
+		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
+		{
+			to.WriteField<TTo>(ToPath, 0, CreateInstance(from.ReadField<TFrom>(new[] { "." }, 0)));
+		}
+	}
+
+	public class UseFactoryBinding<TFrom, TTo> : IAssignmentBindingFactory<Func<TFrom, TTo>>
+	{
+		public AssignmentBinding CreateBinding<T>(ITargetField toField, Func<TFrom, TTo> bindingOption)
+		{
+			return new UseFactory<TFrom, TTo>(bindingOption, toField.FieldPath);
+		}
 	}
 
 	public class CreateInstanceIfNull<T> : AssignmentBinding
@@ -54,7 +83,7 @@ namespace Silk.Data.Modelling.Mapping
 			return _createInstance();
 		}
 
-		public override void AssignBindingValue(IModelReadWriter to)
+		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
 			var nullCheck = to.ReadField<T>(ToPath, 0);
 			if (nullCheck == null)

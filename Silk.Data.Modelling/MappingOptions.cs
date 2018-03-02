@@ -1,5 +1,6 @@
 ﻿using Silk.Data.Modelling.Mapping;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling
 {
@@ -21,5 +22,21 @@ namespace Silk.Data.Modelling
 
 		public List<IMappingConvention> Conventions { get; }
 			= new List<IMappingConvention>();
+
+		public void AddMappingOverride<TFrom, TTo>(IObjectMappingOverride<TFrom, TTo> mappingOverride)
+		{
+			var objectMappingConvention = Conventions.OfType<UseObjectMappingOverrides>().FirstOrDefault();
+			if (objectMappingConvention == null)
+				throw new System.InvalidOperationException("UseObjectMappingOverrides is required.");
+			objectMappingConvention.AddMappingOverride<TFrom, TTo>(mappingOverride);
+		}
+
+		public void RemoveMappingOverride<TFrom, TTo>(IObjectMappingOverride<TFrom, TTo> mappingOverride)
+		{
+			var objectMappingConvention = Conventions.OfType<UseObjectMappingOverrides>().FirstOrDefault();
+			if (objectMappingConvention == null)
+				throw new System.InvalidOperationException("UseObjectMappingOverrides is required.");
+			objectMappingConvention.RemoveMappingOverride<TFrom, TTo>(mappingOverride);
+		}
 	}
 }
