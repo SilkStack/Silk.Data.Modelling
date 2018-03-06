@@ -1,10 +1,17 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
 	public class InflateSameTypes : IMappingConvention
 	{
-		public static InflateSameTypes Instance { get; } = new InflateSameTypes();
+		public InflateSameTypes(bool createInstancesAsNeeded = false)
+		{
+			CreateInstancesAsNeeded = createInstancesAsNeeded;
+		}
+
+		public bool CreateInstancesAsNeeded { get; }
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
@@ -25,6 +32,29 @@ namespace Silk.Data.Modelling.Mapping
 				}
 				if (toField == null)
 					continue;
+
+				if (CreateInstancesAsNeeded)
+				{
+					var path = new List<string>();
+					foreach (var pathSegment in toField.FieldPath.Take(toField.FieldPath.Length - 1))
+					{
+						path.Add(pathSegment);
+						var pathField = toModel.GetField(path.ToArray());
+						if (builder.IsBound(pathField))
+							continue;
+
+						var ctor = pathField.FieldType.GetTypeInfo().DeclaredConstructors
+							.FirstOrDefault(q => q.GetParameters().Length == 0);
+						if (ctor == null)
+						{
+							throw new MappingRequirementException($"A constructor with 0 parameters is required on type {pathField.FieldType}.");
+						}
+
+						builder
+							.Bind(pathField)
+							.AssignUsing<CreateInstanceIfNull, ConstructorInfo>(ctor);
+					}
+				}
 
 				builder
 					.Bind(toField)

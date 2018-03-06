@@ -64,6 +64,39 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(input.Sub.Property, output.Sub.Property);
 		}
 
+		[TestMethod]
+		public void MapFlattenedProperties()
+		{
+			var mapper = new ObjectMapper();
+			var input = new SourcePoco
+			{
+				Sub = new SourceSubPoco
+				{
+					Property = 1
+				}
+			};
+			var output = mapper.Map<FlattenedPoco>(input);
+			Assert.IsNotNull(output);
+			Assert.AreEqual(input.Sub.Property, output.SubProperty);
+		}
+
+		[TestMethod]
+		public void MapInflatedProperties()
+		{
+			var mapper = new ObjectMapper();
+			var input = new FlattenedPoco { SubProperty = 1 };
+			var output = mapper.Map<SourcePoco>(input);
+			Assert.IsNotNull(output);
+			Assert.IsNotNull(output.Sub);
+			Assert.AreEqual(input.SubProperty, output.Sub.Property);
+		}
+
+		[TestMethod]
+		public void MapRecursiveObjects()
+		{
+			throw new System.NotImplementedException();
+		}
+
 		private class SimplePoco
 		{
 			public int Property { get; set; }
@@ -87,6 +120,11 @@ namespace Silk.Data.Modelling.Tests
 		private class TargetSubPoco
 		{
 			public int Property { get; set; }
+		}
+
+		private class FlattenedPoco
+		{
+			public int SubProperty { get; set; }
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace Silk.Data.Modelling.Tests
 			var toPocoModel = TypeModel.GetModelOf<TTo>();
 
 			var builder = new MappingBuilder(fromPocoModel, toPocoModel);
-			builder.AddConvention(InflateSameTypes.Instance);
+			builder.AddConvention(new InflateSameTypes());
 			return builder.BuildMapping();
 		}
 
