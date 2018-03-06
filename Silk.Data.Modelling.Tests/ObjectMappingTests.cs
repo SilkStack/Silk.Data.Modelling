@@ -94,7 +94,27 @@ namespace Silk.Data.Modelling.Tests
 		[TestMethod]
 		public void MapRecursiveObjects()
 		{
-			throw new System.NotImplementedException();
+			var mapper = new ObjectMapper();
+			var input = new RecursiveSource
+			{
+				Property = 1,
+				Sub = new RecursiveSource
+				{
+					Property = 2,
+					Sub = new RecursiveSource
+					{
+						Property = 3
+					}
+				}
+			};
+			var output = mapper.Map<RecursiveTarget>(input);
+			Assert.IsNotNull(output);
+			Assert.IsNotNull(output.Sub);
+			Assert.IsNotNull(output.Sub.Sub);
+			Assert.IsNull(output.Sub.Sub.Sub);
+			Assert.AreEqual(1, output.Property);
+			Assert.AreEqual(2, output.Sub.Property);
+			Assert.AreEqual(3, output.Sub.Sub.Property);
 		}
 
 		private class SimplePoco
@@ -125,6 +145,18 @@ namespace Silk.Data.Modelling.Tests
 		private class FlattenedPoco
 		{
 			public int SubProperty { get; set; }
+		}
+
+		private class RecursiveSource
+		{
+			public int Property { get; set; }
+			public RecursiveSource Sub { get; set; }
+		}
+
+		private class RecursiveTarget
+		{
+			public int Property { get; set; }
+			public RecursiveTarget Sub { get; set; }
 		}
 	}
 }

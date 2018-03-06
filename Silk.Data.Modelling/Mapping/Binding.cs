@@ -205,6 +205,9 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
+			var value = from.ReadField<TFrom>(FromPath, 0);
+			if (value == null)
+				return;
 			Mapping.PerformMapping(
 				new SubmappingModelReadWriter(from, _fromModel, FromPath),
 				new SubmappingModelReadWriter(to, _toModel, ToPath)
