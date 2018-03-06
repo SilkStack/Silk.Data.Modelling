@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Mapping;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Tests
 {
@@ -25,6 +26,19 @@ namespace Silk.Data.Modelling.Tests
 			var target = targetReadWriter.ReadField<ComplexConstructorPoco>(new[] { "." }, 0);
 			Assert.IsNotNull(target);
 			Assert.AreEqual(2, target.Value);
+		}
+
+		[TestMethod]
+		public void MappingUsesOverrideBinding()
+		{
+			var options = new MappingOptions();
+			options.Conventions.Add(new UseObjectMappingOverrides());
+			options.AddMappingOverride(new SimplePocoMappingOverride());
+
+			var mapping = CreateMapping<SimplePoco>(options);
+			Assert.AreEqual(2, mapping.Bindings.Length);
+			Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.FromPath.SequenceEqual(new[] { "PropertyA" }) && binding.ToPath.SequenceEqual(new[] { "PropertyB" })));
+			Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.FromPath.SequenceEqual(new[] { "PropertyB" }) && binding.ToPath.SequenceEqual(new[] { "PropertyA" })));
 		}
 
 		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
@@ -63,6 +77,25 @@ namespace Silk.Data.Modelling.Tests
 			public void CreateBindings(ObjectMappingBuilder<ComplexConstructorPoco, ComplexConstructorPoco> builder)
 			{
 				builder.ConstructWithFactory(from => new ComplexConstructorPoco(from.Value + 1));
+			}
+		}
+
+		private class SimplePoco
+		{
+			public int PropertyA { get; set; }
+			public int PropertyB { get; set; }
+		}
+
+		private class SimplePocoMappingOverride : IObjectMappingOverride<SimplePoco, SimplePoco>
+		{
+			public void CreateBindings(ObjectMappingBuilder<SimplePoco, SimplePoco> builder)
+			{
+				builder
+					.Bind(q => q.PropertyA)
+					.From(q => q.PropertyB);
+				builder
+					.Bind(q => q.PropertyB)
+					.From(q => q.PropertyA);
 			}
 		}
 	}
