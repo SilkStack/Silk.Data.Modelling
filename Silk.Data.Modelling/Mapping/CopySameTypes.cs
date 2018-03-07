@@ -12,7 +12,7 @@ namespace Silk.Data.Modelling.Mapping
 			{
 				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
 					field.FieldName == toField.FieldName &&
-					field.FieldType == toField.FieldType);
+					AreTypesCompatible(field, toField));
 				if (fromField == null)
 					continue;
 				builder
@@ -20,6 +20,12 @@ namespace Silk.Data.Modelling.Mapping
 					.From(fromField)
 					.MapUsing<CopyBinding>();
 			}
+		}
+
+		private bool AreTypesCompatible(ISourceField sourceField, ITargetField targetField)
+		{
+			var compareTypes = ConventionUtilities.GetCompareTypes(sourceField, targetField);
+			return compareTypes.sourceType == compareTypes.targetType;
 		}
 	}
 }

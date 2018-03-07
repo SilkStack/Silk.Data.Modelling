@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Mapping;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Tests
@@ -22,6 +23,20 @@ namespace Silk.Data.Modelling.Tests
 				));
 		}
 
+		[TestMethod]
+		public void DontCopyDifferentTypesWithIdenticalNames()
+		{
+			var mapping = CreateMapping<SimplePoccWithReadWriteProperties, SimplePoccWithDifferentReadWriteProperties>();
+			Assert.AreEqual(0, mapping.Bindings.Length);
+		}
+
+		[TestMethod]
+		public void CopyEnumerablesOfSameTypesWithIdenticalNames()
+		{
+			var mapping = CreateMapping<SourcePocoWithEnumerables, TargetPocoWithEnumerables>();
+			Assert.AreEqual(3, mapping.Bindings.Length);
+		}
+
 		private Mapping.Mapping CreateMapping<T>()
 		{
 			return CreateMapping<T, T>();
@@ -41,6 +56,26 @@ namespace Silk.Data.Modelling.Tests
 		{
 			public int Integer { get; set; }
 			public string String { get; set; }
+		}
+
+		private class SimplePoccWithDifferentReadWriteProperties
+		{
+			public long Integer { get; set; }
+			public char[] String { get; set; }
+		}
+
+		private class SourcePocoWithEnumerables
+		{
+			public List<int> ListOfInt { get; set; }
+			public int[] CollectionOfInt { get; set; }
+			public IEnumerable<int> Ints { get; set; }
+		}
+
+		private class TargetPocoWithEnumerables
+		{
+			public List<int> ListOfInt { get; set; }
+			public ICollection<int> CollectionOfInt { get; set; }
+			public int[] Ints { get; set; }
 		}
 	}
 }

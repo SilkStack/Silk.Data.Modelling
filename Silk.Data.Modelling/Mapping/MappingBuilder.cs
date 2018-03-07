@@ -124,6 +124,10 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
+			if (IsEnumerableMapping())
+			{
+				return MapUsingEnumerable<TBinding>();
+			}
 			_binding = Source.CreateBinding<T>(new TBinding(), Target);
 			return this;
 		}
@@ -132,7 +136,21 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
-			_binding = Source.CreateBinding<T, TOption>(new TBinding(), Target, option);
+			if (IsEnumerableMapping())
+			{
+
+			}
+			else
+			{
+				_binding = Source.CreateBinding<T, TOption>(new TBinding(), Target, option);
+			}
+			return this;
+		}
+
+		private BindingBuilder MapUsingEnumerable<TBinding>()
+			where TBinding : IMappingBindingFactory, new()
+		{
+			_binding = Source.CreateBinding<T, IMappingBindingFactory>(new EnumerableBindingFactory(), Target, new TBinding());
 			return this;
 		}
 
@@ -146,6 +164,17 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			_binding = Target.CreateBinding(new TBinding(), option);
 			return this;
+		}
+
+		private bool IsEnumerableMapping()
+		{
+			if (Target.IsEnumerable && Source.IsEnumerable)
+				return true;
+			if (Target.IsEnumerable)
+				throw new MappingRequirementException("Target is enumerable but source is not.");
+			if (Source.IsEnumerable)
+				throw new MappingRequirementException("Source is enumerable but target is not.");
+			return false;
 		}
 	}
 }

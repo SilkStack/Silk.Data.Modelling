@@ -6,6 +6,13 @@ namespace Silk.Data.Modelling.Mapping
 {
 	public static class ConventionUtilities
 	{
+		public static (Type sourceType, Type targetType) GetCompareTypes(ISourceField sourceField, ITargetField targetField)
+		{
+			if (sourceField.IsEnumerable && targetField.IsEnumerable)
+				return (sourceType: sourceField.ElementType, targetType: targetField.ElementType);
+			return (sourceType: sourceField.FieldType, targetType: targetField.FieldType);
+		}
+
 		public static IEnumerable<string[]> GetPaths(string fieldName, string[] parentPath = null, int offset = 0)
 		{
 			var nextWord = ReadWord(fieldName, offset);
