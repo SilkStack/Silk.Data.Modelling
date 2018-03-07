@@ -1,4 +1,4 @@
-﻿namespace Silk.Data.Modelling.Mapping
+﻿namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public interface IAssignmentBindingFactory
 	{

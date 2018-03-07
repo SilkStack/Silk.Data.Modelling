@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Mapping.Binding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -87,7 +88,7 @@ namespace Silk.Data.Modelling.Mapping
 		public ITargetField Target { get; protected set; }
 		public ISourceField Source { get; protected set; }
 
-		public abstract Binding Binding { get; }
+		public abstract Binding.Binding Binding { get; }
 		public abstract BindingBuilder From(ISourceField sourceField);
 
 		public abstract BindingBuilder AssignUsing<TBinding>()
@@ -103,10 +104,10 @@ namespace Silk.Data.Modelling.Mapping
 
 	public class BindingBuilder<T> : BindingBuilder
 	{
-		private Binding _binding;
+		private Binding.Binding _binding;
 
 		public new TargetField<T> Target { get; }
-		public override Binding Binding => _binding;
+		public override Binding.Binding Binding => _binding;
 
 		public BindingBuilder(TargetField<T> targetField)
 		{

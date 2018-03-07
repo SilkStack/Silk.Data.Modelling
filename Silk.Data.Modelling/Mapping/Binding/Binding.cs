@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Silk.Data.Modelling.Mapping
+namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public abstract class Binding
 	{

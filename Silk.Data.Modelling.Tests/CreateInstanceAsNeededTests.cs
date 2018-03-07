@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Mapping;
+using Silk.Data.Modelling.Mapping.Binding;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Tests

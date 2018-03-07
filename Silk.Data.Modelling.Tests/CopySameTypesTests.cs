@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Mapping;
+using Silk.Data.Modelling.Mapping.Binding;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,6 +36,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SourcePocoWithEnumerables, TargetPocoWithEnumerables>();
 			Assert.AreEqual(3, mapping.Bindings.Length);
+			throw new System.Exception("Incomplete test.");
 		}
 
 		private Mapping.Mapping CreateMapping<T>()

@@ -16,9 +16,9 @@
 		/// <summary>
 		/// Gets the bindings for the mapping operation.
 		/// </summary>
-		public Binding[] Bindings { get; }
+		public Binding.Binding[] Bindings { get; }
 
-		public Mapping(IModel fromModel, IModel toModel, Binding[] bindings)
+		public Mapping(IModel fromModel, IModel toModel, Binding.Binding[] bindings)
 		{
 			FromModel = fromModel;
 			ToModel = toModel;

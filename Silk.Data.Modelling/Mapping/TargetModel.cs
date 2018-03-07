@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Mapping.Binding;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -72,8 +73,8 @@ namespace Silk.Data.Modelling.Mapping
 		string[] FieldPath { get; }
 		ITargetField[] Fields { get; }
 		BindingBuilder CreateBindingBuilder();
-		Binding CreateBinding(IAssignmentBindingFactory bindingFactory);
-		Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option);
+		Binding.Binding CreateBinding(IAssignmentBindingFactory bindingFactory);
+		Binding.Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option);
 	}
 
 	public class TargetField<T> : FieldBase<T>, ITargetField, IField<T>
@@ -106,12 +107,12 @@ namespace Silk.Data.Modelling.Mapping
 			return new BindingBuilder<T>(this);
 		}
 
-		public Binding CreateBinding(IAssignmentBindingFactory bindingFactory)
+		public Binding.Binding CreateBinding(IAssignmentBindingFactory bindingFactory)
 		{
 			return bindingFactory.CreateBinding<T>(this);
 		}
 
-		public Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option)
+		public Binding.Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option)
 		{
 			return bindingFactory.CreateBinding<T>(this, option);
 		}

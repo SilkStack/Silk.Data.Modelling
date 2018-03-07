@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Silk.Data.Modelling.Mapping.Binding;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping
 {
