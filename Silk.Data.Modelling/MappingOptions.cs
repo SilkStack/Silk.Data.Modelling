@@ -14,9 +14,12 @@ namespace Silk.Data.Modelling
 			var ret = new MappingOptions();
 			ret.Conventions.Add(new UseObjectMappingOverrides());
 			ret.Conventions.Add(CreateInstanceAsNeeded.Instance);
+
 			ret.Conventions.Add(CopySameTypes.Instance);
-			ret.Conventions.Add(FlattenSameTypes.Instance);
+			ret.Conventions.Add(CopyExplicitCast.Instance);
 			ret.Conventions.Add(MapReferenceTypes.Instance);
+
+			ret.Conventions.Add(FlattenSameTypes.Instance);
 			ret.Conventions.Add(new InflateSameTypes(true));
 			return ret;
 		}
