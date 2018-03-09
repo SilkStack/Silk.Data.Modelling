@@ -19,11 +19,23 @@ namespace Silk.Data.Modelling.Mapping
 				if (fromField == null)
 					continue;
 
-				//  if a mapping already exists, use it, otherwise build it
-				if (!builder.MappingStore.TryGetMapping(fromField.FieldTypeModel, toField.FieldTypeModel, out var subMapping) &&
-					!builder.BuilderStack.IsBeingMapped(fromField.FieldTypeModel, toField.FieldTypeModel))
+				var fromElementType = fromField.ElementType;
+				var toElementType = toField.ElementType;
+				var fromTypeModel = fromField.FieldTypeModel;
+				var toTypeModel = toField.FieldTypeModel;
+
+				if (fromElementType != null && toElementType != null &&
+					IsReferenceType(fromElementType) && IsReferenceType(toElementType))
 				{
-					var subBuilder = new MappingBuilder(fromField.FieldTypeModel, toField.FieldTypeModel,
+					fromTypeModel = TypeModel.GetModelOf(fromElementType);
+					toTypeModel = TypeModel.GetModelOf(toElementType);
+				}
+
+				//  if a mapping already exists, use it, otherwise build it
+				if (!builder.MappingStore.TryGetMapping(fromTypeModel, toTypeModel, out var subMapping) &&
+					!builder.BuilderStack.IsBeingMapped(fromTypeModel, toTypeModel))
+				{
+					var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
 						builder.MappingStore, builder.BuilderStack);
 					foreach (var convention in builder.Conventions)
 					{
@@ -44,7 +56,7 @@ namespace Silk.Data.Modelling.Mapping
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		private bool IsReferenceType(Type type)
+		public static bool IsReferenceType(Type type)
 		{
 			var typeInfo = type.GetTypeInfo();
 			if (typeInfo.IsValueType)

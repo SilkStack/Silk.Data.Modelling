@@ -1,11 +1,30 @@
-﻿namespace Silk.Data.Modelling.Mapping.Binding
+﻿using System;
+using System.Linq;
+
+namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public class SubmappingBinding : IMappingBindingFactory<MappingStore>
 	{
 		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
 		{
-			return new SubmappingBinding<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore,
-				fromField.FieldPath, toField.FieldPath);
+			var fromElementType = fromField.ElementType;
+			var toElementType = toField.ElementType;
+
+			if (fromElementType != null && toElementType != null &&
+				MapReferenceTypes.IsReferenceType(fromElementType) && MapReferenceTypes.IsReferenceType(toElementType))
+			{
+				return Activator.CreateInstance(typeof(SubmappingBinding<,>).MakeGenericType(fromElementType, toElementType), new object[] {
+					TypeModel.GetModelOf(fromElementType),
+					TypeModel.GetModelOf(toElementType),
+					mappingStore,
+					fromField.FieldPath, toField.FieldPath
+				}) as MappingBinding;
+			}
+			else
+			{
+				return new SubmappingBinding<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore,
+					fromField.FieldPath, toField.FieldPath);
+			}
 		}
 	}
 

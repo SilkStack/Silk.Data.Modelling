@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Tests
 {
@@ -117,6 +119,54 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(3, output.Sub.Sub.Property);
 		}
 
+		[TestMethod]
+		public void MapArrayToCollection()
+		{
+			var mapper = new ObjectMapper();
+			var input = new PocoWithIntArray
+			{
+				Source = new[] { 1, 2, 3, 4, 5 }
+			};
+			var output = mapper.Map<PocoWithIntCollection>(input);
+			Assert.IsNotNull(output.Source);
+			Assert.AreEqual(input.Source.Length, output.Source.Count);
+			Assert.IsTrue(input.Source.SequenceEqual(output.Source));
+		}
+
+		[TestMethod]
+		public void MapCollectionToArray()
+		{
+			var mapper = new ObjectMapper();
+			var input = new PocoWithIntCollection
+			{
+				Source = new List<int> { 1, 2, 3, 4, 5 }
+			};
+			var output = mapper.Map<PocoWithIntArray>(input);
+			Assert.IsNotNull(output.Source);
+			Assert.AreEqual(input.Source.Count, output.Source.Length);
+			Assert.IsTrue(input.Source.SequenceEqual(output.Source));
+		}
+
+		[TestMethod]
+		public void MapSubMappingEnumerable()
+		{
+			var mapper = new ObjectMapper();
+			var input = new PocoWithSubBindingArray
+			{
+				Sources = new SourceSubPoco[]
+				{
+					new SourceSubPoco { Property = 1 },
+					new SourceSubPoco { Property = 2 },
+					new SourceSubPoco { Property = 3 }
+				}
+			};
+			var output = mapper.Map<PocoWithSubBindingCollection>(input);
+			Assert.IsNotNull(output);
+			Assert.IsNotNull(output.Sources);
+			Assert.AreEqual(input.Sources.Length, output.Sources.Count);
+			Assert.IsTrue(input.Sources.Select(q => q.Property).SequenceEqual(output.Sources.Select(q => q.Property)));
+		}
+
 		private class SimplePoco
 		{
 			public int Property { get; set; }
@@ -157,6 +207,26 @@ namespace Silk.Data.Modelling.Tests
 		{
 			public int Property { get; set; }
 			public RecursiveTarget Sub { get; set; }
+		}
+
+		private class PocoWithIntArray
+		{
+			public int[] Source { get; set; }
+		}
+
+		private class PocoWithIntCollection
+		{
+			public ICollection<int> Source { get; set; }
+		}
+
+		private class PocoWithSubBindingArray
+		{
+			public SourceSubPoco[] Sources { get; set; }
+		}
+
+		private class PocoWithSubBindingCollection
+		{
+			public ICollection<TargetSubPoco> Sources { get; set; }
 		}
 	}
 }

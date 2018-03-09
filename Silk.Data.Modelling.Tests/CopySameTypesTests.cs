@@ -36,7 +36,18 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SourcePocoWithEnumerables, TargetPocoWithEnumerables>();
 			Assert.AreEqual(3, mapping.Bindings.Length);
-			throw new System.Exception("Incomplete test.");
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "ListOfInt" }) &&
+				q.ToPath.SequenceEqual(new[] { "ListOfInt" }) &&
+				q is EnumerableBinding<List<int>,List<int>, int, int>
+				));
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "CollectionOfInt" }) &&
+				q.ToPath.SequenceEqual(new[] { "CollectionOfInt" }) &&
+				q is EnumerableBinding<int[], ICollection<int>, int, int>
+				));
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Ints" }) &&
+				q.ToPath.SequenceEqual(new[] { "Ints" }) &&
+				q is EnumerableBinding<IEnumerable<int>, int[], int, int>
+				));
 		}
 
 		private Mapping.Mapping CreateMapping<T>()

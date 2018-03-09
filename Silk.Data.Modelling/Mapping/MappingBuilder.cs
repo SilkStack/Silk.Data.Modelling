@@ -126,10 +126,9 @@ namespace Silk.Data.Modelling.Mapping
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
 			if (IsEnumerableMapping())
-			{
-				return MapUsingEnumerable<TBinding>();
-			}
-			_binding = Source.CreateBinding<T>(new TBinding(), Target);
+				_binding = Source.CreateBinding<T, IMappingBindingFactory>(new EnumerableBindingFactory(), Target, new TBinding());
+			else
+				_binding = Source.CreateBinding<T>(new TBinding(), Target);
 			return this;
 		}
 
@@ -138,20 +137,9 @@ namespace Silk.Data.Modelling.Mapping
 			if (Source == null)
 				throw new InvalidOperationException("Must assign a source field before assigning a binding.");
 			if (IsEnumerableMapping())
-			{
-
-			}
+				_binding = Source.CreateBinding<T, (IMappingBindingFactory<TOption>,TOption)>(new EnumerableBindingFactory<TOption>(), Target, (new TBinding(), option));
 			else
-			{
 				_binding = Source.CreateBinding<T, TOption>(new TBinding(), Target, option);
-			}
-			return this;
-		}
-
-		private BindingBuilder MapUsingEnumerable<TBinding>()
-			where TBinding : IMappingBindingFactory, new()
-		{
-			_binding = Source.CreateBinding<T, IMappingBindingFactory>(new EnumerableBindingFactory(), Target, new TBinding());
 			return this;
 		}
 
