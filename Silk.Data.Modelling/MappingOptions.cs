@@ -19,6 +19,7 @@ namespace Silk.Data.Modelling
 			ret.Conventions.Add(CopyExplicitCast.Instance);
 			ret.Conventions.Add(CastNumericTypes.Instance);
 			ret.Conventions.Add(MapReferenceTypes.Instance);
+			ret.Conventions.Add(ConvertToStringWithToString.Instance);
 
 			ret.Conventions.Add(FlattenSameTypes.Instance);
 			ret.Conventions.Add(new InflateSameTypes(true));
