@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Mapping.Binding;
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -25,11 +26,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q) && _numericTypes.Contains(q.FieldType)))
+			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q) &&
+				(_numericTypes.Contains(q.FieldType) || q.FieldType.GetTypeInfo().IsEnum)))
 			{
 				var fromField = fromModel.Fields.FirstOrDefault(q => q.CanRead &&
 					q.FieldName == toField.FieldName &&
-					_numericTypes.Contains(q.FieldType));
+					(_numericTypes.Contains(q.FieldType) || q.FieldType.GetTypeInfo().IsEnum));
 
 				if (fromField == null)
 					continue;
