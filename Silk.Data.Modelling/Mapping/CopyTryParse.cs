@@ -1,0 +1,43 @@
+using Silk.Data.Modelling.Mapping.Binding;
+using System;
+using System.Linq;
+using System.Reflection;
+
+namespace Silk.Data.Modelling.Mapping
+{
+	public class CopyTryParse : IMappingConvention
+	{
+		public static CopyTryParse Instance { get; } = new CopyTryParse();
+
+		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
+		{
+			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
+			{
+				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
+					field.FieldName == toField.FieldName &&
+					field.FieldType == typeof(string));
+				if (fromField == null)
+					continue;
+				var parseMethod = GetTryParseMethod(fromField, toField);
+				if (parseMethod == null)
+					continue;
+				builder
+					.Bind(toField)
+					.From(fromField)
+					.MapUsing<TryParseBinding, MethodInfo>(parseMethod);
+			}
+		}
+
+		private MethodInfo GetTryParseMethod(ISourceField sourceField, ITargetField targetField)
+		{
+			var toType = targetField.FieldType.GetTypeInfo();
+			if (toType.IsEnum)
+				return typeof(Enum).GetTypeInfo().DeclaredMethods
+					.First(q => q.Name == nameof(Enum.TryParse) && q.IsStatic && q.GetParameters().Length == 3 && q.IsGenericMethodDefinition)
+					.MakeGenericMethod(targetField.FieldType);
+			return toType.DeclaredMethods.FirstOrDefault(
+				q => q.Name == "TryParse" && q.IsStatic && q.GetParameters().Length == 2
+			);
+		}
+	}
+}
