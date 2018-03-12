@@ -42,6 +42,21 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.FromPath.SequenceEqual(new[] { "PropertyB" }) && binding.ToPath.SequenceEqual(new[] { "PropertyA" })));
 		}
 
+		[TestMethod]
+		public void MapToValueOverride()
+		{
+			var options = new MappingOptions();
+			options.Conventions.Add(new UseObjectMappingOverrides());
+			options.AddMappingOverride(new SimplePocoValueOverride());
+
+			var mapper = new ObjectMapper(options);
+			var result = new SimplePoco();
+			mapper.Inject<SimplePoco, SimplePoco>(null, result);
+			Assert.IsNotNull(result);
+			Assert.AreEqual(1, result.PropertyA);
+			Assert.AreEqual(2, result.PropertyB);
+		}
+
 		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
 		{
 			return CreateMapping<T, T>(mappingOptions);
@@ -97,6 +112,19 @@ namespace Silk.Data.Modelling.Tests
 				builder
 					.Bind(q => q.PropertyB)
 					.From(q => q.PropertyA);
+			}
+		}
+
+		private class SimplePocoValueOverride : IObjectMappingOverride<SimplePoco, SimplePoco>
+		{
+			public void CreateBindings(ObjectMappingBuilder<SimplePoco, SimplePoco> builder)
+			{
+				builder
+					.Bind(q => q.PropertyA)
+					.ToValue(1);
+				builder
+					.Bind(q => q.PropertyB)
+					.ToValue(2);
 			}
 		}
 	}

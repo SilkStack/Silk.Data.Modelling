@@ -61,8 +61,10 @@ namespace Silk.Data.Modelling.Mapping
 			BindingBuilder = bindingBuilder;
 		}
 
-		public PropertyMappingBuilder<TProperty, TFrom> ToValue(TProperty property)
+		public PropertyMappingBuilder<TProperty, TFrom> ToValue(TProperty value)
 		{
+			BindingBuilder
+				.AssignUsing<ValueBindingFactory<TProperty>, TProperty>(value);
 			return this;
 		}
 
