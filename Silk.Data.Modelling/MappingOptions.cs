@@ -18,6 +18,7 @@ namespace Silk.Data.Modelling
 			//  object type conversions
 			ret.Conventions.Add(CopyExplicitCast.Instance);
 			ret.Conventions.Add(MapReferenceTypes.Instance);
+			ret.Conventions.Add(CreateInstancesOfPropertiesAsNeeded.Instance);
 
 			//  straight up copies
 			ret.Conventions.Add(CopySameTypes.Instance);
