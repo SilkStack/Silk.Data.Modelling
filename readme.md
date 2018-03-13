@@ -2,46 +2,67 @@
 
 ## Overview
 
-Silk.Data.Modelling is a library for modelling data structures for .NET.
+A library for .NET for handling data modelling, model transformations and mapping tasks.
 
-Using Silk.Data.Modelling will allow you to use conventions to translate data between different problem domains such as ORM mapping, wire formats or cache servers.
+### APIs
+
+* *Modelling* - Represent data structures as manipulable meta data. 
+* *Model transformations* - Transforms data models into problem-domain specific models.
+* *Mapping* - Map data between models.
 
 ### Platforms
 
-Silk.Data.Modelling supports netstandard2.0.
+Silk.Data.Modelling supports netstandard1.3.
 
-### Mapping
+## Modelling
 
-Silk.Data.Modelling provides an extensible API for mapping data between domains, that is, from models to views and back again.
+Modelling converts and represents your data structures into metadata that can be used for many different purposes - this library uses it for mapping. Models are implementations of `IModel<TField>` that can be customized to expose metadata needed by your applications.
 
-Library authors are able to provide their own mapping conventions, data sources and even translate data as it's mapped - with full async support!
+### TypeModel
 
-### Models
+The built in model is `TypeModel` and it's type-specific implementation `TypeModel<T>`. A `TypeModel` instance represents a .NET `Type`.
 
-Models are a representation of a data structure, commonly representing a CLR `Type`.
+	var modelOfObject = TypeModel.GetModelOf<object>();
 
-A model looks a lot like .NETs reflection but is abstracted away to work with more than just object instances.
+## Model Transformations
 
-### Views
+Transformations allow you to change an existing model into a model more suitable for your applications purposes. Say you want to derive a model for persisting a cached version of a .NET object you could transform a `TypeModel` instance into your own `CacheModel` model and expose any extra metadata you need.
 
-A view is a translation of a model for a specific problem domain. For example, a business object might have a view that represents the persistent storage schema in a database.
+To accomplish this implement `IModelTransformer` and call `IModel.Transform`.
 
-Views are built from a model and a set of rules or conventions that decide how the view should be assembled.
+## Mapping
 
-### Containers
+Mapping uses metadata from models to transform, copy or map data from one model instance to another. It's important to realize that mapping isn't limited to reading and writing to objects, through implementing an `IModelReadWriter` you could write to any data structure of your choosing.
 
-Containers are objects that contain your data, instances of your model or view.
+### Object Mapping
 
-These can be .NET CLR types, database record rows, JSON objects or anything else suitable for storing data.
+The simplest operation is mapping between different objects. Doing this just needs an instance of `ObjectMapper`.
 
-## Custom View Modelling
+	var objectMapper = new ObjectMapper();
+	var toObject = objectMapper.Map<ToType>(fromObject);
 
-## Transformations
+### Options
 
-## Upcoming Features
+The `ObjectMapper` constructor can take 2 arguments:
 
-* Sub-mapping on enumerable fields
-* Support for flattened enumerable fields
+* *MappingOptions* - Specifies conventions to be used when mapping, defaults to a common sense collection of conventions for most use cases.
+* *MappingStore* - Specifies a cache of mappings, carrying this between `ObjectMapper` instances will prevent mappings being generated multiple times.
+
+### Conventions
+
+Conventions define the rules that mappings follow. When a mapping is generated each convention is executed in turn to create any supported bindings between models.
+
+Developers can author their own conventions and their own bindings to suit the needs of their applications.
+
+### Custom Mapping
+
+If you want to map to something other than objects, or use your own `IModel` implementations use `MappingBuilder`.
+
+	var mappingOptions = new MappingOptions();
+	mappingOptions.Conventions.Add(new MyConvention());
+	var mappingBuilder = new MappingBuilder(fromModel, toModel, mappingOptions);
+	var mapping = mappingBuilder.BuildMapping();
+	mapping.PerformMapping(fromReadWriter, toReadWriter);
 
 ## License
 
