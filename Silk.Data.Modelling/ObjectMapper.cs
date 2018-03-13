@@ -8,34 +8,30 @@ namespace Silk.Data.Modelling
 	public class ObjectMapper : IObjectMapper
 	{
 		private static readonly string[] _selfPath = new[] { "." };
-		private readonly MappingStore _mappingStore = new MappingStore();
 		private readonly object _syncObject = new object();
 
+		public MappingStore MappingStore { get; }
 		public MappingOptions Options { get; }
 
-		public ObjectMapper()
+		public ObjectMapper(MappingOptions mappingOptions = null, MappingStore mappingStore = null)
 		{
-			Options = MappingOptions.DefaultObjectMappingOptions;
-		}
-
-		public ObjectMapper(MappingOptions mappingOptions)
-		{
-			Options = mappingOptions;
+			Options = mappingOptions ?? MappingOptions.DefaultObjectMappingOptions;
+			MappingStore = mappingStore ?? new MappingStore();
 		}
 
 		private Mapping.Mapping GetMapping(Type fromType, Type toType)
 		{
 			var fromModel = TypeModel.GetModelOf(fromType);
 			var toModel = TypeModel.GetModelOf(toType);
-			if (_mappingStore.TryGetMapping(fromModel, toModel, out var mapping))
+			if (MappingStore.TryGetMapping(fromModel, toModel, out var mapping))
 				return mapping;
 
 			lock (_syncObject)
 			{
-				if (_mappingStore.TryGetMapping(fromModel, toModel, out mapping))
+				if (MappingStore.TryGetMapping(fromModel, toModel, out mapping))
 					return mapping;
 
-				var mappingBuilder = new MappingBuilder(fromModel, toModel, _mappingStore);
+				var mappingBuilder = new MappingBuilder(fromModel, toModel, MappingStore);
 				foreach (var convention in Options.Conventions)
 				{
 					mappingBuilder.AddConvention(convention);
