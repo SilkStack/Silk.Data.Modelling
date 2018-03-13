@@ -11,12 +11,8 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
 			{
-				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
-					field.FieldName == toField.FieldName);
-				if (fromField == null)
-					continue;
 				var castMethod = GetExplicitCast(fromField.FieldType, toField.FieldType);
 				if (castMethod == null)
 					continue;

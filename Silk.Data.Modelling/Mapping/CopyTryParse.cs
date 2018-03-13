@@ -11,13 +11,10 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
+			//foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
+				.Where(q => q.sourceField.FieldType == typeof(string)))
 			{
-				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
-					field.FieldName == toField.FieldName &&
-					field.FieldType == typeof(string));
-				if (fromField == null)
-					continue;
 				var parseMethod = GetTryParseMethod(fromField, toField);
 				if (parseMethod == null)
 					continue;
