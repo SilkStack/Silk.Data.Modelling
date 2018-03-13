@@ -9,13 +9,9 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
+				.Where(q => AreTypesCompatible(q.sourceField, q.targetField)))
 			{
-				var fromField = fromModel.Fields.FirstOrDefault(field => field.CanRead &&
-					field.FieldName == toField.FieldName &&
-					AreTypesCompatible(field, toField));
-				if (fromField == null)
-					continue;
 				builder
 					.Bind(toField)
 					.From(fromField)
