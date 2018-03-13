@@ -1,4 +1,3 @@
-using System.Linq;
 using Silk.Data.Modelling.Mapping.Binding;
 
 namespace Silk.Data.Modelling.Mapping
@@ -9,9 +8,11 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
-				.Where(q => q.targetField.FieldType == typeof(string)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
 			{
+				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
+				if (toType != typeof(string))
+					continue;
 				builder
 					.Bind(toField)
 					.From(fromField)

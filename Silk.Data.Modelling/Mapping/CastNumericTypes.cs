@@ -26,10 +26,13 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
-				.Where(q => (_numericTypes.Contains(q.sourceField.FieldType) || q.sourceField.FieldType.GetTypeInfo().IsEnum) &&
-					(_numericTypes.Contains(q.targetField.FieldType) || q.targetField.FieldType.GetTypeInfo().IsEnum)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
 			{
+				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
+				if (!_numericTypes.Contains(fromType) && !fromType.GetTypeInfo().IsEnum)
+					continue;
+				if (!_numericTypes.Contains(toType) && !toType.GetTypeInfo().IsEnum)
+					continue;
 				builder
 					.Bind(toField)
 					.From(fromField)

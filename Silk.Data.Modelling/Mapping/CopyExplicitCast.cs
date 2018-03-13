@@ -13,7 +13,8 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
 			{
-				var castMethod = GetExplicitCast(fromField.FieldType, toField.FieldType);
+				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
+				var castMethod = GetExplicitCast(fromType, toType);
 				if (castMethod == null)
 					continue;
 

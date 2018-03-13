@@ -12,10 +12,13 @@ namespace Silk.Data.Modelling.Mapping
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
 			//foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
-				.Where(q => q.sourceField.FieldType == typeof(string)))
+			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
 			{
-				var parseMethod = GetTryParseMethod(fromField, toField);
+				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
+				if (fromType != typeof(string))
+					continue;
+
+				var parseMethod = GetTryParseMethod(fromType, toType);
 				if (parseMethod == null)
 					continue;
 				builder
@@ -25,14 +28,14 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		private MethodInfo GetTryParseMethod(ISourceField sourceField, ITargetField targetField)
+		private MethodInfo GetTryParseMethod(Type sourceType, Type toType)
 		{
-			var toType = targetField.FieldType.GetTypeInfo();
-			if (toType.IsEnum)
+			var toTypeInfo = toType.GetTypeInfo();
+			if (toTypeInfo.IsEnum)
 				return typeof(Enum).GetTypeInfo().DeclaredMethods
 					.First(q => q.Name == nameof(Enum.TryParse) && q.IsStatic && q.GetParameters().Length == 3 && q.IsGenericMethodDefinition)
-					.MakeGenericMethod(targetField.FieldType);
-			return toType.DeclaredMethods.FirstOrDefault(
+					.MakeGenericMethod(toType);
+			return toTypeInfo.DeclaredMethods.FirstOrDefault(
 				q => q.Name == "TryParse" && q.IsStatic && q.GetParameters().Length == 2
 			);
 		}
