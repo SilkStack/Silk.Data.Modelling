@@ -57,6 +57,21 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(2, result.PropertyB);
 		}
 
+		[TestMethod]
+		public void MapToDelegateOverride()
+		{
+			var options = new MappingOptions();
+			options.Conventions.Add(new UseObjectMappingOverrides());
+			options.AddMappingOverride(new SimplePocoDelegateOverride());
+
+			var mapper = new ObjectMapper(options);
+			var result = new SimplePoco();
+			mapper.Inject<SimplePoco, SimplePoco>(new SimplePoco { PropertyA = 1, PropertyB = 2 }, result);
+			Assert.IsNotNull(result);
+			Assert.AreEqual(2, result.PropertyA);
+			Assert.AreEqual(4, result.PropertyB);
+		}
+
 		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
 		{
 			return CreateMapping<T, T>(mappingOptions);
@@ -125,6 +140,19 @@ namespace Silk.Data.Modelling.Tests
 				builder
 					.Bind(q => q.PropertyB)
 					.ToValue(2);
+			}
+		}
+
+		private class SimplePocoDelegateOverride : IObjectMappingOverride<SimplePoco, SimplePoco>
+		{
+			public void CreateBindings(ObjectMappingBuilder<SimplePoco, SimplePoco> builder)
+			{
+				builder
+					.Bind(q => q.PropertyA)
+					.From(q => q.PropertyA, value => value + 1);
+				builder
+					.Bind(q => q.PropertyB)
+					.From(q => q.PropertyB, value => value + 2);
 			}
 		}
 	}

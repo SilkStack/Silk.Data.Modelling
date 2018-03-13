@@ -35,7 +35,7 @@ namespace Silk.Data.Modelling.Mapping
 				.AssignUsing<UseFactoryBinding<TFrom,TTo>, Func<TFrom, TTo>>(factory);
 		}
 
-		public PropertyMappingBuilder<T,TFrom> Bind<T>(Expression<Func<TTo, T>> property)
+		public PropertyMappingBuilder<T,TFrom, TTo> Bind<T>(Expression<Func<TTo, T>> property)
 		{
 			var memberExpression = property.Body as MemberExpression;
 			if (memberExpression == null)
@@ -43,11 +43,11 @@ namespace Silk.Data.Modelling.Mapping
 			var targetField = _targetModel.Fields.OfType<TargetField<T>>().FirstOrDefault(q => q.FieldName == memberExpression.Member.Name);
 			if (targetField == null)
 				throw new ArgumentException("Must specify a property to bind.", nameof(property));
-			return new PropertyMappingBuilder<T, TFrom>(targetField, _sourceModel, (BindingBuilder<T>)_mappingBuilder.Bind(targetField));
+			return new PropertyMappingBuilder<T, TFrom, TTo>(targetField, _sourceModel, (BindingBuilder<T>)_mappingBuilder.Bind(targetField));
 		}
 	}
 
-	public class PropertyMappingBuilder<TProperty, TFrom>
+	public class PropertyMappingBuilder<TProperty, TFrom, TTo>
 	{
 		public TargetField<TProperty> TargetField { get; }
 		public SourceModel SourceModel { get; }
@@ -61,14 +61,14 @@ namespace Silk.Data.Modelling.Mapping
 			BindingBuilder = bindingBuilder;
 		}
 
-		public PropertyMappingBuilder<TProperty, TFrom> ToValue(TProperty value)
+		public PropertyMappingBuilder<TProperty, TFrom, TTo> ToValue(TProperty value)
 		{
 			BindingBuilder
 				.AssignUsing<ValueBindingFactory<TProperty>, TProperty>(value);
 			return this;
 		}
 
-		public PropertyMappingBuilder<TProperty, TFrom> From(Expression<Func<TFrom, TProperty>> property)
+		public PropertyMappingBuilder<TProperty, TFrom, TTo> From(Expression<Func<TFrom, TProperty>> property)
 		{
 			var memberExpression = property.Body as MemberExpression;
 			if (memberExpression == null)
@@ -79,6 +79,20 @@ namespace Silk.Data.Modelling.Mapping
 			BindingBuilder
 				.From(sourceField)
 				.MapUsing<CopyBinding>();
+			return this;
+		}
+
+		public PropertyMappingBuilder<TProperty, TFrom, TTo> From<T>(Expression<Func<TFrom, T>> property, Func<T, TProperty> @delegate)
+		{
+			var memberExpression = property.Body as MemberExpression;
+			if (memberExpression == null)
+				throw new ArgumentException("Must specify a property to bind.", nameof(property));
+			var sourceField = SourceModel.Fields.OfType<SourceField<TProperty>>().FirstOrDefault(q => q.FieldName == memberExpression.Member.Name);
+			if (sourceField == null)
+				throw new ArgumentException("Must specify a property to bind.", nameof(property));
+			BindingBuilder
+				.From(sourceField)
+				.MapUsing<DelegateBinding, Delegate>(@delegate);
 			return this;
 		}
 	}
