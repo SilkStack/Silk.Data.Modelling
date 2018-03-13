@@ -12,10 +12,14 @@ namespace Silk.Data.Modelling.Tests
 		public void MapCastableProperties()
 		{
 			var mapping = CreateMapping<SourcePoco, TargetPoco>();
-			Assert.AreEqual(1, mapping.Bindings.Length);
+			Assert.AreEqual(2, mapping.Bindings.Length);
 			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Castable" }) &&
 				q.ToPath.SequenceEqual(new[] { "Castable" }) &&
 				q is CastExpressionBinding<int, float>
+				));
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Enum" }) &&
+				q.ToPath.SequenceEqual(new[] { "Enum" }) &&
+				q is CastExpressionBinding<SourceEnum, int>
 				));
 		}
 
@@ -25,13 +29,15 @@ namespace Silk.Data.Modelling.Tests
 			var mapping = CreateMapping<SourcePoco, TargetPoco>();
 			var source = new SourcePoco
 			{
-				Castable = 1
+				Castable = 1,
+				Enum = SourceEnum.Option2
 			};
 			var result = new TargetPoco();
 			var sourceReader = new ObjectReadWriter(source, TypeModel.GetModelOf<SourcePoco>(), typeof(SourcePoco));
 			var targetWriter = new ObjectReadWriter(result, TypeModel.GetModelOf<TargetPoco>(), typeof(TargetPoco));
 			mapping.PerformMapping(sourceReader, targetWriter);
 			Assert.AreEqual(source.Castable, result.Castable);
+			Assert.AreEqual((int)source.Enum, result.Enum);
 		}
 
 		private Mapping.Mapping CreateMapping<T>()
@@ -52,11 +58,19 @@ namespace Silk.Data.Modelling.Tests
 		private class SourcePoco
 		{
 			public int Castable { get; set; }
+			public SourceEnum Enum { get; set; }
 		}
 
 		private class TargetPoco
 		{
 			public float Castable { get; set; }
+			public int Enum { get; set; }
+		}
+
+		private enum SourceEnum
+		{
+			Option1 = 5,
+			Option2 = 10
 		}
 	}
 }
