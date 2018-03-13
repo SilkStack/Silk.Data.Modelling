@@ -9,14 +9,8 @@
 
 Part of the SilkStack project.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.1</Version>
+    <Version>0.1.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="vold\**" />
-    <EmbeddedResource Remove="vold\**" />
-    <None Remove="vold\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
