@@ -1,4 +1,7 @@
-﻿namespace Silk.Data.Modelling
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Performs mappings on objects.
@@ -14,9 +17,25 @@
 		TTo Map<TTo>(object from);
 
 		/// <summary>
+		/// Map from enumerable <see cref="from"/> one at a time.
+		/// </summary>
+		/// <typeparam name="TTo"></typeparam>
+		/// <param name="from"></param>
+		/// <returns></returns>
+		IEnumerable<TTo> MapAll<TTo>(IEnumerable from);
+
+		/// <summary>
 		/// Map from <see cref="from"/> to a new instance of <see cref="TTo"/>.
 		/// </summary>
 		TTo Map<TTo, TFrom>(TFrom from);
+
+		/// <summary>
+		/// Map from enumerable <see cref="from"/> one at a time.
+		/// </summary>
+		/// <typeparam name="TTo"></typeparam>
+		/// <param name="from"></param>
+		/// <returns></returns>
+		IEnumerable<TTo> MapAll<TTo, TFrom>(IEnumerable<TFrom> from);
 
 		/// <summary>
 		/// Inject values from <see cref="from"/> into <see cref="to"/>.
@@ -26,8 +45,22 @@
 		void Inject(object from, object to);
 
 		/// <summary>
+		/// Inject values from all <see cref="from"/> into <see cref="to"/> one at a time.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		void InjectAll(IEnumerable from, ICollection to);
+
+		/// <summary>
 		/// Inject values from <see cref="from"/> into <see cref="to"/>.
 		/// </summary>
 		void Inject<TFrom, TTo>(TFrom from, TTo to);
+
+		/// <summary>
+		/// Inject values from all <see cref="from"/> into <see cref="to"/> one at a time.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		void InjectAll<TFrom, TTo>(IEnumerable<TFrom> from, ICollection<TTo> to);
 	}
 }

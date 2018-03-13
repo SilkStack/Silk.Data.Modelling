@@ -167,6 +167,61 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsTrue(input.Sources.Select(q => q.Property).SequenceEqual(output.Sources.Select(q => q.Property)));
 		}
 
+		[TestMethod]
+		public void InjectEnumerableSameTypes()
+		{
+			var mapper = new ObjectMapper();
+			var output = new SimplePoco[]
+			{
+				new SimplePoco(),
+				new SimplePoco()
+			};
+			var outputReference = output;
+			var input = new[] {
+				new SimplePoco
+				{
+					Property = 1
+				},
+				new SimplePoco
+				{
+					Property = 2
+				}
+			};
+			mapper.InjectAll(input, output);
+			Assert.ReferenceEquals(output, outputReference);
+			for (var i = 0; i < output.Length; i++)
+			{
+				Assert.AreEqual(input[i].Property, output[i].Property);
+			}
+		}
+
+		[TestMethod]
+		public void MapEnumerableSameTypes()
+		{
+			var mapper = new ObjectMapper();
+			var input = new[] {
+				new SimplePoco
+				{
+					Property = 1
+				},
+				new SimplePoco
+				{
+					Property = 2
+				}
+			};
+			var output = mapper.MapAll<SimplePoco>(input);
+			using (var inputEnumerator = ((ICollection<SimplePoco>)input).GetEnumerator())
+			using (var outputEnumerator = output.GetEnumerator())
+			{
+				while (inputEnumerator.MoveNext() &&
+					outputEnumerator.MoveNext())
+				{
+					Assert.IsNotNull(outputEnumerator.Current);
+					Assert.AreEqual(inputEnumerator.Current.Property, outputEnumerator.Current.Property);
+				}
+			}
+		}
+
 		private class SimplePoco
 		{
 			public int Property { get; set; }

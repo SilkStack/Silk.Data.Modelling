@@ -1,5 +1,7 @@
 ﻿using Silk.Data.Modelling.Mapping;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Silk.Data.Modelling
 {
@@ -82,6 +84,56 @@ namespace Silk.Data.Modelling
 				toWriter
 				);
 			return toWriter.ReadField<TTo>(_selfPath, 0);
+		}
+
+		public IEnumerable<TTo> MapAll<TTo>(IEnumerable from)
+		{
+			foreach (var obj in from)
+			{
+				yield return Map<TTo>(obj);
+			}
+		}
+
+		public IEnumerable<TTo> MapAll<TTo, TFrom>(IEnumerable<TFrom> from)
+		{
+			foreach (var obj in from)
+			{
+				yield return Map<TTo, TFrom>(obj);
+			}
+		}
+
+		public void InjectAll(IEnumerable from, ICollection to)
+		{
+			var fromEnumerator = from.GetEnumerator();
+			var toEnumerator = to.GetEnumerator();
+			try
+			{
+				while (fromEnumerator.MoveNext() &&
+					toEnumerator.MoveNext())
+				{
+					Inject(fromEnumerator.Current, toEnumerator.Current);
+				}
+			}
+			finally
+			{
+				if (fromEnumerator is IDisposable fromDisposable)
+					fromDisposable.Dispose();
+				if (toEnumerator is IDisposable toDisposable)
+					toDisposable.Dispose();
+			}
+		}
+
+		public void InjectAll<TFrom, TTo>(IEnumerable<TFrom> from, ICollection<TTo> to)
+		{
+			using (var fromEnumerator = from.GetEnumerator())
+			using (var toEnumerator = to.GetEnumerator())
+			{
+				while (fromEnumerator.MoveNext() &&
+					toEnumerator.MoveNext())
+				{
+					Inject<TFrom, TTo>(fromEnumerator.Current, toEnumerator.Current);
+				}
+			}
 		}
 	}
 }
