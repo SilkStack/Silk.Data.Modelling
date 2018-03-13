@@ -15,10 +15,17 @@ namespace Silk.Data.Modelling
 			ret.Conventions.Add(new UseObjectMappingOverrides());
 			ret.Conventions.Add(CreateInstanceAsNeeded.Instance);
 
-			ret.Conventions.Add(CopySameTypes.Instance);
+			//  object type conversions
 			ret.Conventions.Add(CopyExplicitCast.Instance);
-			ret.Conventions.Add(CastNumericTypes.Instance);
 			ret.Conventions.Add(MapReferenceTypes.Instance);
+
+			//  straight up copies
+			ret.Conventions.Add(CopySameTypes.Instance);
+
+			//  framework types casting
+			ret.Conventions.Add(CastNumericTypes.Instance);
+
+			//  string conversions
 			ret.Conventions.Add(ConvertToStringWithToString.Instance);
 			ret.Conventions.Add(CopyTryParse.Instance);
 

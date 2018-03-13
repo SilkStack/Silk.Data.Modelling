@@ -19,11 +19,17 @@ namespace Silk.Data.Modelling.Mapping
 				var fromTypeModel = fromField.FieldTypeModel;
 				var toTypeModel = toField.FieldTypeModel;
 
-				if (fromElementType != null && toElementType != null &&
-					IsReferenceType(fromElementType) && IsReferenceType(toElementType))
+				if (fromElementType != null && toElementType != null)
 				{
-					fromTypeModel = TypeModel.GetModelOf(fromElementType);
-					toTypeModel = TypeModel.GetModelOf(toElementType);
+					if (IsReferenceType(fromElementType) && IsReferenceType(toElementType))
+					{
+						fromTypeModel = TypeModel.GetModelOf(fromElementType);
+						toTypeModel = TypeModel.GetModelOf(toElementType);
+					}
+					else
+					{
+						continue;
+					}
 				}
 
 				//  if a mapping already exists, use it, otherwise build it

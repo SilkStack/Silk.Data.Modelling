@@ -17,6 +17,12 @@ namespace Silk.Data.Modelling.Mapping
 			if (typeModel == null)
 				return;
 
+			if (typeModel.Type.GetEnumerableElementType() != null)
+				return;
+
+			if (!MapReferenceTypes.IsReferenceType(typeModel.Type))
+				return;
+
 			var selfField = toModel.GetSelf();
 			if (builder.IsBound(selfField))
 				return;
