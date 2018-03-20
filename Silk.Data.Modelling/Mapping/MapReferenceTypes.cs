@@ -59,6 +59,10 @@ namespace Silk.Data.Modelling.Mapping
 		/// <returns></returns>
 		public static bool IsReferenceType(Type type)
 		{
+			//  string is technically a reference type but is semantically a value type in most use cases
+			if (type == typeof(string))
+				return false;
+
 			var typeInfo = type.GetTypeInfo();
 			if (typeInfo.IsValueType)
 				return false;

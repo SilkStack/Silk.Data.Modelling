@@ -15,11 +15,13 @@ namespace Silk.Data.Modelling.Tests
 			var outputReference = output;
 			var input = new SimplePoco
 			{
-				Property = 1
+				Property = 1,
+				StrProperty = "Hello"
 			};
 			mapper.Inject(input, output);
 			Assert.ReferenceEquals(output, outputReference);
 			Assert.AreEqual(input.Property, output.Property);
+			Assert.AreEqual(input.StrProperty, output.StrProperty);
 		}
 
 		[TestMethod]
@@ -28,11 +30,13 @@ namespace Silk.Data.Modelling.Tests
 			var mapper = new ObjectMapper();
 			var input = new SimplePoco
 			{
-				Property = 1
+				Property = 1,
+				StrProperty = "Hello"
 			};
 			var output = mapper.Map<SimplePoco>(input);
 			Assert.IsNotNull(output);
 			Assert.AreEqual(input.Property, output.Property);
+			Assert.AreEqual(input.StrProperty, output.StrProperty);
 		}
 
 		[TestMethod]
@@ -225,6 +229,7 @@ namespace Silk.Data.Modelling.Tests
 		private class SimplePoco
 		{
 			public int Property { get; set; }
+			public string StrProperty { get; set; }
 		}
 
 		private class SourcePoco
