@@ -32,6 +32,9 @@ namespace Silk.Data.Modelling.Mapping
 					}
 				}
 
+				if (fromTypeModel.Type == toTypeModel.Type)
+					continue;
+
 				//  if a mapping already exists, use it, otherwise build it
 				if (!builder.MappingStore.TryGetMapping(fromTypeModel, toTypeModel, out var subMapping) &&
 					!builder.BuilderStack.IsBeingMapped(fromTypeModel, toTypeModel))
