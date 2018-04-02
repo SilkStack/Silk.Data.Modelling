@@ -72,6 +72,21 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(4, result.PropertyB);
 		}
 
+		[TestMethod]
+		public void MapPropertiesUsingMappingOverride()
+		{
+			var options = new MappingOptions();
+			options.Conventions.Add(new UseObjectMappingOverrides());
+			options.AddMappingOverride<string, StrObj>(new StrToObjOverride());
+			options.AddMappingOverride<StrObj, string>(new StrToObjOverride());
+
+			var mapper = new ObjectMapper(options);
+			var result = new PocoWithObj();
+			mapper.Inject(new PocoWithStr { Property = "Hello World" }, result);
+			Assert.IsNotNull(result.Property);
+			Assert.AreEqual("Hello World", result.Property.Value);
+		}
+
 		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
 		{
 			return CreateMapping<T, T>(mappingOptions);
@@ -117,6 +132,21 @@ namespace Silk.Data.Modelling.Tests
 			public int PropertyB { get; set; }
 		}
 
+		private class PocoWithStr
+		{
+			public string Property { get; set; }
+		}
+
+		private class PocoWithObj
+		{
+			public StrObj Property { get; set; }
+		}
+
+		private class StrObj
+		{
+			public string Value { get; set; }
+		}
+
 		private class SimplePocoMappingOverride : IObjectMappingOverride<SimplePoco, SimplePoco>
 		{
 			public void CreateBindings(ObjectMappingBuilder<SimplePoco, SimplePoco> builder)
@@ -153,6 +183,19 @@ namespace Silk.Data.Modelling.Tests
 				builder
 					.Bind(q => q.PropertyB)
 					.From(q => q.PropertyB, value => value + 2);
+			}
+		}
+
+		private class StrToObjOverride : IObjectMappingOverride<string, StrObj>, IObjectMappingOverride<StrObj, string>
+		{
+			public void CreateBindings(ObjectMappingBuilder<string, StrObj> builder)
+			{
+				builder.ConstructWithFactory(from => new StrObj { Value = from });
+			}
+
+			public void CreateBindings(ObjectMappingBuilder<StrObj, string> builder)
+			{
+				builder.ConstructWithFactory(from => from.Value);
 			}
 		}
 	}
