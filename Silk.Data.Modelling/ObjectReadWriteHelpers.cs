@@ -41,11 +41,11 @@ namespace Silk.Data.Modelling
 			{
 				Delegate setter = null;
 				Delegate getter = null;
-				if (property.CanWrite && !property.SetMethod.IsStatic)
+				if (property.CanWrite && !property.SetMethod.IsStatic && property.GetIndexParameters().Length == 0)
 				{
 					setter = CreateWriteDelegate<T>(property);
 				}
-				if (property.CanRead && !property.GetMethod.IsStatic)
+				if (property.CanRead && !property.GetMethod.IsStatic && property.GetIndexParameters().Length == 0)
 				{
 					getter = CreateReadDelegate<T>(property);
 				}
