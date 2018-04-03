@@ -1,4 +1,4 @@
-﻿using Silk.Data.Modelling.Mapping.Binding;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -58,57 +58,25 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
+		public IObjectMappingOverride[] GetOverrides(Type fromType, Type toType)
 		{
-			CreateTypeBindings(fromModel, toModel, builder);
-
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
+			_lock.EnterReadLock();
+			try
 			{
-				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
 				var mappingOverrideType = typeof(IObjectMappingOverride<,>).MakeGenericType(fromType, toType);
-
-				IObjectMappingOverride[] mappingOverrides;
-				_lock.EnterReadLock();
-				try
-				{
-					mappingOverrides = _mappingOverrides
-						.Where(q => q.GetType().GetTypeInfo().ImplementedInterfaces.Contains(mappingOverrideType))
-						.GroupBy(q => q.GetType())
-						.Select(q => q.First())
-						.ToArray();
-				}
-				finally
-				{
-					_lock.ExitReadLock();
-				}
-
-				if (mappingOverrides.Length > 0)
-				{
-					var fromTypeModel = TypeModel.GetModelOf(fromType);
-					var toTypeModel = TypeModel.GetModelOf(toType);
-
-					//  if a mapping already exists, use it, otherwise build it
-					if (!builder.MappingStore.TryGetMapping(fromTypeModel, toTypeModel, out var subMapping) &&
-						!builder.BuilderStack.IsBeingMapped(fromTypeModel, toTypeModel))
-					{
-						var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
-							builder.MappingStore, builder.BuilderStack);
-						foreach (var convention in builder.Conventions)
-						{
-							subBuilder.AddConvention(convention);
-						}
-						subMapping = subBuilder.BuildMapping();
-					}
-
-					builder
-						.Bind(toField)
-						.From(fromField)
-						.MapUsing<SubmappingBinding, MappingStore>(builder.MappingStore);
-				}
+				return _mappingOverrides
+					.Where(q => q.GetType().GetTypeInfo().ImplementedInterfaces.Contains(mappingOverrideType))
+					.GroupBy(q => q.GetType())
+					.Select(q => q.First())
+					.ToArray();
+			}
+			finally
+			{
+				_lock.ExitReadLock();
 			}
 		}
 
-		private void CreateTypeBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
+		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
 			var toTypeModel = toModel.FromModel as TypeModel;
 			if (toTypeModel == null)

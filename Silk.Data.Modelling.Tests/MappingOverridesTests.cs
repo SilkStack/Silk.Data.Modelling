@@ -77,6 +77,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var options = new MappingOptions();
 			options.Conventions.Add(new UseObjectMappingOverrides());
+			options.Conventions.Add(MapOverriddenTypes.Instance);
 			options.AddMappingOverride<string, StrObj>(new StrToObjOverride());
 			options.AddMappingOverride<StrObj, string>(new StrToObjOverride());
 

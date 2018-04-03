@@ -14,6 +14,7 @@ namespace Silk.Data.Modelling
 			var ret = new MappingOptions();
 			ret.Conventions.Add(new UseObjectMappingOverrides());
 			ret.Conventions.Add(CreateInstanceAsNeeded.Instance);
+			ret.Conventions.Add(MapOverriddenTypes.Instance);
 
 			//  object type conversions
 			ret.Conventions.Add(CopyExplicitCast.Instance);
