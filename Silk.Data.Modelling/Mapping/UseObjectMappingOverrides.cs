@@ -129,7 +129,11 @@ namespace Silk.Data.Modelling.Mapping
 			_lock.EnterReadLock();
 			try
 			{
-				mappingOverrides = _mappingOverrides.OfType<IObjectMappingOverride<TFrom, TTo>>().ToArray();
+				mappingOverrides = _mappingOverrides
+					.OfType<IObjectMappingOverride<TFrom, TTo>>()
+					.GroupBy(q => q.GetType())
+					.Select(q => q.First())
+					.ToArray();
 			}
 			finally
 			{

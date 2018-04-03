@@ -85,6 +85,10 @@ namespace Silk.Data.Modelling.Tests
 			mapper.Inject(new PocoWithStr { Property = "Hello World" }, result);
 			Assert.IsNotNull(result.Property);
 			Assert.AreEqual("Hello World", result.Property.Value);
+
+			var backwardsResult = new PocoWithStr();
+			mapper.Inject(result, backwardsResult);
+			Assert.AreEqual("Hello World", backwardsResult.Property);
 		}
 
 		private Mapping.Mapping CreateMapping<T>(MappingOptions mappingOptions = null)
