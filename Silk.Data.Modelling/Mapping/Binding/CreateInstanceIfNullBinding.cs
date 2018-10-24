@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -16,11 +17,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		private Func<T> CreateCtorMethod(ConstructorInfo constructorInfo)
 		{
-			var method = new DynamicMethod("Ctor", typeof(T), new Type[0], true);
-			var ilgen = method.GetILGenerator();
-			ilgen.Emit(OpCodes.Newobj, constructorInfo);
-			ilgen.Emit(OpCodes.Ret);
-			return method.CreateDelegate(typeof(Func<T>)) as Func<T>;
+			var lambda = Expression.Lambda<Func<T>>(
+				Expression.New(constructorInfo)
+				);
+			return lambda.Compile();
 		}
 
 		public T CreateInstance()

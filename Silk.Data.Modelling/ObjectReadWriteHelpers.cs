@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -61,23 +62,29 @@ namespace Silk.Data.Modelling
 
 		private static Delegate CreateReadDelegate<T>(PropertyInfo property)
 		{
-			var method = new DynamicMethod("Getter", property.PropertyType, new[] { typeof(T) }, true);
-			var ilgen = method.GetILGenerator();
-			ilgen.Emit(OpCodes.Ldarg_0);
-			ilgen.Emit(OpCodes.Callvirt, property.GetMethod);
-			ilgen.Emit(OpCodes.Ret);
-			return method.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(T), property.PropertyType));
+			var parameter = Expression.Parameter(typeof(T));
+			var lambda = Expression.Lambda(
+				typeof(Func<,>).MakeGenericType(typeof(T), property.PropertyType),
+				Expression.Property(parameter, property),
+				parameter
+				);
+			return lambda.Compile();
 		}
 
 		private static Delegate CreateWriteDelegate<T>(PropertyInfo property)
 		{
-			var method = new DynamicMethod("Setter", typeof(void), new[] { typeof(T), property.PropertyType }, true);
-			var ilgen = method.GetILGenerator();
-			ilgen.Emit(OpCodes.Ldarg_0);
-			ilgen.Emit(OpCodes.Ldarg_1);
-			ilgen.Emit(OpCodes.Callvirt, property.SetMethod);
-			ilgen.Emit(OpCodes.Ret);
-			return method.CreateDelegate(typeof(Action<,>).MakeGenericType(typeof(T), property.PropertyType));
+			var instanceParameter = Expression.Parameter(typeof(T));
+			var valueParameter = Expression.Parameter(property.PropertyType);
+			var lamba = Expression.Lambda(
+				typeof(Action<,>).MakeGenericType(typeof(T), property.PropertyType),
+				Expression.Assign(
+					Expression.Property(instanceParameter, property),
+					valueParameter
+					),
+				instanceParameter,
+				valueParameter
+				);
+			return lamba.Compile();
 		}
 
 		private static IEnumerable<PropertyInfo> GetProperties(Type type)

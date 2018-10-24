@@ -53,6 +53,15 @@ namespace Silk.Data.Modelling.Tests
 			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 0, 2);
 		}
 
+		[TestMethod]
+		public void WritePropertyWithPrivateSetter()
+		{
+			var obj = new PocoClassWithPrivateSetter();
+			var readWriter = new ObjectReadWriter(obj, TypeModel.GetModelOf<PocoClassWithPrivateSetter>(), typeof(PocoClassWithPrivateSetter));
+			readWriter.WriteField<int>(new[] { nameof(PocoClassWithPrivateSetter.Property) }, 0, 5);
+			Assert.AreEqual(5, obj.Property);
+		}
+
 		private class PocoClass
 		{
 			public int Property { get; set; }
@@ -62,6 +71,11 @@ namespace Silk.Data.Modelling.Tests
 		private class SubPocoClass
 		{
 			public int Property { get; set; }
+		}
+
+		private class PocoClassWithPrivateSetter
+		{
+			public int Property { get; private set; }
 		}
 	}
 }

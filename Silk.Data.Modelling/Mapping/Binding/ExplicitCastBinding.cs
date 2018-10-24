@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -20,12 +21,12 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		private static Func<TFrom, TTo> CreateCastDelegate(MethodInfo castMethod)
 		{
-			var method = new DynamicMethod("Cast", typeof(TTo), new[] { typeof(TFrom) }, true);
-			var ilgen = method.GetILGenerator();
-			ilgen.Emit(OpCodes.Ldarg_0);
-			ilgen.Emit(OpCodes.Call, castMethod);
-			ilgen.Emit(OpCodes.Ret);
-			return method.CreateDelegate(typeof(Func<TFrom,TTo>)) as Func<TFrom,TTo>;
+			var parameter = Expression.Parameter(typeof(TFrom));
+			var lambda = Expression.Lambda<Func<TFrom, TTo>>(
+				Expression.Call(castMethod, parameter),
+				parameter
+				);
+			return lambda.Compile();
 		}
 	}
 

@@ -12,10 +12,4 @@ Part of the SilkStack project.</Description>
     <Version>0.1.5</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-  </ItemGroup>
-
 </Project>
