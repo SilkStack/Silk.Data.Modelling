@@ -67,7 +67,7 @@ namespace Silk.Data.Modelling
 				new ObjectReadWriter(from, mapping.FromModel, from.GetType()),
 				toWriter
 				);
-			return toWriter.ReadField<TTo>(_selfPath, 0);
+			return toWriter.ReadField<TTo>(_selfPath);
 		}
 
 		public TTo Map<TTo, TFrom>(TFrom from)
@@ -79,7 +79,7 @@ namespace Silk.Data.Modelling
 				new ObjectReadWriter(from, mapping.FromModel, typeof(TFrom)),
 				toWriter
 				);
-			return toWriter.ReadField<TTo>(_selfPath, 0);
+			return toWriter.ReadField<TTo>(_selfPath);
 		}
 
 		public IEnumerable<TTo> MapAll<TTo>(IEnumerable from)

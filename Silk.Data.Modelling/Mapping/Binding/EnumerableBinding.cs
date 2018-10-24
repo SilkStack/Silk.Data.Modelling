@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var source = from.ReadField<TFrom>(FromPath, 0);
+			var source = from.ReadField<TFrom>(FromPath);
 			var result = new List<TToElement>();
 
 			var sourceReader = new EnumerableModelReader<TFromElement>(source, TypeModel.GetModelOf(typeof(TFromElement)));
@@ -31,9 +31,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			}
 
 			if (typeof(TTo).IsArray)
-				to.WriteField<TTo>(ToPath, 0, result.ToArray() as TTo);
+				to.WriteField<TTo>(ToPath, result.ToArray() as TTo);
 			else
-				to.WriteField<TTo>(ToPath, 0, result as TTo);
+				to.WriteField<TTo>(ToPath, result as TTo);
 		}
 	}
 
@@ -81,15 +81,15 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			List = list;
 		}
 
-		public T ReadField<T>(string[] path, int offset)
+		public T ReadField<T>(Span<string> path)
 		{
 			//  todo: how to get a potential source object
 			return default(T);
 		}
 
-		public void WriteField<T>(string[] path, int offset, T value)
+		public void WriteField<T>(Span<string> path, T value)
 		{
-			if (path.Length > offset + 1 && path[offset + 1] == ".")
+			if (path.Length > 1 && path[1] == ".")
 			{
 				//  path taken for object mapping
 				List.Add((TToElement)(object)value);
@@ -98,7 +98,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			else
 			{
 				if (_objectReadWriter != null)
-					_objectReadWriter.WriteField<T>(path, offset + 1, value);
+					_objectReadWriter.WriteField<T>(path.Slice(1), value);
 				else
 					//  path taken for straight value binding
 					List.Add((TToElement)(object)value);
@@ -132,14 +132,17 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			return false;
 		}
 
-		public T ReadField<T>(string[] path, int offset)
+		public T ReadField<T>(Span<string> path)
 		{
-			if (path.Length == offset + 1)
-				return _objectReadWriter.ReadField<T>(path.Concat(new[] { "." }).ToArray(), offset + 1);
-			return _objectReadWriter.ReadField<T>(path, offset + 1);
+			if (path.Length == 1)
+				return _objectReadWriter.ReadField<T>(
+					new Span<string>(
+						path.Slice(1).ToArray().Concat(new[] { "." }).ToArray()
+					));
+			return _objectReadWriter.ReadField<T>(path.Slice(1));
 		}
 
-		public void WriteField<T>(string[] path, int offset, T value)
+		public void WriteField<T>(Span<string> path, T value)
 		{
 			throw new NotSupportedException();
 		}

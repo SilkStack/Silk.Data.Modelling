@@ -21,7 +21,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<T>(ToPath, 0, from.ReadField<T>(FromPath, 0));
+			to.WriteField<T>(ToPath, from.ReadField<T>(FromPath));
 		}
 	}
 }

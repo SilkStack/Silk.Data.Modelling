@@ -11,7 +11,7 @@
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField(ToPath, 0, _value);
+			to.WriteField(ToPath, _value);
 		}
 	}
 

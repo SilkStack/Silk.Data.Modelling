@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, 0, CreateInstance(from.ReadField<TFrom>(new[] { "." }, 0)));
+			to.WriteField<TTo>(ToPath, CreateInstance(from.ReadField<TFrom>(new[] { "." })));
 		}
 	}
 

@@ -36,9 +36,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var fromItem = from.ReadField<TFrom>(FromPath, 0);
+			var fromItem = from.ReadField<TFrom>(FromPath);
 			if (_tryParse(fromItem, out var toItem))
-				to.WriteField(ToPath, 0, toItem);
+				to.WriteField(ToPath, toItem);
 		}
 	}
 

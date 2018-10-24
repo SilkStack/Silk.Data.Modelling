@@ -126,7 +126,7 @@ namespace Silk.Data.Modelling.Tests
 
 				public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 				{
-					to.WriteField<T>(ToPath, 0, default(T));
+					to.WriteField<T>(ToPath, default(T));
 				}
 			}
 		}

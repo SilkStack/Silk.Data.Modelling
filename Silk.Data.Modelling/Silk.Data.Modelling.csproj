@@ -12,4 +12,8 @@ Part of the SilkStack project.</Description>
     <Version>0.1.5</Version>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.1" />
+  </ItemGroup>
+
 </Project>

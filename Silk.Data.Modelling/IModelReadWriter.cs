@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling
+﻿using System;
+
+namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Reads and writes model fields to a store instance.
@@ -16,7 +18,7 @@
 		/// <typeparam name="T"></typeparam>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		T ReadField<T>(string[] path, int offset);
+		T ReadField<T>(Span<string> path);
 
 		/// <summary>
 		/// Writes to a given field.
@@ -24,6 +26,6 @@
 		/// <typeparam name="T"></typeparam>
 		/// <param name="path"></param>
 		/// <param name="value"></param>
-		void WriteField<T>(string[] path, int offset, T value);
+		void WriteField<T>(Span<string> path, T value);
 	}
 }

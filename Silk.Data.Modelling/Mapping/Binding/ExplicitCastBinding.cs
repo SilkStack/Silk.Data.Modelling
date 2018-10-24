@@ -16,7 +16,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, 0, _cast(from.ReadField<TFrom>(FromPath, 0)));
+			to.WriteField<TTo>(ToPath, _cast(from.ReadField<TFrom>(FromPath)));
 		}
 
 		private static Func<TFrom, TTo> CreateCastDelegate(MethodInfo castMethod)

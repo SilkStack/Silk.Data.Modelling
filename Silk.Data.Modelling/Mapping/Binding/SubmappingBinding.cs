@@ -56,7 +56,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var value = from.ReadField<TFrom>(FromPath, 0);
+			var value = from.ReadField<TFrom>(FromPath);
 			if (value == null)
 				return;
 			Mapping.PerformMapping(
@@ -79,16 +79,16 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				PrefixPath = prefixPath;
 			}
 
-			public T ReadField<T>(string[] path, int offset)
+			public T ReadField<T>(Span<string> path)
 			{
-				var fixedPath = path.Take(offset).Concat(PrefixPath).Concat(path.Skip(offset)).ToArray();
-				return RealReadWriter.ReadField<T>(fixedPath, offset);
+				var fixedPath = PrefixPath.Concat(path.ToArray()).ToArray();
+				return RealReadWriter.ReadField<T>(fixedPath);
 			}
 
-			public void WriteField<T>(string[] path, int offset, T value)
+			public void WriteField<T>(Span<string> path, T value)
 			{
-				var fixedPath = path.Take(offset).Concat(PrefixPath).Concat(path.Skip(offset)).ToArray();
-				RealReadWriter.WriteField<T>(fixedPath, offset, value);
+				var fixedPath = PrefixPath.Concat(path.ToArray()).ToArray();
+				RealReadWriter.WriteField<T>(fixedPath, value);
 			}
 		}
 	}

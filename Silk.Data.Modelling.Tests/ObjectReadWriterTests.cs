@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Tests
 		public void ReadProperty()
 		{
 			var readWriter = new ObjectReadWriter(new PocoClass { Property = 1 }, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }, 0));
+			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }));
 		}
 
 		[TestMethod]
@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var instance = new PocoClass { Property = 1 };
 			var readWriter = new ObjectReadWriter(instance, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Property) }, 0, 2);
+			readWriter.WriteField(new[] { nameof(PocoClass.Property) }, 2);
 			Assert.AreEqual(2, instance.Property);
 		}
 
@@ -27,7 +27,7 @@ namespace Silk.Data.Modelling.Tests
 		public void ReadDeepProperty()
 		{
 			var readWriter = new ObjectReadWriter(new PocoClass { Sub = new SubPocoClass { Property = 1 } }, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 0));
+			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }));
 		}
 
 		[TestMethod]
@@ -35,7 +35,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var instance = new PocoClass { Sub = new SubPocoClass { Property = 1 } };
 			var readWriter = new ObjectReadWriter(instance, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 0, 2);
+			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 2);
 			Assert.AreEqual(2, instance.Sub.Property);
 		}
 
@@ -43,14 +43,14 @@ namespace Silk.Data.Modelling.Tests
 		public void ReadDefaultWhenPropertyNull()
 		{
 			var readWriter = new ObjectReadWriter(null, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(0, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }, 0));
+			Assert.AreEqual(0, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }));
 		}
 
 		[TestMethod]
 		public void IgnoreWriteWhenPropertyNull()
 		{
 			var readWriter = new ObjectReadWriter(null, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 0, 2);
+			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 2);
 		}
 
 		[TestMethod]
@@ -58,7 +58,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var obj = new PocoClassWithPrivateSetter();
 			var readWriter = new ObjectReadWriter(obj, TypeModel.GetModelOf<PocoClassWithPrivateSetter>(), typeof(PocoClassWithPrivateSetter));
-			readWriter.WriteField<int>(new[] { nameof(PocoClassWithPrivateSetter.Property) }, 0, 5);
+			readWriter.WriteField<int>(new[] { nameof(PocoClassWithPrivateSetter.Property) }, 5);
 			Assert.AreEqual(5, obj.Property);
 		}
 

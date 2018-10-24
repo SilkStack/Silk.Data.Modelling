@@ -30,10 +30,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var nullCheck = to.ReadField<T>(ToPath, 0);
+			var nullCheck = to.ReadField<T>(ToPath);
 			if (nullCheck == null)
 			{
-				to.WriteField<T>(ToPath, 0, _createInstance());
+				to.WriteField<T>(ToPath, _createInstance());
 			}
 		}
 	}
