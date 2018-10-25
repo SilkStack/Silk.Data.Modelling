@@ -28,7 +28,17 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		}
 	}
 
-	public class SubmappingBinding<TFrom, TTo> : MappingBinding
+	public abstract class SubmappingBindingBase : MappingBinding
+	{
+		public abstract Mapping Mapping { get; }
+
+		public SubmappingBindingBase(string[] fromPath, string[] toPath)
+			: base(fromPath, toPath)
+		{
+		}
+	}
+
+	public class SubmappingBinding<TFrom, TTo> : SubmappingBindingBase
 	{
 		private readonly IModel _fromModel;
 		private readonly IModel _toModel;
@@ -36,7 +46,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		public MappingStore MappingStore { get; }
 
 		private Mapping _mapping;
-		public Mapping Mapping
+		public override Mapping Mapping
 		{
 			get
 			{
