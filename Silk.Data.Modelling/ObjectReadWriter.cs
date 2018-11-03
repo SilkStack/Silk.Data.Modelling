@@ -66,5 +66,15 @@ namespace Silk.Data.Modelling
 			if (path[1] == ".")
 				_readWriteMethods.SetTypedValue<T>(_instance, field.FieldName, value);
 		}
+
+		public static ObjectReadWriter Create<T>(T instance = default(T))
+		{
+			return new ObjectReadWriter(instance, TypeModel.GetModelOf<T>(), typeof(T));
+		}
+
+		public static ObjectReadWriter Create(Type type, object instance = null)
+		{
+			return new ObjectReadWriter(instance, TypeModel.GetModelOf(type), type);
+		}
 	}
 }
