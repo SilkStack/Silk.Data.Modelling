@@ -100,6 +100,16 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				var fixedPath = PrefixPath.Concat(path.ToArray()).ToArray();
 				RealReadWriter.WriteField<T>(fixedPath, value);
 			}
+
+			public T ReadField<T>(ModelNode modelNode)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void WriteField<T>(ModelNode modelNode, T value)
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

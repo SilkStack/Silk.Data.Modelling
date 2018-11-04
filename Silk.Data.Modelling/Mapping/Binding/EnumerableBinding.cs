@@ -104,6 +104,16 @@ namespace Silk.Data.Modelling.Mapping.Binding
 					List.Add((TToElement)(object)value);
 			}
 		}
+
+		public T ReadField<T>(ModelNode modelNode)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void WriteField<T>(ModelNode modelNode, T value)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	internal class EnumerableModelReader<TFromElement> : IModelReadWriter
@@ -145,6 +155,16 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		public void WriteField<T>(Span<string> path, T value)
 		{
 			throw new NotSupportedException();
+		}
+
+		public T ReadField<T>(ModelNode modelNode)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void WriteField<T>(ModelNode modelNode, T value)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

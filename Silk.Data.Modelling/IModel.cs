@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling
+﻿using System;
+
+namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Base interface for all models.
@@ -16,6 +18,13 @@
 		/// </summary>
 		/// <param name="transformer"></param>
 		void Transform(IModelTransformer transformer);
+
+		/// <summary>
+		/// Resolves a path to the specified model node.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		ModelNode ResolveNode(Span<string> path);
 	}
 
 	/// <summary>

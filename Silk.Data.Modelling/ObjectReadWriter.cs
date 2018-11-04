@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace Silk.Data.Modelling
 {
+	/// <summary>
+	/// Reads and writes fields on an object tree.
+	/// </summary>
 	public class ObjectReadWriter : IModelReadWriter
 	{
 		public IModel Model { get; }
@@ -17,61 +20,80 @@ namespace Silk.Data.Modelling
 		}
 
 		public T ReadField<T>(Span<string> path)
-		{
-			if (path[0] == ".")
-				return (T)_instance;
+			=> ReadField<T>(Model.ResolveNode(path));
 
+		public void WriteField<T>(Span<string> path, T value)
+			=> WriteField<T>(Model.ResolveNode(path), value);
+
+
+		public T ReadField<T>(ModelNode modelNode)
+		{
 			if (_instance == null)
 				return default(T);
 
-			var firstFieldName = path[0];
-			var field = Model.Fields.FirstOrDefault(q => q.FieldName == firstFieldName);
-			if (field == null)
-				throw new Exception("Unknown field on model.");
+			var currentObj = _instance;
+			var currentReadWriterHelpers = _readWriteMethods;
+			foreach (var pathNode in modelNode.Path)
+			{
+				switch (pathNode.PathNodeType)
+				{
+					case ModelPathNodeType.Root:
+						return (T)_instance;
+					case ModelPathNodeType.Field:
+						return currentReadWriterHelpers.GetTypedValue<T>(currentObj, pathNode.PathNodeName);
+					case ModelPathNodeType.Tree:
+						currentObj = currentReadWriterHelpers.GetValue(currentObj, pathNode.PathNodeName);
+						if (currentObj == null)
+							return default(T);
+						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(currentObj.GetType());
+						break;
+				}
+			}
 
-			if (path.Length == 1)
-				return _readWriteMethods.GetTypedValue<T>(_instance, field.FieldName);
-
-			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
-			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel, field.FieldType);
-			return subReadWriter.ReadField<T>(path.Slice(1));
+			throw new ArgumentException("Path does not lead to a valid field.", nameof(modelNode));
 		}
 
-		public void WriteField<T>(Span<string> path, T value)
+		public void WriteField<T>(ModelNode modelNode, T value)
 		{
-			if (path[0] == ".")
+			var currentObj = _instance;
+			var currentReadWriterHelpers = _readWriteMethods;
+			foreach (var pathNode in modelNode.Path)
 			{
-				_instance = value;
-				return;
+				switch (pathNode.PathNodeType)
+				{
+					case ModelPathNodeType.Root:
+						_instance = value;
+						break;
+					case ModelPathNodeType.Field:
+						currentReadWriterHelpers.SetTypedValue<T>(currentObj, pathNode.PathNodeName, value);
+						break;
+					case ModelPathNodeType.Tree:
+						currentObj = currentReadWriterHelpers.GetValue(currentObj, pathNode.PathNodeName);
+						if (currentObj == null)
+							return;
+						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(currentObj.GetType());
+						break;
+				}
 			}
-
-			if (_instance == null)
-				return;
-
-			var firstFieldName = path[0];
-			var field = Model.Fields.FirstOrDefault(q => q.FieldName == firstFieldName);
-			if (field == null)
-				throw new Exception("Unknown field on model.");
-
-			if (path.Length == 1)
-			{
-				_readWriteMethods.SetTypedValue<T>(_instance, field.FieldName, value);
-				return;
-			}
-
-			var subObject = _readWriteMethods.GetValue(_instance, field.FieldName);
-			var subReadWriter = new ObjectReadWriter(subObject, field.FieldTypeModel, field.FieldType);
-			subReadWriter.WriteField<T>(path.Slice(1), value);
-
-			if (path[1] == ".")
-				_readWriteMethods.SetTypedValue<T>(_instance, field.FieldName, value);
 		}
 
+		/// <summary>
+		/// Create a new ObjectReadWriter for writing to instances of type T.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="instance"></param>
+		/// <returns></returns>
 		public static ObjectReadWriter Create<T>(T instance = default(T))
 		{
 			return new ObjectReadWriter(instance, TypeModel.GetModelOf<T>(), typeof(T));
 		}
 
+		/// <summary>
+		/// Create a new ObjectReadWriter for writing to instances of the provided type.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="instance"></param>
+		/// <returns></returns>
 		public static ObjectReadWriter Create(Type type, object instance = null)
 		{
 			return new ObjectReadWriter(instance, TypeModel.GetModelOf(type), type);
