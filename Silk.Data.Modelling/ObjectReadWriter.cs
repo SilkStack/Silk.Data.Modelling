@@ -38,14 +38,14 @@ namespace Silk.Data.Modelling
 				switch (pathNode.PathNodeType)
 				{
 					case ModelPathNodeType.Root:
-						return (T)_instance;
+						return (T)currentObj;
 					case ModelPathNodeType.Field:
 						return currentReadWriterHelpers.GetTypedValue<T>(currentObj, pathNode.PathNodeName);
 					case ModelPathNodeType.Tree:
 						currentObj = currentReadWriterHelpers.GetValue(currentObj, pathNode.PathNodeName);
 						if (currentObj == null)
 							return default(T);
-						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(currentObj.GetType());
+						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(pathNode.Field.FieldType);
 						break;
 				}
 			}
@@ -57,23 +57,34 @@ namespace Silk.Data.Modelling
 		{
 			var currentObj = _instance;
 			var currentReadWriterHelpers = _readWriteMethods;
+			var previousReadWriterHelpers = _readWriteMethods;
+			var previousNode = default(ModelPathNode);
+			var previousObj = default(object);
 			foreach (var pathNode in modelNode.Path)
 			{
 				switch (pathNode.PathNodeType)
 				{
 					case ModelPathNodeType.Root:
-						_instance = value;
+						if (modelNode.Path.Count == 1)
+							_instance = value;
+						else
+							previousReadWriterHelpers.SetTypedValue<T>(previousObj, previousNode.PathNodeName, value);
 						break;
 					case ModelPathNodeType.Field:
+						if (currentObj == null)
+							return;
 						currentReadWriterHelpers.SetTypedValue<T>(currentObj, pathNode.PathNodeName, value);
 						break;
 					case ModelPathNodeType.Tree:
-						currentObj = currentReadWriterHelpers.GetValue(currentObj, pathNode.PathNodeName);
+						previousObj = currentObj;
 						if (currentObj == null)
 							return;
-						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(currentObj.GetType());
+						currentObj = currentReadWriterHelpers.GetValue(currentObj, pathNode.PathNodeName);
+						previousReadWriterHelpers = currentReadWriterHelpers;
+						currentReadWriterHelpers = ObjectReadWriteHelpers.GetForType(pathNode.Field.FieldType);
 						break;
 				}
+				previousNode = pathNode;
 			}
 		}
 
