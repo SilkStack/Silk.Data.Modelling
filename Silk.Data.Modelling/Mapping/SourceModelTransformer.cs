@@ -23,10 +23,10 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			if (_rootPath == null || _rootPath.Length == 0)
 				_fields.Add(new SourceField<T>(field.FieldName, field.CanRead, field.CanWrite, field.IsEnumerable,
-					field.ElementType, new[] { field.FieldName }));
+					field.ElementType, new[] { field.FieldName }, _fromModel));
 			else
 				_fields.Add(new SourceField<T>(field.FieldName, field.CanRead, field.CanWrite, field.IsEnumerable,
-					field.ElementType, _rootPath.Concat(new[] { field.FieldName }).ToArray()));
+					field.ElementType, _rootPath.Concat(new[] { field.FieldName }).ToArray(), _fromModel));
 		}
 
 		public SourceModel BuildSourceModel()

@@ -38,8 +38,9 @@ namespace Silk.Data.Modelling.Tests
 
 			var mapping = CreateMapping<SimplePoco>(options);
 			Assert.AreEqual(2, mapping.Bindings.Length);
-			Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.FromPath.SequenceEqual(new[] { "PropertyA" }) && binding.ToPath.SequenceEqual(new[] { "PropertyB" })));
-			Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.FromPath.SequenceEqual(new[] { "PropertyB" }) && binding.ToPath.SequenceEqual(new[] { "PropertyA" })));
+			//Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.From.SequenceEqual(new[] { "PropertyA" }) && binding.To.SequenceEqual(new[] { "PropertyB" })));
+			//Assert.IsTrue(mapping.Bindings.OfType<CopyBinding<int>>().Any(binding => binding.From.SequenceEqual(new[] { "PropertyB" }) && binding.To.SequenceEqual(new[] { "PropertyA" })));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		[TestMethod]

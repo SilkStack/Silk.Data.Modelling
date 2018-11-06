@@ -13,14 +13,15 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SourcePoco, TargetPoco>();
 			Assert.AreEqual(2, mapping.Bindings.Length);
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Castable" }) &&
-				q.ToPath.SequenceEqual(new[] { "Castable" }) &&
-				q is CastExpressionBinding<int, float>
-				));
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Enum" }) &&
-				q.ToPath.SequenceEqual(new[] { "Enum" }) &&
-				q is CastExpressionBinding<SourceEnum, int>
-				));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "Castable" }) &&
+			//	q.To.SequenceEqual(new[] { "Castable" }) &&
+			//	q is CastExpressionBinding<int, float>
+			//	));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "Enum" }) &&
+			//	q.To.SequenceEqual(new[] { "Enum" }) &&
+			//	q is CastExpressionBinding<SourceEnum, int>
+			//	));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		[TestMethod]

@@ -23,8 +23,9 @@ namespace Silk.Data.Modelling.Tests
 			Assert.AreEqual(1, submappingBinding.Mapping.Bindings.Length);
 
 			binding = (MappingBinding)submappingBinding.Mapping.Bindings[0];
-			Assert.IsTrue(binding.FromPath.SequenceEqual(new[] { "OneToOneMapping" }));
-			Assert.IsTrue(binding.ToPath.SequenceEqual(new[] { "OneToOneMapping" }));
+			//Assert.IsTrue(binding.From.SequenceEqual(new[] { "OneToOneMapping" }));
+			//Assert.IsTrue(binding.To.SequenceEqual(new[] { "OneToOneMapping" }));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		[TestMethod]

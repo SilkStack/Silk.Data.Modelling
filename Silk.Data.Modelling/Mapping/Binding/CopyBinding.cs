@@ -4,24 +4,24 @@ namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public class CopyBinding : IMappingBindingFactory
 	{
-		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField)
+		public MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField)
 		{
 			if (typeof(TFrom) != typeof(TTo))
 				throw new InvalidOperationException("TFrom and TTo type mismatch.");
-			return new CopyBinding<TFrom>(fromField.FieldPath, toField.FieldPath);
+			return new CopyBinding<TFrom>(fromField, toField);
 		}
 	}
 
 	public class CopyBinding<T> : MappingBinding
 	{
-		public CopyBinding(string[] fromPath, string[] toPath)
-			: base(fromPath, toPath)
+		public CopyBinding(IFieldReference from, IFieldReference to)
+			: base(from, to)
 		{
 		}
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<T>(ToPath, from.ReadField<T>(FromPath));
+			to.WriteField<T>(To, from.ReadField<T>(From));
 		}
 	}
 }

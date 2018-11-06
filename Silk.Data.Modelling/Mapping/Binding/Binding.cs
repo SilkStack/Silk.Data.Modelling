@@ -10,11 +10,11 @@
 	/// </summary>
 	public abstract class AssignmentBinding : Binding
 	{
-		public string[] ToPath { get; }
+		public IFieldReference To { get; }
 
-		public AssignmentBinding(string[] toPath)
+		public AssignmentBinding(IFieldReference to)
 		{
-			ToPath = toPath;
+			To = to;
 		}
 
 		public override void PerformBinding(IModelReadWriter from, IModelReadWriter to)
@@ -30,14 +30,14 @@
 	/// </summary>
 	public abstract class MappingBinding : Binding
 	{
-		public string[] FromPath { get; }
+		public IFieldReference From { get; }
 
-		public string[] ToPath { get; }
+		public IFieldReference To { get; }
 
-		public MappingBinding(string[] fromPath, string[] toPath)
+		public MappingBinding(IFieldReference from, IFieldReference to)
 		{
-			FromPath = fromPath;
-			ToPath = toPath;
+			From = from;
+			To = to;
 		}
 
 		public override void PerformBinding(IModelReadWriter from, IModelReadWriter to)

@@ -14,14 +14,15 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SimplePoccWithReadWriteProperties>();
 			Assert.AreEqual(2, mapping.Bindings.Length);
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Integer" }) &&
-				q.ToPath.SequenceEqual(new[] { "Integer" }) &&
-				q is CopyBinding<int>
-				));
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "String" }) &&
-				q.ToPath.SequenceEqual(new[] { "String" }) &&
-				q is CopyBinding<string>
-				));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "Integer" }) &&
+			//	q.To.SequenceEqual(new[] { "Integer" }) &&
+			//	q is CopyBinding<int>
+			//	));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "String" }) &&
+			//	q.To.SequenceEqual(new[] { "String" }) &&
+			//	q is CopyBinding<string>
+			//	));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		[TestMethod]
@@ -36,18 +37,19 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SourcePocoWithEnumerables, TargetPocoWithEnumerables>();
 			Assert.AreEqual(3, mapping.Bindings.Length);
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "ListOfInt" }) &&
-				q.ToPath.SequenceEqual(new[] { "ListOfInt" }) &&
-				q is EnumerableBinding<List<int>,List<int>, int, int>
-				));
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "CollectionOfInt" }) &&
-				q.ToPath.SequenceEqual(new[] { "CollectionOfInt" }) &&
-				q is EnumerableBinding<int[], ICollection<int>, int, int>
-				));
-			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.FromPath.SequenceEqual(new[] { "Ints" }) &&
-				q.ToPath.SequenceEqual(new[] { "Ints" }) &&
-				q is EnumerableBinding<IEnumerable<int>, int[], int, int>
-				));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "ListOfInt" }) &&
+			//	q.To.SequenceEqual(new[] { "ListOfInt" }) &&
+			//	q is EnumerableBinding<List<int>,List<int>, int, int>
+			//	));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "CollectionOfInt" }) &&
+			//	q.To.SequenceEqual(new[] { "CollectionOfInt" }) &&
+			//	q is EnumerableBinding<int[], ICollection<int>, int, int>
+			//	));
+			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "Ints" }) &&
+			//	q.To.SequenceEqual(new[] { "Ints" }) &&
+			//	q is EnumerableBinding<IEnumerable<int>, int[], int, int>
+			//	));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		private Mapping.Mapping CreateMapping<T>()

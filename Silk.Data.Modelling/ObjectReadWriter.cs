@@ -9,6 +9,9 @@ namespace Silk.Data.Modelling
 	public class ObjectReadWriter : IModelReadWriter
 	{
 		public IModel Model { get; }
+
+		public IFieldResolver FieldResolver { get; }
+
 		private object _instance;
 		private ObjectReadWriteHelpers _readWriteMethods;
 
@@ -17,6 +20,7 @@ namespace Silk.Data.Modelling
 			_instance = instance;
 			Model = model;
 			_readWriteMethods = ObjectReadWriteHelpers.GetForType(objectType);
+			FieldResolver = model.CreateFieldResolver();
 		}
 
 		public T ReadField<T>(Span<string> path)
@@ -26,7 +30,7 @@ namespace Silk.Data.Modelling
 			=> WriteField<T>(Model.ResolveNode(path), value);
 
 
-		public T ReadField<T>(ModelNode modelNode)
+		private T ReadField<T>(ModelNode modelNode)
 		{
 			if (_instance == null)
 				return default(T);
@@ -53,7 +57,7 @@ namespace Silk.Data.Modelling
 			throw new ArgumentException("Path does not lead to a valid field.", nameof(modelNode));
 		}
 
-		public void WriteField<T>(ModelNode modelNode, T value)
+		private void WriteField<T>(ModelNode modelNode, T value)
 		{
 			var currentObj = _instance;
 			var currentReadWriterHelpers = _readWriteMethods;
@@ -109,5 +113,11 @@ namespace Silk.Data.Modelling
 		{
 			return new ObjectReadWriter(instance, TypeModel.GetModelOf(type), type);
 		}
+
+		public T ReadField<T>(IFieldReference field)
+			=> ReadField<T>(FieldResolver.ResolveNode(field));
+
+		public void WriteField<T>(IFieldReference field, T value)
+			=> WriteField<T>(FieldResolver.ResolveNode(field), value);
 	}
 }

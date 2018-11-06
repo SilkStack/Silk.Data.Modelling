@@ -7,14 +7,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly Func<TFrom, TTo> _cast;
 
-		public CastExpressionBinding(string[] fromPath, string[] toPath) : base(fromPath, toPath)
+		public CastExpressionBinding(IFieldReference from, IFieldReference to) : base(from, to)
 		{
 			_cast = CreateCastExpression();
 		}
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, _cast(from.ReadField<TFrom>(FromPath)));
+			to.WriteField<TTo>(To, _cast(from.ReadField<TFrom>(From)));
 		}
 
 		private Func<TFrom, TTo> CreateCastExpression()
@@ -27,9 +27,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 	public class CastExpressionBinding : IMappingBindingFactory
 	{
-		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField)
+		public MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField)
 		{
-			return new CastExpressionBinding<TFrom, TTo>(fromField.FieldPath, toField.FieldPath);
+			return new CastExpressionBinding<TFrom, TTo>(fromField, toField);
 		}
 	}
 }

@@ -9,8 +9,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly Func<T> _createInstance;
 
-		public CreateInstanceIfNull(ConstructorInfo constructorInfo, string[] toPath) :
-			base(toPath)
+		public CreateInstanceIfNull(ConstructorInfo constructorInfo, IFieldReference to) :
+			base(to)
 		{
 			_createInstance = CreateCtorMethod(constructorInfo);
 		}
@@ -30,19 +30,19 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var nullCheck = to.ReadField<T>(ToPath);
+			var nullCheck = to.ReadField<T>(To);
 			if (nullCheck == null)
 			{
-				to.WriteField<T>(ToPath, _createInstance());
+				to.WriteField<T>(To, _createInstance());
 			}
 		}
 	}
 
 	public class CreateInstanceIfNull : IAssignmentBindingFactory<ConstructorInfo>
 	{
-		public AssignmentBinding CreateBinding<TTo>(ITargetField toField, ConstructorInfo bindingOption)
+		public AssignmentBinding CreateBinding<TTo>(IFieldReference toField, ConstructorInfo bindingOption)
 		{
-			return new CreateInstanceIfNull<TTo>(bindingOption, toField.FieldPath);
+			return new CreateInstanceIfNull<TTo>(bindingOption, toField);
 		}
 	}
 }

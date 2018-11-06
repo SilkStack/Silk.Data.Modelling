@@ -6,8 +6,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly Func<TFrom, TTo> _factory;
 
-		public UseFactory(Func<TFrom, TTo> factory, string[] toPath) :
-			base(toPath)
+		public UseFactory(Func<TFrom, TTo> factory, IFieldReference to) :
+			base(to)
 		{
 			_factory = factory;
 		}
@@ -19,15 +19,15 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, CreateInstance(from.ReadField<TFrom>(new[] { "." })));
+			to.WriteField<TTo>(To, CreateInstance(from.ReadField<TFrom>(new[] { "." })));
 		}
 	}
 
 	public class UseFactoryBinding<TFrom, TTo> : IAssignmentBindingFactory<Func<TFrom, TTo>>
 	{
-		public AssignmentBinding CreateBinding<T>(ITargetField toField, Func<TFrom, TTo> bindingOption)
+		public AssignmentBinding CreateBinding<T>(IFieldReference toField, Func<TFrom, TTo> bindingOption)
 		{
-			return new UseFactory<TFrom, TTo>(bindingOption, toField.FieldPath);
+			return new UseFactory<TFrom, TTo>(bindingOption, toField);
 		}
 	}
 }

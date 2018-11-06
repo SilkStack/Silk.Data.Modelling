@@ -9,14 +9,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private Func<TFrom, TTo> _cast;
 
-		public ExplicitCastBinding(string[] fromPath, string[] toPath, MethodInfo castMethod) : base(fromPath, toPath)
+		public ExplicitCastBinding(IFieldReference from, IFieldReference to, MethodInfo castMethod) : base(from, to)
 		{
 			_cast = CreateCastDelegate(castMethod);
 		}
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField<TTo>(ToPath, _cast(from.ReadField<TFrom>(FromPath)));
+			to.WriteField<TTo>(To, _cast(from.ReadField<TFrom>(From)));
 		}
 
 		private static Func<TFrom, TTo> CreateCastDelegate(MethodInfo castMethod)
@@ -32,9 +32,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 	public class ExplicitCastBinding : IMappingBindingFactory<MethodInfo>
 	{
-		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MethodInfo castMethod)
+		public MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField, MethodInfo castMethod)
 		{
-			return new ExplicitCastBinding<TFrom, TTo>(fromField.FieldPath, toField.FieldPath, castMethod);
+			return new ExplicitCastBinding<TFrom, TTo>(fromField, toField, castMethod);
 		}
 	}
 }

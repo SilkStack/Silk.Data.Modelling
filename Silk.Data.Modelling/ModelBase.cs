@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Silk.Data.Modelling.Mapping;
 
 namespace Silk.Data.Modelling
 {
@@ -53,5 +54,9 @@ namespace Silk.Data.Modelling
 
 			return new ModelNode(field, modelNodePath);
 		}
+
+		public abstract IFieldResolver CreateFieldResolver();
+		public abstract IFieldReference GetFieldReference(ISourceField sourceField);
+		public abstract IFieldReference GetFieldReference(ITargetField targetField);
 	}
 }

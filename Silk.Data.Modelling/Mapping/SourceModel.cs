@@ -39,6 +39,21 @@ namespace Silk.Data.Modelling.Mapping
 			}
 			return next;
 		}
+
+		public override IFieldResolver CreateFieldResolver()
+		{
+			throw new NotSupportedException();
+		}
+
+		public override IFieldReference GetFieldReference(ISourceField sourceField)
+		{
+			throw new NotSupportedException();
+		}
+
+		public override IFieldReference GetFieldReference(ITargetField targetField)
+		{
+			throw new NotSupportedException();
+		}
 	}
 
 	public interface ISourceField : IField
@@ -52,6 +67,8 @@ namespace Silk.Data.Modelling.Mapping
 
 	public class SourceField<T> : FieldBase<T>, ISourceField, IField<T>
 	{
+		private readonly IModel _sourceModel;
+
 		public string[] FieldPath { get; }
 
 		private ISourceField[] _fields;
@@ -69,20 +86,26 @@ namespace Silk.Data.Modelling.Mapping
 		}
 
 		public SourceField(string fieldName, bool canRead, bool canWrite,
-			bool isEnumerable, Type elementType, string[] fieldPath) :
+			bool isEnumerable, Type elementType, string[] fieldPath, IModel sourceModel) :
 			base(fieldName, canRead, canWrite, isEnumerable, elementType)
 		{
 			FieldPath = fieldPath;
+			_sourceModel = sourceModel;
 		}
 
 		public MappingBinding CreateBinding<TTo>(IMappingBindingFactory bindingFactory, ITargetField toField)
 		{
-			return bindingFactory.CreateBinding<T, TTo>(this, toField);
+			return bindingFactory.CreateBinding<T, TTo>(
+				_sourceModel.GetFieldReference(this),
+				_sourceModel.GetFieldReference(toField));
 		}
 
 		public MappingBinding CreateBinding<TTo, TBindingOption>(IMappingBindingFactory<TBindingOption> bindingFactory, ITargetField toField, TBindingOption bindingOption)
 		{
-			return bindingFactory.CreateBinding<T, TTo>(this, toField, bindingOption);
+			return bindingFactory.CreateBinding<T, TTo>(
+				_sourceModel.GetFieldReference(this),
+				_sourceModel.GetFieldReference(toField),
+				bindingOption);
 		}
 	}
 }

@@ -42,7 +42,8 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsInstanceOfType(mapping.Bindings[0], typeof(CreateInstanceIfNull<PocoWithPublicCtor>));
 
 			var ctorBinding = (CreateInstanceIfNull<PocoWithPublicCtor>)mapping.Bindings[0];
-			Assert.IsTrue(ctorBinding.ToPath.SequenceEqual(new[] { "." }));
+			//Assert.IsTrue(ctorBinding.To.SequenceEqual(new[] { "." }));
+			Assert.Fail("Re-implement test for ctor binding.");
 
 			var instance = ctorBinding.CreateInstance();
 			Assert.IsNotNull(instance);
@@ -56,7 +57,8 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsInstanceOfType(mapping.Bindings[0], typeof(CreateInstanceIfNull<PocoWithPrivateCtor>));
 
 			var ctorBinding = (CreateInstanceIfNull<PocoWithPrivateCtor>)mapping.Bindings[0];
-			Assert.IsTrue(ctorBinding.ToPath.SequenceEqual(new[] { "." }));
+			//Assert.IsTrue(ctorBinding.To.SequenceEqual(new[] { "." }));
+			Assert.Fail("Re-implement test for ctor binding.");
 
 			var instance = ctorBinding.CreateInstance();
 			Assert.IsNotNull(instance);
@@ -113,20 +115,20 @@ namespace Silk.Data.Modelling.Tests
 
 		private class AssignFactory : IAssignmentBindingFactory
 		{
-			public AssignmentBinding CreateBinding<TTo>(ITargetField toField)
+			public AssignmentBinding CreateBinding<TTo>(IFieldReference toField)
 			{
-				return new DefaultBinding<TTo>(toField.FieldPath);
+				return new DefaultBinding<TTo>(toField);
 			}
 
 			public class DefaultBinding<T> : AssignmentBinding
 			{
-				public DefaultBinding(string[] toPath) : base(toPath)
+				public DefaultBinding(IFieldReference to) : base(to)
 				{
 				}
 
 				public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 				{
-					to.WriteField<T>(ToPath, default(T));
+					to.WriteField<T>(To, default(T));
 				}
 			}
 		}

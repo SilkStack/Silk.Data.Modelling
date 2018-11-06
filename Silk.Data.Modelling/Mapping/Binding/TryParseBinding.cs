@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		private readonly TryParseMethod _tryParse;
 
-		public TryParseBinding(string[] fromPath, string[] toPath, MethodInfo parseMethod) : base(fromPath, toPath)
+		public TryParseBinding(IFieldReference from, IFieldReference to, MethodInfo parseMethod) : base(from, to)
 		{
 			_tryParse = CreateTryParseMethod(parseMethod);
 		}
@@ -36,17 +36,17 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var fromItem = from.ReadField<TFrom>(FromPath);
+			var fromItem = from.ReadField<TFrom>(From);
 			if (_tryParse(fromItem, out var toItem))
-				to.WriteField(ToPath, toItem);
+				to.WriteField(To, toItem);
 		}
 	}
 
 	public class TryParseBinding : IMappingBindingFactory<MethodInfo>
 	{
-		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MethodInfo bindingOption)
+		public MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField, MethodInfo bindingOption)
 		{
-			return new TryParseBinding<TFrom, TTo>(fromField.FieldPath, toField.FieldPath, bindingOption);
+			return new TryParseBinding<TFrom, TTo>(fromField, toField, bindingOption);
 		}
 	}
 }

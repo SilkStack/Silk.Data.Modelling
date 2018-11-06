@@ -16,8 +16,9 @@ namespace Silk.Data.Modelling.Tests
 
 			var flattenBinding = (MappingBinding)mapping.Bindings[0];
 			Assert.IsInstanceOfType(flattenBinding, typeof(CopyBinding<int>));
-			Assert.IsTrue(flattenBinding.ToPath.SequenceEqual(new[] { "Data", "Property" }));
-			Assert.IsTrue(flattenBinding.FromPath.SequenceEqual(new[] { "DataProperty" }));
+			//Assert.IsTrue(flattenBinding.To.SequenceEqual(new[] { "Data", "Property" }));
+			//Assert.IsTrue(flattenBinding.From.SequenceEqual(new[] { "DataProperty" }));
+			Assert.Fail("Re-implement test for bindings binding.");
 		}
 
 		private Mapping.Mapping CreateMapping<T>()

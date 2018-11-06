@@ -2,21 +2,21 @@
 {
 	public interface IAssignmentBindingFactory
 	{
-		AssignmentBinding CreateBinding<TTo>(ITargetField toField);
+		AssignmentBinding CreateBinding<TTo>(IFieldReference toField);
 	}
 
 	public interface IAssignmentBindingFactory<T>
 	{
-		AssignmentBinding CreateBinding<TTo>(ITargetField toField, T bindingOption);
+		AssignmentBinding CreateBinding<TTo>(IFieldReference toField, T bindingOption);
 	}
 
 	public interface IMappingBindingFactory
 	{
-		MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField);
+		MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField);
 	}
 
 	public interface IMappingBindingFactory<T>
 	{
-		MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, T bindingOption);
+		MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField, T bindingOption);
 	}
 }

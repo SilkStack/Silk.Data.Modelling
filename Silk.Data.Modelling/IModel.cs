@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.Mapping;
+using System;
 
 namespace Silk.Data.Modelling
 {
@@ -25,6 +26,26 @@ namespace Silk.Data.Modelling
 		/// <param name="path"></param>
 		/// <returns></returns>
 		ModelNode ResolveNode(Span<string> path);
+
+		/// <summary>
+		/// Gets a field reference for a source field.
+		/// </summary>
+		/// <param name="sourceField"></param>
+		/// <returns></returns>
+		IFieldReference GetFieldReference(ISourceField sourceField);
+
+		/// <summary>
+		/// Gets a field reference for a target field.
+		/// </summary>
+		/// <param name="targetField"></param>
+		/// <returns></returns>
+		IFieldReference GetFieldReference(ITargetField targetField);
+
+		/// <summary>
+		/// Creates a new field resolver.
+		/// </summary>
+		/// <returns></returns>
+		IFieldResolver CreateFieldResolver();
 	}
 
 	/// <summary>

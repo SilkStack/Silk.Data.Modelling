@@ -1,6 +1,5 @@
 ﻿using Silk.Data.Modelling.Mapping.Binding;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -44,7 +43,7 @@ namespace Silk.Data.Modelling.Mapping
 		private ITargetField MakeSelfField<T>()
 		{
 			var enumerableElementType = typeof(T).GetEnumerableElementType();
-			return new TargetField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath);
+			return new TargetField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath, FromModel);
 		}
 
 		public ITargetField GetField(params string[] fieldPath)
@@ -67,6 +66,21 @@ namespace Silk.Data.Modelling.Mapping
 			}
 			return next;
 		}
+
+		public override IFieldResolver CreateFieldResolver()
+		{
+			throw new NotSupportedException();
+		}
+
+		public override IFieldReference GetFieldReference(ISourceField sourceField)
+		{
+			throw new NotSupportedException();
+		}
+
+		public override IFieldReference GetFieldReference(ITargetField targetField)
+		{
+			throw new NotSupportedException();
+		}
 	}
 
 	public interface ITargetField : IField
@@ -80,6 +94,8 @@ namespace Silk.Data.Modelling.Mapping
 
 	public class TargetField<T> : FieldBase<T>, ITargetField, IField<T>
 	{
+		private readonly IModel _sourceModel;
+
 		public string[] FieldPath { get; }
 
 		private ITargetField[] _fields;
@@ -97,9 +113,10 @@ namespace Silk.Data.Modelling.Mapping
 		}
 
 		public TargetField(string fieldName, bool canRead, bool canWrite,
-			bool isEnumerable, Type elementType, string[] fieldPath) :
+			bool isEnumerable, Type elementType, string[] fieldPath, IModel sourceModel) :
 			base(fieldName, canRead, canWrite, isEnumerable, elementType)
 		{
+			_sourceModel = sourceModel;
 			FieldPath = fieldPath;
 		}
 
@@ -110,12 +127,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public Binding.Binding CreateBinding(IAssignmentBindingFactory bindingFactory)
 		{
-			return bindingFactory.CreateBinding<T>(this);
+			return bindingFactory.CreateBinding<T>(_sourceModel.GetFieldReference(this));
 		}
 
 		public Binding.Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option)
 		{
-			return bindingFactory.CreateBinding<T>(this, option);
+			return bindingFactory.CreateBinding<T>(_sourceModel.GetFieldReference(this), option);
 		}
 	}
 }

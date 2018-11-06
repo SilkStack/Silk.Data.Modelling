@@ -5,10 +5,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public class SubmappingBinding : IMappingBindingFactory<MappingStore>
 	{
-		public MappingBinding CreateBinding<TFrom, TTo>(ISourceField fromField, ITargetField toField, MappingStore mappingStore)
+		public MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField, MappingStore mappingStore)
 		{
-			var fromElementType = fromField.ElementType;
-			var toElementType = toField.ElementType;
+			var fromElementType = fromField.Field.ElementType;
+			var toElementType = toField.Field.ElementType;
 
 			if (fromElementType != null && toElementType != null &&
 				MapReferenceTypes.IsReferenceType(fromElementType) && MapReferenceTypes.IsReferenceType(toElementType))
@@ -17,13 +17,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 					TypeModel.GetModelOf(fromElementType),
 					TypeModel.GetModelOf(toElementType),
 					mappingStore,
-					fromField.FieldPath, toField.FieldPath
+					fromField, toField
 				}) as MappingBinding;
 			}
 			else
 			{
-				return new SubmappingBinding<TFrom, TTo>(fromField.FieldTypeModel, toField.FieldTypeModel, mappingStore,
-					fromField.FieldPath, toField.FieldPath);
+				return new SubmappingBinding<TFrom, TTo>(
+					fromField.Field.FieldTypeModel, toField.Field.FieldTypeModel,
+					mappingStore, fromField, toField);
 			}
 		}
 	}
@@ -32,8 +33,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		public abstract Mapping Mapping { get; }
 
-		public SubmappingBindingBase(string[] fromPath, string[] toPath)
-			: base(fromPath, toPath)
+		public SubmappingBindingBase(IFieldReference from, IFieldReference to)
+			: base(from, to)
 		{
 		}
 	}
@@ -56,8 +57,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			}
 		}
 
-		public SubmappingBinding(IModel fromModel, IModel toModel, MappingStore mappingStore, string[] fromPath, string[] toPath) :
-			base(fromPath, toPath)
+		public SubmappingBinding(IModel fromModel, IModel toModel, MappingStore mappingStore, IFieldReference from, IFieldReference to) :
+			base(from, to)
 		{
 			_fromModel = fromModel;
 			_toModel = toModel;
@@ -66,12 +67,12 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			var value = from.ReadField<TFrom>(FromPath);
+			var value = from.ReadField<TFrom>(From);
 			if (value == null)
 				return;
 			Mapping.PerformMapping(
-				new SubmappingModelReadWriter(from, _fromModel, FromPath),
-				new SubmappingModelReadWriter(to, _toModel, ToPath)
+				new SubmappingModelReadWriter(from, _fromModel, new string[0]),
+				new SubmappingModelReadWriter(to, _toModel, new string[0])
 				);
 		}
 
@@ -80,6 +81,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			public IModel Model { get; }
 			public IModelReadWriter RealReadWriter { get; }
 			public string[] PrefixPath { get; }
+
+			public IFieldResolver FieldResolver => throw new NotImplementedException();
 
 			public SubmappingModelReadWriter(IModelReadWriter modelReadWriter, IModel model,
 				string[] prefixPath)
@@ -107,6 +110,16 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			}
 
 			public void WriteField<T>(ModelNode modelNode, T value)
+			{
+				throw new NotImplementedException();
+			}
+
+			public T ReadField<T>(IFieldReference field)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void WriteField<T>(IFieldReference field, T value)
 			{
 				throw new NotImplementedException();
 			}

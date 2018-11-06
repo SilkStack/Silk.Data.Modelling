@@ -4,22 +4,22 @@
 	{
 		private readonly T _value;
 
-		public ValueBinding(string[] toPath, T value) : base(toPath)
+		public ValueBinding(IFieldReference to, T value) : base(to)
 		{
 			_value = value;
 		}
 
 		public override void AssignBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
-			to.WriteField(ToPath, _value);
+			to.WriteField(To, _value);
 		}
 	}
 
 	public class ValueBindingFactory<T> : IAssignmentBindingFactory<T>
 	{
-		public AssignmentBinding CreateBinding<TTo>(ITargetField toField, T value)
+		public AssignmentBinding CreateBinding<TTo>(IFieldReference toField, T value)
 		{
-			return new ValueBinding<T>(toField.FieldPath, value);
+			return new ValueBinding<T>(toField, value);
 		}
 	}
 }

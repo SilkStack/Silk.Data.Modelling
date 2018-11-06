@@ -13,20 +13,25 @@ namespace Silk.Data.Modelling
 		IModel Model { get; }
 
 		/// <summary>
-		/// Reads a given field.
+		/// Gets the field resolver used to resolve field nodes on Model.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="modelNode"></param>
-		/// <returns></returns>
-		T ReadField<T>(ModelNode modelNode);
+		IFieldResolver FieldResolver { get; }
 
 		/// <summary>
-		/// Writes to a given field.
+		/// Reads a given field's value.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="modelNode"></param>
+		/// <param name="field"></param>
+		/// <returns></returns>
+		T ReadField<T>(IFieldReference field);
+
+		/// <summary>
+		/// Writes a value to a given field.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="field"></param>
 		/// <param name="value"></param>
-		void WriteField<T>(ModelNode modelNode, T value);
+		void WriteField<T>(IFieldReference field, T value);
 
 		/// <summary>
 		/// Reads a given field.
