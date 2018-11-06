@@ -10,9 +10,19 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFrom : class, IEnumerable<TFromElement>
 		where TTo : class, IEnumerable<TToElement>
 	{
+		private readonly TypeModel<EnumerableResult> _toModel = TypeModel.GetModelOf<EnumerableResult>();
+		private readonly TypeModel<TFromElement> _fromModel = TypeModel.GetModelOf<TFromElement>();
+		private readonly IFieldReference _fromSelfFieldReference;
+		private readonly EnumerableReaderMutator _readerMutator
+			= new EnumerableReaderMutator();
+		private readonly EnumerableWriterMutator _writerMutator
+			= new EnumerableWriterMutator();
+
 		public EnumerableBinding(IFieldReference from, IFieldReference to, MappingBinding elementBinding) : base(from, to)
 		{
 			ElementBinding = elementBinding;
+
+			_fromSelfFieldReference = _fromModel.GetFieldReference(_fromModel.TransformToSourceModel().GetSelf());
 		}
 
 		public MappingBinding ElementBinding { get; }
@@ -20,20 +30,51 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
 		{
 			var source = from.ReadField<TFrom>(From);
-			var result = new List<TToElement>();
+			var result = new EnumerableResult();
 
-			var sourceReader = new EnumerableModelReader<TFromElement>(source, TypeModel.GetModelOf(typeof(TFromElement)));
-			var resultWriter = new EnumerableModelWriter<TToElement>(result, TypeModel.GetModelOf(typeof(TToElement)));
-
-			while(sourceReader.MoveNext())
+			var resultWriter = new ObjectReadWriter(result, _toModel, typeof(EnumerableResult));
+			var itemReader = new ObjectReadWriter(null, _fromModel, typeof(TFromElement));
+			itemReader.FieldResolver.AddMutator(_readerMutator);
+			resultWriter.FieldResolver.AddMutator(_writerMutator);
+			foreach (var item in source)
 			{
-				ElementBinding.CopyBindingValue(sourceReader, resultWriter);
+				itemReader.WriteField<TFromElement>(_fromSelfFieldReference, item);
+				ElementBinding.CopyBindingValue(itemReader, resultWriter);
 			}
 
 			if (typeof(TTo).IsArray)
 				to.WriteField<TTo>(To, result.ToArray() as TTo);
 			else
 				to.WriteField<TTo>(To, result as TTo);
+		}
+
+		private class EnumerableResult : List<TToElement>
+		{
+			public TToElement Element
+			{
+				get => default(TToElement);
+				set => Add(value);
+			}
+		}
+
+		private class EnumerableReaderMutator : IFieldReferenceMutator
+		{
+			public void MutatePath(List<ModelPathNode> pathNodes)
+			{
+				pathNodes.Clear();
+				pathNodes.Add(RootPathNode.Instance);
+			}
+		}
+
+		private class EnumerableWriterMutator : IFieldReferenceMutator
+		{
+			private static readonly FieldPathNode _fieldPathNode = new FieldPathNode("Element", null);
+
+			public void MutatePath(List<ModelPathNode> pathNodes)
+			{
+				pathNodes.Clear();
+				pathNodes.Add(_fieldPathNode);
+			}
 		}
 	}
 
@@ -49,7 +90,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 			return Activator.CreateInstance(typeof(EnumerableBinding<,,,>)
 				.MakeGenericType(typeof(TFrom), typeof(TTo), fromField.Field.ElementType, toField.Field.ElementType),
-				new object[] { new string[0], new string[0], elementBinding }) as MappingBinding;
+				new object[] { fromField, toField, elementBinding }) as MappingBinding;
 		}
 	}
 
@@ -65,132 +106,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 			return Activator.CreateInstance(typeof(EnumerableBinding<,,,>)
 				.MakeGenericType(typeof(TFrom), typeof(TTo), fromField.Field.ElementType, toField.Field.ElementType),
-				new object[] { new string[0], new string[0], elementBinding }) as MappingBinding;
-		}
-	}
-
-	internal class EnumerableModelWriter<TToElement> : IModelReadWriter
-	{
-		public IModel Model { get; }
-		public List<TToElement> List { get; }
-
-		public IFieldResolver FieldResolver => throw new NotImplementedException();
-
-		private ObjectReadWriter _objectReadWriter;
-
-		public EnumerableModelWriter(List<TToElement> list, IModel model)
-		{
-			Model = model;
-			List = list;
-		}
-
-		public T ReadField<T>(Span<string> path)
-		{
-			//  todo: how to get a potential source object
-			return default(T);
-		}
-
-		public void WriteField<T>(Span<string> path, T value)
-		{
-			if (path.Length > 1 && path[1] == ".")
-			{
-				//  path taken for object mapping
-				List.Add((TToElement)(object)value);
-				_objectReadWriter = new ObjectReadWriter((TToElement)(object)value, Model, typeof(TToElement));
-			}
-			else
-			{
-				if (_objectReadWriter != null)
-					_objectReadWriter.WriteField<T>(path.Slice(1), value);
-				else
-					//  path taken for straight value binding
-					List.Add((TToElement)(object)value);
-			}
-		}
-
-		public T ReadField<T>(ModelNode modelNode)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteField<T>(ModelNode modelNode, T value)
-		{
-			throw new NotImplementedException();
-		}
-
-		public T ReadField<T>(IFieldReference field)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteField<T>(IFieldReference field, T value)
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	internal class EnumerableModelReader<TFromElement> : IModelReadWriter
-	{
-		public IModel Model { get; }
-		public IEnumerable Source { get; }
-
-		public IFieldResolver FieldResolver => throw new NotImplementedException();
-
-		private IEnumerator _enumerator;
-		private ObjectReadWriter _objectReadWriter;
-
-		public EnumerableModelReader(IEnumerable source, IModel model)
-		{
-			Model = model;
-			Source = source;
-			_enumerator = Source.GetEnumerator();
-		}
-
-		public bool MoveNext()
-		{
-			if (_enumerator.MoveNext())
-			{
-				_objectReadWriter = new ObjectReadWriter(_enumerator.Current, Model, typeof(TFromElement));
-				return true;
-			}
-
-			_objectReadWriter = null;
-			return false;
-		}
-
-		public T ReadField<T>(Span<string> path)
-		{
-			if (path.Length == 1)
-				return _objectReadWriter.ReadField<T>(
-					new Span<string>(
-						path.Slice(1).ToArray().Concat(new[] { "." }).ToArray()
-					));
-			return _objectReadWriter.ReadField<T>(path.Slice(1));
-		}
-
-		public void WriteField<T>(Span<string> path, T value)
-		{
-			throw new NotSupportedException();
-		}
-
-		public T ReadField<T>(ModelNode modelNode)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteField<T>(ModelNode modelNode, T value)
-		{
-			throw new NotImplementedException();
-		}
-
-		public T ReadField<T>(IFieldReference field)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteField<T>(IFieldReference field, T value)
-		{
-			throw new NotImplementedException();
+				new object[] { fromField, toField, elementBinding }) as MappingBinding;
 		}
 	}
 }
