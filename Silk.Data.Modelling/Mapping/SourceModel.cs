@@ -58,6 +58,7 @@ namespace Silk.Data.Modelling.Mapping
 
 	public interface ISourceField : IField
 	{
+		IModel RootModel { get; }
 		string[] FieldPath { get; }
 		ISourceField[] Fields { get; }
 
@@ -67,7 +68,9 @@ namespace Silk.Data.Modelling.Mapping
 
 	public class SourceField<T> : FieldBase<T>, ISourceField, IField<T>
 	{
-		private readonly IModel _sourceModel;
+		private readonly IModel _rootModel;
+
+		public IModel RootModel => _rootModel;
 
 		public string[] FieldPath { get; }
 
@@ -78,7 +81,7 @@ namespace Silk.Data.Modelling.Mapping
 			{
 				if (_fields == null)
 				{
-					var fieldTypeSourceModel = FieldTypeModel.TransformToSourceModel(FieldPath);
+					var fieldTypeSourceModel = FieldTypeModel.TransformToSourceModel(FieldPath, _rootModel);
 					_fields = fieldTypeSourceModel.Fields;
 				}
 				return _fields;
@@ -86,25 +89,25 @@ namespace Silk.Data.Modelling.Mapping
 		}
 
 		public SourceField(string fieldName, bool canRead, bool canWrite,
-			bool isEnumerable, Type elementType, string[] fieldPath, IModel sourceModel) :
+			bool isEnumerable, Type elementType, string[] fieldPath, IModel rootModel) :
 			base(fieldName, canRead, canWrite, isEnumerable, elementType)
 		{
 			FieldPath = fieldPath;
-			_sourceModel = sourceModel;
+			_rootModel = rootModel;
 		}
 
 		public MappingBinding CreateBinding<TTo>(IMappingBindingFactory bindingFactory, ITargetField toField)
 		{
 			return bindingFactory.CreateBinding<T, TTo>(
-				_sourceModel.GetFieldReference(this),
-				_sourceModel.GetFieldReference(toField));
+				_rootModel.GetFieldReference(this),
+				toField.RootModel.GetFieldReference(toField));
 		}
 
 		public MappingBinding CreateBinding<TTo, TBindingOption>(IMappingBindingFactory<TBindingOption> bindingFactory, ITargetField toField, TBindingOption bindingOption)
 		{
 			return bindingFactory.CreateBinding<T, TTo>(
-				_sourceModel.GetFieldReference(this),
-				_sourceModel.GetFieldReference(toField),
+				_rootModel.GetFieldReference(this),
+				toField.RootModel.GetFieldReference(toField),
 				bindingOption);
 		}
 	}

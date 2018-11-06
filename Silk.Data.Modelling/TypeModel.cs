@@ -11,6 +11,11 @@ namespace Silk.Data.Modelling
 	public abstract partial class TypeModel : ModelBase<IPropertyField>
 	{
 		public abstract Type Type { get; }
+
+		protected abstract class PropertyReference
+		{
+			public abstract IReadOnlyCollection<ModelPathNode> Path { get; }
+		}
 	}
 
 	/// <summary>
@@ -74,11 +79,6 @@ namespace Silk.Data.Modelling
 			}
 
 			return (field, pathNodes);
-		}
-
-		private abstract class PropertyReference
-		{
-			public abstract IReadOnlyCollection<ModelPathNode> Path { get; }
 		}
 
 		private class RootReference : PropertyReference, IFieldReference

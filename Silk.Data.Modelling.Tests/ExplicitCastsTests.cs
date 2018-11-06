@@ -13,11 +13,9 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var mapping = CreateMapping<SourcePoco, TargetPoco>();
 			Assert.AreEqual(1, mapping.Bindings.Length);
-			//Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => q.From.SequenceEqual(new[] { "Castable" }) &&
-			//	q.To.SequenceEqual(new[] { "Castable" }) &&
-			//	q is ExplicitCastBinding<SourceCastType, TargetCastType>
-			//	));
-			Assert.Fail("Re-implement test for bindings binding.");
+			Assert.IsTrue(mapping.Bindings.OfType<MappingBinding>().Any(q => 
+				q is ExplicitCastBinding<SourceCastType, TargetCastType>
+				));
 		}
 
 		[TestMethod]

@@ -16,13 +16,16 @@ namespace Silk.Data.Modelling.Mapping
 
 		private readonly string[] _selfPath;
 		private ITargetField _self;
+		private readonly IModel _rootModel;
 
-		public TargetModel(IModel fromModel, ITargetField[] fields, string[] selfPath)
+		public TargetModel(IModel fromModel, ITargetField[] fields, string[] selfPath,
+			IModel rootModel = null)
 		{
 			FromModel = fromModel;
 			Fields = fields;
 
 			_selfPath = selfPath;
+			_rootModel = rootModel ?? fromModel;
 		}
 
 		public ITargetField GetSelf()
@@ -85,6 +88,7 @@ namespace Silk.Data.Modelling.Mapping
 
 	public interface ITargetField : IField
 	{
+		IModel RootModel { get; }
 		string[] FieldPath { get; }
 		ITargetField[] Fields { get; }
 		BindingBuilder CreateBindingBuilder();
@@ -94,7 +98,9 @@ namespace Silk.Data.Modelling.Mapping
 
 	public class TargetField<T> : FieldBase<T>, ITargetField, IField<T>
 	{
-		private readonly IModel _sourceModel;
+		private readonly IModel _rootModel;
+
+		public IModel RootModel => _rootModel;
 
 		public string[] FieldPath { get; }
 
@@ -105,7 +111,7 @@ namespace Silk.Data.Modelling.Mapping
 			{
 				if (_fields == null)
 				{
-					var fieldTypeSourceModel = FieldTypeModel.TransformToTargetModel(FieldPath);
+					var fieldTypeSourceModel = FieldTypeModel.TransformToTargetModel(FieldPath, _rootModel);
 					_fields = fieldTypeSourceModel.Fields;
 				}
 				return _fields;
@@ -113,10 +119,10 @@ namespace Silk.Data.Modelling.Mapping
 		}
 
 		public TargetField(string fieldName, bool canRead, bool canWrite,
-			bool isEnumerable, Type elementType, string[] fieldPath, IModel sourceModel) :
+			bool isEnumerable, Type elementType, string[] fieldPath, IModel rootModel) :
 			base(fieldName, canRead, canWrite, isEnumerable, elementType)
 		{
-			_sourceModel = sourceModel;
+			_rootModel = rootModel;
 			FieldPath = fieldPath;
 		}
 
@@ -127,12 +133,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public Binding.Binding CreateBinding(IAssignmentBindingFactory bindingFactory)
 		{
-			return bindingFactory.CreateBinding<T>(_sourceModel.GetFieldReference(this));
+			return bindingFactory.CreateBinding<T>(_rootModel.GetFieldReference(this));
 		}
 
 		public Binding.Binding CreateBinding<TOption>(IAssignmentBindingFactory<TOption> bindingFactory, TOption option)
 		{
-			return bindingFactory.CreateBinding<T>(_sourceModel.GetFieldReference(this), option);
+			return bindingFactory.CreateBinding<T>(_rootModel.GetFieldReference(this), option);
 		}
 	}
 }

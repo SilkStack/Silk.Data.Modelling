@@ -8,10 +8,12 @@ namespace Silk.Data.Modelling.Mapping
 		private IModel _fromModel;
 		private readonly List<ITargetField> _fields = new List<ITargetField>();
 		private readonly string[] _rootPath;
+		private readonly IModel _rootModel;
 
-		public TargetModelTransformer(string[] rootPath)
+		public TargetModelTransformer(string[] rootPath, IModel rootModel)
 		{
 			_rootPath = rootPath;
+			_rootModel = rootModel;
 		}
 
 		public void VisitModel<TField>(IModel<TField> model) where TField : IField
@@ -23,10 +25,10 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			if (_rootPath == null || _rootPath.Length == 0)
 				_fields.Add(new TargetField<T>(field.FieldName, field.CanRead, field.CanWrite, field.IsEnumerable,
-					field.ElementType, new[] { field.FieldName }, _fromModel));
+					field.ElementType, new[] { field.FieldName }, _rootModel ?? _fromModel));
 			else
 				_fields.Add(new TargetField<T>(field.FieldName, field.CanRead, field.CanWrite, field.IsEnumerable,
-					field.ElementType, _rootPath.Concat(new[] { field.FieldName }).ToArray(), _fromModel));
+					field.ElementType, _rootPath.Concat(new[] { field.FieldName }).ToArray(), _rootModel ?? _fromModel));
 		}
 
 		public TargetModel BuildTargetModel()
@@ -36,7 +38,7 @@ namespace Silk.Data.Modelling.Mapping
 				selfPath = new[] { "." };
 			else
 				selfPath = _rootPath.Concat(new[] { "." }).ToArray();
-			return new TargetModel(_fromModel, _fields.ToArray(), selfPath);
+			return new TargetModel(_fromModel, _fields.ToArray(), selfPath, _rootModel);
 		}
 	}
 }
