@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping.Binding
@@ -43,6 +44,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly IModel _fromModel;
 		private readonly IModel _toModel;
+		private readonly IFieldReferenceMutator _fromMutator;
+		private readonly IFieldReferenceMutator _toMutator;
 
 		public MappingStore MappingStore { get; }
 
@@ -57,12 +60,19 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			}
 		}
 
-		public SubmappingBinding(IModel fromModel, IModel toModel, MappingStore mappingStore, IFieldReference from, IFieldReference to) :
+		public SubmappingBinding(IModel fromModel, IModel toModel, MappingStore mappingStore,
+			IFieldReference from, IFieldReference to) :
 			base(from, to)
 		{
 			_fromModel = fromModel;
 			_toModel = toModel;
 			MappingStore = mappingStore;
+
+			var fromNode = fromModel.CreateFieldResolver().ResolveNode(from);
+			var toNode = toModel.CreateFieldResolver().ResolveNode(to);
+
+			_fromMutator = new Mutator(fromNode.Path);
+			_toMutator = new Mutator(toNode.Path);
 		}
 
 		public override void CopyBindingValue(IModelReadWriter from, IModelReadWriter to)
@@ -70,58 +80,44 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			var value = from.ReadField<TFrom>(From);
 			if (value == null)
 				return;
-			Mapping.PerformMapping(
-				new SubmappingModelReadWriter(from, _fromModel, new string[0]),
-				new SubmappingModelReadWriter(to, _toModel, new string[0])
-				);
+
+			from.FieldResolver.AddMutator(_fromMutator);
+			to.FieldResolver.AddMutator(_toMutator);
+
+			Mapping.PerformMapping(from, to);
+
+			from.FieldResolver.RemoveMutator(_fromMutator);
+			to.FieldResolver.RemoveMutator(_toMutator);
 		}
 
-		private class SubmappingModelReadWriter : IModelReadWriter
+		private class Mutator : IFieldReferenceMutator
 		{
-			public IModel Model { get; }
-			public IModelReadWriter RealReadWriter { get; }
-			public string[] PrefixPath { get; }
+			private readonly IReadOnlyCollection<ModelPathNode> _pathNodes;
 
-			public IFieldResolver FieldResolver => throw new NotImplementedException();
-
-			public SubmappingModelReadWriter(IModelReadWriter modelReadWriter, IModel model,
-				string[] prefixPath)
+			public Mutator(IReadOnlyCollection<ModelPathNode> pathNodes)
 			{
-				Model = model;
-				RealReadWriter = modelReadWriter;
-				PrefixPath = prefixPath;
+				_pathNodes = FixMutatePath(pathNodes);
 			}
 
-			public T ReadField<T>(Span<string> path)
+			public void MutatePath(List<ModelPathNode> pathNodes)
 			{
-				var fixedPath = PrefixPath.Concat(path.ToArray()).ToArray();
-				return RealReadWriter.ReadField<T>(fixedPath);
+				pathNodes.InsertRange(0, _pathNodes);
 			}
 
-			public void WriteField<T>(Span<string> path, T value)
+			private static IReadOnlyCollection<ModelPathNode> FixMutatePath(IReadOnlyCollection<ModelPathNode> pathNodes)
 			{
-				var fixedPath = PrefixPath.Concat(path.ToArray()).ToArray();
-				RealReadWriter.WriteField<T>(fixedPath, value);
+				if (!pathNodes.OfType<FieldPathNode>().Any())
+					return pathNodes;
+				return new List<ModelPathNode>(
+					pathNodes.Select(q => FixMutateNode(q))
+					);
 			}
 
-			public T ReadField<T>(ModelNode modelNode)
+			private static ModelPathNode FixMutateNode(ModelPathNode node)
 			{
-				throw new NotImplementedException();
-			}
-
-			public void WriteField<T>(ModelNode modelNode, T value)
-			{
-				throw new NotImplementedException();
-			}
-
-			public T ReadField<T>(IFieldReference field)
-			{
-				throw new NotImplementedException();
-			}
-
-			public void WriteField<T>(IFieldReference field, T value)
-			{
-				throw new NotImplementedException();
+				if (node.PathNodeType != ModelPathNodeType.Field)
+					return node;
+				return new TreePathNode(node.PathNodeName, node.Field);
 			}
 		}
 	}

@@ -120,18 +120,32 @@ namespace Silk.Data.Modelling
 		private class FieldResolver : IFieldResolver
 		{
 			private readonly TypeModel<T> _model;
+			private readonly List<IFieldReferenceMutator> _mutators
+				= new List<IFieldReferenceMutator>();
 
 			public FieldResolver(TypeModel<T> model)
 			{
 				_model = model;
 			}
 
+			public void AddMutator(IFieldReferenceMutator mutator)
+				=> _mutators.Add(mutator);
+
+			public void RemoveMutator(IFieldReferenceMutator mutator)
+				=> _mutators.Remove(mutator);
+
 			public ModelNode ResolveNode(IFieldReference fieldReference)
 			{
 				switch (fieldReference)
 				{
 					case PropertyReference propertyReference:
-						return new ModelNode(fieldReference.Field, propertyReference.Path);
+						if (_mutators.Count == 0)
+							return new ModelNode(fieldReference.Field, propertyReference.Path);
+
+						var pathCopy = new List<ModelPathNode>(propertyReference.Path);
+						foreach (var mutator in _mutators)
+							mutator.MutatePath(pathCopy);
+						return new ModelNode(fieldReference.Field, pathCopy);
 					default:
 						throw new InvalidOperationException($"Field reference type '{fieldReference.GetType().FullName}' not supported.");
 				}
