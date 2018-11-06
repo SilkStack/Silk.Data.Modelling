@@ -46,7 +46,7 @@ namespace Silk.Data.Modelling.Mapping
 		private ITargetField MakeSelfField<T>()
 		{
 			var enumerableElementType = typeof(T).GetEnumerableElementType();
-			return new TargetField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath, FromModel);
+			return new TargetField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath, _rootModel ?? FromModel);
 		}
 
 		public ITargetField GetField(params string[] fieldPath)

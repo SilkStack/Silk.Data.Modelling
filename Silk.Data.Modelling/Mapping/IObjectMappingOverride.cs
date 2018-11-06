@@ -32,7 +32,8 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			_mappingBuilder
 				.Bind(_targetModel.GetSelf())
-				.AssignUsing<UseFactoryBinding<TFrom,TTo>, Func<TFrom, TTo>>(factory);
+				.From(_sourceModel.GetSelf())
+				.MapUsing<UseFactoryBinding<TFrom, TTo>, Func<TFrom, TTo>>(factory);
 		}
 
 		public PropertyMappingBuilder<T,TFrom, TTo> Bind<T>(Expression<Func<TTo, T>> property)

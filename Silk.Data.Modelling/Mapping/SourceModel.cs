@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Mapping.Binding;
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -13,10 +14,39 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override ISourceField[] Fields { get; }
 
-		public SourceModel(IModel fromModel, ISourceField[] fields)
+		private readonly string[] _selfPath;
+		private ISourceField _self;
+		private readonly IModel _rootModel;
+
+		public SourceModel(IModel fromModel, ISourceField[] fields, string[] selfPath,
+			IModel rootModel = null)
 		{
 			FromModel = fromModel;
 			Fields = fields;
+
+			_selfPath = selfPath;
+			_rootModel = rootModel ?? fromModel;
+		}
+
+		public ISourceField GetSelf()
+		{
+			if (_self != null)
+				return _self;
+
+			var typeModel = FromModel as TypeModel;
+			if (typeModel == null)
+				return null;
+
+			var typeOfSelf = typeModel.Type;
+			_self = typeof(SourceModel).GetTypeInfo().GetDeclaredMethod("MakeSelfField")
+				.MakeGenericMethod(typeOfSelf).Invoke(this, new object[0]) as ISourceField;
+			return _self;
+		}
+
+		private ISourceField MakeSelfField<T>()
+		{
+			var enumerableElementType = typeof(T).GetEnumerableElementType();
+			return new SourceField<T>(".", true, true, enumerableElementType != null, enumerableElementType, _selfPath, _rootModel ?? FromModel);
 		}
 
 		public ISourceField GetField(params string[] fieldPath)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 
 namespace Silk.Data.Modelling.Mapping.Binding
 {

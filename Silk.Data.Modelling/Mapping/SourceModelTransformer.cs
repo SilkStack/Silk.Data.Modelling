@@ -33,7 +33,12 @@ namespace Silk.Data.Modelling.Mapping
 
 		public SourceModel BuildSourceModel()
 		{
-			return new SourceModel(_fromModel, _fields.ToArray());
+			string[] selfPath;
+			if (_rootPath == null || _rootPath.Length == 0)
+				selfPath = new[] { "." };
+			else
+				selfPath = _rootPath.Concat(new[] { "." }).ToArray();
+			return new SourceModel(_fromModel, _fields.ToArray(), selfPath, _rootModel);
 		}
 	}
 }
