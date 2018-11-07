@@ -23,12 +23,11 @@ namespace Silk.Data.Modelling
 			FieldResolver = model.CreateFieldResolver();
 		}
 
-		public T ReadField<T>(Span<string> path)
-			=> ReadField<T>(Model.ResolveNode(path));
+		public T ReadField<T>(IFieldReference field)
+			=> ReadField<T>(FieldResolver.ResolveNode(field));
 
-		public void WriteField<T>(Span<string> path, T value)
-			=> WriteField<T>(Model.ResolveNode(path), value);
-
+		public void WriteField<T>(IFieldReference field, T value)
+			=> WriteField<T>(FieldResolver.ResolveNode(field), value);
 
 		private T ReadField<T>(ModelNode modelNode)
 		{
@@ -113,11 +112,5 @@ namespace Silk.Data.Modelling
 		{
 			return new ObjectReadWriter(instance, TypeModel.GetModelOf(type), type);
 		}
-
-		public T ReadField<T>(IFieldReference field)
-			=> ReadField<T>(FieldResolver.ResolveNode(field));
-
-		public void WriteField<T>(IFieldReference field, T value)
-			=> WriteField<T>(FieldResolver.ResolveNode(field), value);
 	}
 }

@@ -32,23 +32,5 @@ namespace Silk.Data.Modelling
 		/// <param name="field"></param>
 		/// <param name="value"></param>
 		void WriteField<T>(IFieldReference field, T value);
-
-		/// <summary>
-		/// Reads a given field.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		[Obsolete]
-		T ReadField<T>(Span<string> path);
-
-		/// <summary>
-		/// Writes to a given field.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="path"></param>
-		/// <param name="value"></param>
-		[Obsolete]
-		void WriteField<T>(Span<string> path, T value);
 	}
 }
