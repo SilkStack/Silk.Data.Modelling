@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Silk.Data.Modelling.Mapping;
 
 namespace Silk.Data.Modelling
@@ -32,11 +33,20 @@ namespace Silk.Data.Modelling
 		internal TypeModel(IPropertyField[] fields)
 		{
 			Fields = fields;
-			Root = new FieldReference(this, null, new ModelPathNode[] { RootPathNode.Instance });
+			Root = new RootReference(this);
 		}
 
 		public override IFieldResolver CreateFieldResolver()
 			=> new FieldResolver(this);
+
+		public IFieldReference GetFieldReference<TProperty>(Expression<Func<T, TProperty>> field)
+		{
+			if (!(field.Body is MemberExpression memberExpression))
+				return null;
+			var path = new List<string>();
+			PopulatePath(field.Body, path);
+			return GetFieldReference(path);
+		}
 
 		public override IFieldReference GetFieldReference(ISourceField sourceField)
 			=> GetFieldReference(sourceField.FieldPath);
@@ -44,21 +54,31 @@ namespace Silk.Data.Modelling
 		public override IFieldReference GetFieldReference(ITargetField targetField)
 			=> GetFieldReference(targetField.FieldPath);
 
-		private IFieldReference GetFieldReference(string[] path)
+		private IFieldReference GetFieldReference(IList<string> path)
 		{
-			if (path.Length == 1 && path[0] == ".")
+			if (path.Count == 1 && path[0] == ".")
 				return new RootReference(this);
 			var (field, pathNodes) = GetField(path);
 			return new FieldReference(this, field, pathNodes);
 		}
 
-		private (IPropertyField, List<ModelPathNode>) GetField(string[] path)
+		private void PopulatePath(Expression expression, List<string> path)
 		{
-			var pathSpan = new Span<string>(path);
+			if (expression is MemberExpression memberExpression)
+			{
+				var parentExpr = memberExpression.Expression;
+				PopulatePath(parentExpr, path);
+
+				path.Add(memberExpression.Member.Name);
+			}
+		}
+
+		private (IPropertyField, List<ModelPathNode>) GetField(IList<string> path)
+		{
 			var fieldCandidates = Fields;
 			var field = default(IPropertyField);
 			var pathNodes = new List<ModelPathNode>();
-			foreach (var fieldName in pathSpan.Slice(0, pathSpan.Length - 1))
+			foreach (var fieldName in path.Take(path.Count - 1))
 			{
 				field = fieldCandidates.FirstOrDefault(q => q.FieldName == fieldName);
 				if (field == null)
@@ -67,14 +87,14 @@ namespace Silk.Data.Modelling
 				pathNodes.Add(new TreePathNode(fieldName, field));
 			}
 
-			if (path[path.Length - 1] == ".")
+			if (path[path.Count - 1] == ".")
 			{
 				field = default(IPropertyField);
 				pathNodes.Add(RootPathNode.Instance);
 			}
 			else
 			{
-				var fieldName = path[path.Length - 1];
+				var fieldName = path[path.Count - 1];
 				field = fieldCandidates.FirstOrDefault(q => q.FieldName == fieldName);
 				if (field == null)
 					throw new ArgumentException("Invalid field path.", nameof(path));

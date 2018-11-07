@@ -5,13 +5,22 @@ namespace Silk.Data.Modelling.Tests
 	[TestClass]
 	public class ObjectReadWriterTests
 	{
-		private IModel _objectModel = TypeModel.GetModelOf<PocoClass>();
+		private readonly TypeModel<PocoClass> _objectModel;
+		private readonly IFieldReference _propertyReference;
+		private readonly IFieldReference _subPropertyReference;
+
+		public ObjectReadWriterTests()
+		{
+			 _objectModel = TypeModel.GetModelOf<PocoClass>();
+			_propertyReference = _objectModel.GetFieldReference(q => q.Property);
+			_subPropertyReference = _objectModel.GetFieldReference(q => q.Sub.Property);
+		}
 
 		[TestMethod]
 		public void ReadProperty()
 		{
 			var readWriter = new ObjectReadWriter(new PocoClass { Property = 1 }, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }));
+			Assert.AreEqual(1, readWriter.ReadField<int>(_propertyReference));
 		}
 
 		[TestMethod]
@@ -19,7 +28,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var instance = new PocoClass { Property = 1 };
 			var readWriter = new ObjectReadWriter(instance, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Property) }, 2);
+			readWriter.WriteField(_propertyReference, 2);
 			Assert.AreEqual(2, instance.Property);
 		}
 
@@ -27,7 +36,7 @@ namespace Silk.Data.Modelling.Tests
 		public void ReadDeepProperty()
 		{
 			var readWriter = new ObjectReadWriter(new PocoClass { Sub = new SubPocoClass { Property = 1 } }, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(1, readWriter.ReadField<int>(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }));
+			Assert.AreEqual(1, readWriter.ReadField<int>(_subPropertyReference));
 		}
 
 		[TestMethod]
@@ -35,7 +44,7 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var instance = new PocoClass { Sub = new SubPocoClass { Property = 1 } };
 			var readWriter = new ObjectReadWriter(instance, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 2);
+			readWriter.WriteField(_subPropertyReference, 2);
 			Assert.AreEqual(2, instance.Sub.Property);
 		}
 
@@ -43,14 +52,14 @@ namespace Silk.Data.Modelling.Tests
 		public void ReadDefaultWhenPropertyNull()
 		{
 			var readWriter = new ObjectReadWriter(null, _objectModel, typeof(PocoClass));
-			Assert.AreEqual(0, readWriter.ReadField<int>(new[] { nameof(PocoClass.Property) }));
+			Assert.AreEqual(0, readWriter.ReadField<int>(_propertyReference));
 		}
 
 		[TestMethod]
 		public void IgnoreWriteWhenPropertyNull()
 		{
 			var readWriter = new ObjectReadWriter(null, _objectModel, typeof(PocoClass));
-			readWriter.WriteField(new[] { nameof(PocoClass.Sub), nameof(SubPocoClass.Property) }, 2);
+			readWriter.WriteField(_subPropertyReference, 2);
 		}
 
 		[TestMethod]
@@ -58,7 +67,9 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var obj = new PocoClassWithPrivateSetter();
 			var readWriter = new ObjectReadWriter(obj, TypeModel.GetModelOf<PocoClassWithPrivateSetter>(), typeof(PocoClassWithPrivateSetter));
-			readWriter.WriteField<int>(new[] { nameof(PocoClassWithPrivateSetter.Property) }, 5);
+			var propertyReference = TypeModel.GetModelOf<PocoClassWithPrivateSetter>()
+				.GetFieldReference(q => q.Property);
+			readWriter.WriteField<int>(propertyReference, 5);
 			Assert.AreEqual(5, obj.Property);
 		}
 

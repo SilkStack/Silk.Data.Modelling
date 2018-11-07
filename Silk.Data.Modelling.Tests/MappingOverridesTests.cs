@@ -24,7 +24,7 @@ namespace Silk.Data.Modelling.Tests
 			var targetReadWriter = new ObjectReadWriter(null, mapping.ToModel, typeof(ComplexConstructorPoco));
 			mapping.PerformMapping(sourceReadWriter, targetReadWriter);
 
-			var target = targetReadWriter.ReadField<ComplexConstructorPoco>(new[] { "." });
+			var target = targetReadWriter.ReadField<ComplexConstructorPoco>(TypeModel.GetModelOf<ComplexConstructorPoco>().Root);
 			Assert.IsNotNull(target);
 			Assert.AreEqual(2, target.Value);
 		}
