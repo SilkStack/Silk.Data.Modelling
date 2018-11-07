@@ -129,7 +129,7 @@ namespace Silk.Data.Modelling
 			}
 
 			public void AddMutator(IFieldReferenceMutator mutator)
-				=> _mutators.Add(mutator);
+				=> _mutators.Insert(0, mutator);
 
 			public void RemoveMutator(IFieldReferenceMutator mutator)
 				=> _mutators.Remove(mutator);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -34,12 +33,19 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 			var resultWriter = new ObjectReadWriter(result, _toModel, typeof(EnumerableResult));
 			var itemReader = new ObjectReadWriter(null, _fromModel, typeof(TFromElement));
-			itemReader.FieldResolver.AddMutator(_readerMutator);
-			resultWriter.FieldResolver.AddMutator(_writerMutator);
 			foreach (var item in source)
 			{
 				itemReader.WriteField<TFromElement>(_fromSelfFieldReference, item);
+
+				itemReader.FieldResolver.AddMutator(_readerMutator);
+				resultWriter.FieldResolver.AddMutator(_writerMutator);
+
 				ElementBinding.CopyBindingValue(itemReader, resultWriter);
+
+				itemReader.FieldResolver.RemoveMutator(_readerMutator);
+				resultWriter.FieldResolver.RemoveMutator(_writerMutator);
+
+				result.Reset();
 			}
 
 			if (typeof(TTo).IsArray)
@@ -50,10 +56,21 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		private class EnumerableResult : List<TToElement>
 		{
+			private TToElement _last;
+
+			public void Reset()
+			{
+				_last = default(TToElement);
+			}
+
 			public TToElement Element
 			{
-				get => default(TToElement);
-				set => Add(value);
+				get => _last;
+				set
+				{
+					_last = value;
+					Add(value);
+				}
 			}
 		}
 
@@ -61,19 +78,25 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			public void MutatePath(List<ModelPathNode> pathNodes)
 			{
-				pathNodes.Clear();
-				pathNodes.Add(RootPathNode.Instance);
+				pathNodes.RemoveAt(0);
+				if (pathNodes.Count == 0)
+					pathNodes.Add(RootPathNode.Instance);
 			}
 		}
 
 		private class EnumerableWriterMutator : IFieldReferenceMutator
 		{
 			private static readonly FieldPathNode _fieldPathNode = new FieldPathNode("Element", null);
+			private static readonly TreePathNode _treePathNode = new TreePathNode("Element", 
+				TypeModel.GetModelOf<EnumerableResult>().Fields.First(q => q.FieldName == "Element"));
 
 			public void MutatePath(List<ModelPathNode> pathNodes)
 			{
-				pathNodes.Clear();
-				pathNodes.Add(_fieldPathNode);
+				pathNodes.RemoveAt(0);
+				if (pathNodes.Count == 0)
+					pathNodes.Add(_fieldPathNode);
+				else
+					pathNodes.Insert(0, _treePathNode);
 			}
 		}
 	}
