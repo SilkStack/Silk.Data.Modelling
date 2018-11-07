@@ -5,7 +5,7 @@ namespace Silk.Data.Modelling
 	/// <summary>
 	/// Describes a node on a model.
 	/// </summary>
-	public class ModelNode
+	public struct ModelNode
 	{
 		public IField Field { get; }
 		public IReadOnlyCollection<ModelPathNode> Path { get; }
