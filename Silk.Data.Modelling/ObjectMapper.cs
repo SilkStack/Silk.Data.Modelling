@@ -7,7 +7,6 @@ namespace Silk.Data.Modelling
 {
 	public class ObjectMapper : IObjectMapper
 	{
-		private static readonly string[] _selfPath = new[] { "." };
 		private readonly object _syncObject = new object();
 
 		public MappingStore MappingStore { get; }
@@ -67,7 +66,7 @@ namespace Silk.Data.Modelling
 				new ObjectReadWriter(from, mapping.FromModel, from.GetType()),
 				toWriter
 				);
-			return toWriter.ReadField<TTo>(_selfPath);
+			return toWriter.ReadField<TTo>(toModel.Root);
 		}
 
 		public TTo Map<TTo, TFrom>(TFrom from)
@@ -79,7 +78,7 @@ namespace Silk.Data.Modelling
 				new ObjectReadWriter(from, mapping.FromModel, typeof(TFrom)),
 				toWriter
 				);
-			return toWriter.ReadField<TTo>(_selfPath);
+			return toWriter.ReadField<TTo>(toModel.Root);
 		}
 
 		public IEnumerable<TTo> MapAll<TTo>(IEnumerable from)

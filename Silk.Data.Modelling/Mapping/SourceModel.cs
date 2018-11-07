@@ -14,6 +14,8 @@ namespace Silk.Data.Modelling.Mapping
 
 		public override ISourceField[] Fields { get; }
 
+		public override IFieldReference Root => throw new NotImplementedException();
+
 		private readonly string[] _selfPath;
 		private ISourceField _self;
 		private readonly IModel _rootModel;

@@ -1,5 +1,4 @@
 ﻿using Silk.Data.Modelling.Mapping;
-using System;
 
 namespace Silk.Data.Modelling
 {
@@ -13,6 +12,11 @@ namespace Silk.Data.Modelling
 		/// Gets an array of fields on the model.
 		/// </summary>
 		IField[] Fields { get; }
+
+		/// <summary>
+		/// Gets a reference to the root of the model.
+		/// </summary>
+		IFieldReference Root { get; }
 
 		/// <summary>
 		/// Performs all relevant calls to the given <see cref="IModelTransformer"/> to transform the model type.

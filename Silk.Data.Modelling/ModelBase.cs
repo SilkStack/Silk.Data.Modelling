@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Silk.Data.Modelling.Mapping;
+﻿using Silk.Data.Modelling.Mapping;
 
 namespace Silk.Data.Modelling
 {
@@ -14,6 +11,8 @@ namespace Silk.Data.Modelling
 	{
 		public abstract TField[] Fields { get; }
 		IField[] IModel.Fields => Fields;
+
+		public abstract IFieldReference Root { get; }
 
 		public virtual void Transform(IModelTransformer transformer)
 		{

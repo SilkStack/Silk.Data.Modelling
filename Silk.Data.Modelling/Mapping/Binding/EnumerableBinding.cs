@@ -11,7 +11,6 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly TypeModel<EnumerableResult> _toModel = TypeModel.GetModelOf<EnumerableResult>();
 		private readonly TypeModel<TFromElement> _fromModel = TypeModel.GetModelOf<TFromElement>();
-		private readonly IFieldReference _fromSelfFieldReference;
 		private readonly EnumerableReaderMutator _readerMutator
 			= new EnumerableReaderMutator();
 		private readonly EnumerableWriterMutator _writerMutator
@@ -20,8 +19,6 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		public EnumerableBinding(IFieldReference from, IFieldReference to, MappingBinding elementBinding) : base(from, to)
 		{
 			ElementBinding = elementBinding;
-
-			_fromSelfFieldReference = _fromModel.GetFieldReference(_fromModel.TransformToSourceModel().GetSelf());
 		}
 
 		public MappingBinding ElementBinding { get; }
@@ -35,7 +32,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			var itemReader = new ObjectReadWriter(null, _fromModel, typeof(TFromElement));
 			foreach (var item in source)
 			{
-				itemReader.WriteField<TFromElement>(_fromSelfFieldReference, item);
+				itemReader.WriteField<TFromElement>(_fromModel.Root, item);
 
 				itemReader.FieldResolver.AddMutator(_readerMutator);
 				resultWriter.FieldResolver.AddMutator(_writerMutator);

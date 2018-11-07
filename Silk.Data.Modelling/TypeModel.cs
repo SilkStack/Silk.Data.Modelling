@@ -27,9 +27,12 @@ namespace Silk.Data.Modelling
 
 		public override IPropertyField[] Fields { get; }
 
+		public override IFieldReference Root { get; }
+
 		internal TypeModel(IPropertyField[] fields)
 		{
 			Fields = fields;
+			Root = new FieldReference(this, null, new ModelPathNode[] { RootPathNode.Instance });
 		}
 
 		public override IFieldResolver CreateFieldResolver()
