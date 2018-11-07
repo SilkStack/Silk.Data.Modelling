@@ -21,13 +21,6 @@ namespace Silk.Data.Modelling
 		void Transform(IModelTransformer transformer);
 
 		/// <summary>
-		/// Resolves a path to the specified model node.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		ModelNode ResolveNode(Span<string> path);
-
-		/// <summary>
 		/// Gets a field reference for a source field.
 		/// </summary>
 		/// <param name="sourceField"></param>
