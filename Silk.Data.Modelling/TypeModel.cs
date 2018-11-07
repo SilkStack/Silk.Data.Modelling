@@ -12,9 +12,9 @@ namespace Silk.Data.Modelling
 	{
 		public abstract Type Type { get; }
 
-		protected abstract class PropertyReference
+		protected interface IPropertyReference
 		{
-			public abstract IReadOnlyCollection<ModelPathNode> Path { get; }
+			IReadOnlyCollection<ModelPathNode> Path { get; }
 		}
 	}
 
@@ -81,7 +81,7 @@ namespace Silk.Data.Modelling
 			return (field, pathNodes);
 		}
 
-		private class RootReference : PropertyReference, IFieldReference
+		private class RootReference : IPropertyReference, IFieldReference
 		{
 			private readonly TypeModel<T> _model;
 
@@ -89,7 +89,7 @@ namespace Silk.Data.Modelling
 
 			public IModel Model => _model;
 
-			public override IReadOnlyCollection<ModelPathNode> Path { get; }
+			public IReadOnlyCollection<ModelPathNode> Path { get; }
 
 			public RootReference(TypeModel<T> model)
 			{
@@ -98,7 +98,7 @@ namespace Silk.Data.Modelling
 			}
 		}
 
-		private class FieldReference : PropertyReference, IFieldReference
+		private class FieldReference : IPropertyReference, IFieldReference
 		{
 			private readonly TypeModel<T> _model;
 			private readonly IPropertyField _field;
@@ -106,7 +106,7 @@ namespace Silk.Data.Modelling
 			public IField Field => _field;
 			public IModel Model => _model;
 
-			public override IReadOnlyCollection<ModelPathNode> Path { get; }
+			public IReadOnlyCollection<ModelPathNode> Path { get; }
 
 			public FieldReference(TypeModel<T> model, IPropertyField propertyField,
 				IReadOnlyCollection<ModelPathNode> path)
@@ -138,7 +138,7 @@ namespace Silk.Data.Modelling
 			{
 				switch (fieldReference)
 				{
-					case PropertyReference propertyReference:
+					case IPropertyReference propertyReference:
 						if (_mutators.Count == 0)
 							return new ModelNode(fieldReference.Field, propertyReference.Path);
 
