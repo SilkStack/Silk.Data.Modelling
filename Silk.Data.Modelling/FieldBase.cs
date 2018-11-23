@@ -26,6 +26,8 @@ namespace Silk.Data.Modelling
 		}
 		TypeModel IField.FieldTypeModel => FieldTypeModel;
 
+		public virtual IModel FieldModel => FieldTypeModel;
+
 		protected FieldBase(string fieldName, bool canRead, bool canWrite, bool isEnumerable,
 			Type elementType)
 		{

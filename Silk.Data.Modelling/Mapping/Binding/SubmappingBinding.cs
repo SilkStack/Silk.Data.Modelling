@@ -24,7 +24,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			else
 			{
 				return new SubmappingBinding<TFrom, TTo>(
-					fromField.Field.FieldTypeModel, toField.Field.FieldTypeModel,
+					fromField.Field.FieldModel, toField.Field.FieldModel,
 					mappingStore, fromField, toField);
 			}
 		}
