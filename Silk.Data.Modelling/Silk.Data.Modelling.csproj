@@ -9,7 +9,7 @@
 
 Part of the SilkStack project.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3.0.1</Version>
+    <Version>0.3.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
