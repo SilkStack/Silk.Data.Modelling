@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling
 		public List<IMappingConvention> Conventions { get; }
 			= new List<IMappingConvention>();
 
-		public GetBindCandidatePairs BindingCandidatesDelegate { get; }
+		public GetBindCandidatePairs BindingCandidatesDelegate { get; set; }
 			= ConventionUtilities.GetBindCandidatePairs;
 
 		public void AddMappingOverride<TFrom, TTo>(IObjectMappingOverride<TFrom, TTo> mappingOverride)
