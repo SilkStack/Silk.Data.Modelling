@@ -30,11 +30,7 @@ namespace Silk.Data.Modelling
 				if (MappingStore.TryGetMapping(fromModel, toModel, out mapping))
 					return mapping;
 
-				var mappingBuilder = new MappingBuilder(fromModel, toModel, MappingStore);
-				foreach (var convention in Options.Conventions)
-				{
-					mappingBuilder.AddConvention(convention);
-				}
+				var mappingBuilder = new MappingBuilder(fromModel, toModel, Options, MappingStore);
 				return mappingBuilder.BuildMapping();
 			}
 		}

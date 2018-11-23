@@ -28,8 +28,9 @@ namespace Silk.Data.Modelling.Tests
 			var fromPocoModel = TypeModel.GetModelOf<TFrom>();
 			var toPocoModel = TypeModel.GetModelOf<TTo>();
 
-			var builder = new MappingBuilder(fromPocoModel, toPocoModel);
-			builder.AddConvention(CopySameTypes.Instance);
+			var options = new MappingOptions();
+			options.Conventions.Add(CopySameTypes.Instance);
+			var builder = new MappingBuilder(fromPocoModel, toPocoModel, options);
 			return builder.BuildMapping();
 		}
 

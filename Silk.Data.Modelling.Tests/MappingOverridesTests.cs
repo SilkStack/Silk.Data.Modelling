@@ -100,14 +100,10 @@ namespace Silk.Data.Modelling.Tests
 			var fromPocoModel = TypeModel.GetModelOf<TFrom>();
 			var toPocoModel = TypeModel.GetModelOf<TTo>();
 
-			var builder = new MappingBuilder(fromPocoModel, toPocoModel);
-			if (mappingOptions != null)
-			{
-				foreach (var convention in mappingOptions.Conventions)
-				{
-					builder.AddConvention(convention);
-				}
-			}
+			if (mappingOptions == null)
+				mappingOptions = new MappingOptions();
+
+			var builder = new MappingBuilder(fromPocoModel, toPocoModel, mappingOptions);
 			return builder.BuildMapping();
 		}
 

@@ -14,7 +14,7 @@ namespace Silk.Data.Modelling.Mapping
 			if (mappingOverridesConvention == null)
 				return;
 
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
+			foreach (var (fromField, toField) in builder.BindingCandidatesDelegate(fromModel, toModel, builder))
 			{
 				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
 
@@ -31,12 +31,12 @@ namespace Silk.Data.Modelling.Mapping
 					if (!builder.MappingStore.TryGetMapping(fromTypeModel, toTypeModel, out var subMapping) &&
 						!builder.BuilderStack.IsBeingMapped(fromTypeModel, toTypeModel))
 					{
-						var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
-							builder.MappingStore, builder.BuilderStack);
+						var options = new MappingOptions();
 						foreach (var convention in builder.Conventions)
-						{
-							subBuilder.AddConvention(convention);
-						}
+							options.Conventions.Add(convention);
+
+						var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
+							options, builder.MappingStore, builder.BuilderStack);
 						subMapping = subBuilder.BuildMapping();
 					}
 

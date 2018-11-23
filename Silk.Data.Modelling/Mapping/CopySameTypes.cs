@@ -9,7 +9,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
+			foreach (var (fromField, toField) in builder.BindingCandidatesDelegate(fromModel, toModel, builder)
 				.Where(q => AreTypesCompatible(q.sourceField, q.targetField)))
 			{
 				builder

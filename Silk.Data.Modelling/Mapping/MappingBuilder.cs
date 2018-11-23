@@ -15,14 +15,19 @@ namespace Silk.Data.Modelling.Mapping
 		public IReadOnlyCollection<IMappingConvention> Conventions => _conventions;
 		public MappingStore MappingStore { get; }
 		public MappingBuilderStack BuilderStack { get; }
+		public GetBindCandidatePairs BindingCandidatesDelegate { get; }
 
-		public MappingBuilder(IModel fromModel, IModel toModel,
+		public MappingBuilder(IModel fromModel, IModel toModel, MappingOptions options,
 			MappingStore mappingStore = null, MappingBuilderStack builderStack = null)
 		{
 			FromModel = fromModel;
 			ToModel = toModel;
 			MappingStore = mappingStore ?? new MappingStore();
 			BuilderStack = builderStack ?? new MappingBuilderStack();
+
+			foreach (var convention in options.Conventions)
+				AddConvention(convention);
+			BindingCandidatesDelegate = options.BindingCandidatesDelegate;
 		}
 
 		public bool IsBound(ITargetField field)
@@ -42,13 +47,7 @@ namespace Silk.Data.Modelling.Mapping
 			return builder;
 		}
 
-		public void AddConvention<T>()
-			where T : IMappingConvention, new()
-		{
-			AddConvention(new T());
-		}
-
-		public void AddConvention(IMappingConvention convention)
+		private void AddConvention(IMappingConvention convention)
 		{
 			_conventions.Add(convention);
 		}

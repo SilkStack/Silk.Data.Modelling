@@ -11,8 +11,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			//foreach (var toField in toModel.Fields.Where(q => q.CanWrite && !builder.IsBound(q)))
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder))
+			foreach (var (fromField, toField) in builder.BindingCandidatesDelegate(fromModel, toModel, builder))
 			{
 				var (fromType, toType) = ConventionUtilities.GetCompareTypes(fromField, toField);
 				if (fromType != typeof(string))

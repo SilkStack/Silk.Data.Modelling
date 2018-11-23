@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace Silk.Data.Modelling
 {
+	public delegate IEnumerable<(ISourceField sourceField, ITargetField targetField)> GetBindCandidatePairs(SourceModel fromModel, TargetModel toModel, MappingBuilder builder);
+
 	public class MappingOptions
 	{
 		public static MappingOptions DefaultObjectMappingOptions { get; }
@@ -36,6 +38,9 @@ namespace Silk.Data.Modelling
 
 		public List<IMappingConvention> Conventions { get; }
 			= new List<IMappingConvention>();
+
+		public GetBindCandidatePairs BindingCandidatesDelegate { get; }
+			= ConventionUtilities.GetBindCandidatePairs;
 
 		public void AddMappingOverride<TFrom, TTo>(IObjectMappingOverride<TFrom, TTo> mappingOverride)
 		{

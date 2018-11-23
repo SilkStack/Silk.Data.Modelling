@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void CreateBindings(SourceModel fromModel, TargetModel toModel, MappingBuilder builder)
 		{
-			foreach (var (fromField, toField) in ConventionUtilities.GetBindCandidatePairs(fromModel, toModel, builder)
+			foreach (var (fromField, toField) in builder.BindingCandidatesDelegate(fromModel, toModel, builder)
 				.Where(q => IsReferenceType(q.sourceField.FieldType) && IsReferenceType(q.targetField.FieldType)))
 			{
 				var fromElementType = fromField.ElementType;
@@ -39,12 +39,12 @@ namespace Silk.Data.Modelling.Mapping
 				if (!builder.MappingStore.TryGetMapping(fromTypeModel, toTypeModel, out var subMapping) &&
 					!builder.BuilderStack.IsBeingMapped(fromTypeModel, toTypeModel))
 				{
-					var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
-						builder.MappingStore, builder.BuilderStack);
+					var options = new MappingOptions();
 					foreach (var convention in builder.Conventions)
-					{
-						subBuilder.AddConvention(convention);
-					}
+						options.Conventions.Add(convention);
+
+					var subBuilder = new MappingBuilder(fromTypeModel, toTypeModel,
+						options, builder.MappingStore, builder.BuilderStack);
 					subMapping = subBuilder.BuildMapping();
 				}
 
