@@ -11,6 +11,12 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 		where TLeftField : IField
 		where TRightField : IField
 	{
+		/// <summary>
+		/// Get an enumerable of intersect candidates between the two provided models.
+		/// </summary>
+		/// <param name="leftModel"></param>
+		/// <param name="rightModel"></param>
+		/// <returns></returns>
 		IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(
 			TLeftModel leftModel, TRightModel rightModel
 			);

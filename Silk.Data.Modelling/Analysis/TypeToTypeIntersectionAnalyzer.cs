@@ -23,7 +23,7 @@ namespace Silk.Data.Modelling.Analysis
 		{
 			if (intersectCandidateSources == null)
 			{
-				CandidateSources.Add(new ExactNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+				CandidateSources.Add(new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 				CandidateSources.Add(new FlattenedNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 
 				return;

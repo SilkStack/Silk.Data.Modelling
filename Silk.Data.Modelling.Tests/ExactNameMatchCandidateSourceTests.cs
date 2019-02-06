@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling.Tests
 		[TestMethod]
 		public void GetIntersectCandidates_Includes_Candidates_With_Same_Names()
 		{
-			var candidateSource = new ExactNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidateSource = new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var candidates = candidateSource.GetIntersectCandidates(LeftTypeModel, RightTypeModel);
 			var testCandidate = candidates.FirstOrDefault(candidate => candidate.LeftField.FieldName == candidate.RightField.FieldName);
 			Assert.IsNotNull(testCandidate, "No intersect candidate with identical names found.");
@@ -22,7 +22,7 @@ namespace Silk.Data.Modelling.Tests
 		[TestMethod]
 		public void GetIntersectCandidates_Excludes_Candidates_With_Different_Names()
 		{
-			var candidateSource = new ExactNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidateSource = new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var candidates = candidateSource.GetIntersectCandidates(LeftTypeModel, RightTypeModel);
 			var testCandidate = candidates.FirstOrDefault(candidate => candidate.LeftField.FieldName != candidate.RightField.FieldName);
 			Assert.IsNull(testCandidate, "Intersect candidate with mismatched names found.");

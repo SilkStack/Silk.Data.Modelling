@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling.Tests
 		public void CreateIntersection_Finds_SameName_And_DataType()
 		{
 			var analyzer = new TypeToTypeIntersectionAnalyzer(
-				new[] { new ExactNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>() },
+				new[] { new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>() },
 				new[] { new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>() }
 				);
 			var leftModel = TypeModel.GetModelOf<Model>();

@@ -15,20 +15,48 @@ namespace Silk.Data.Modelling.Analysis
 		where TLeftField : IField
 		where TRightField : IField
 	{
+		/// <summary>
+		/// Gets a writable collection of intersect candidate sources.
+		/// </summary>
 		public ICollection<IIntersectCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>> CandidateSources { get; }
 			= new List<IIntersectCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>>();
 
+		/// <summary>
+		/// Gets a wrtiable collection of intersection rules.
+		/// </summary>
 		public ICollection<IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>> IntersectionRules { get; }
 			= new List<IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>>();
 
+		/// <summary>
+		/// Get all intersection candidates from candidate sources.
+		/// </summary>
+		/// <param name="leftModel"></param>
+		/// <param name="rightModel"></param>
+		/// <returns></returns>
 		protected virtual IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>[] GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
 			=> CandidateSources.SelectMany(source => source.GetIntersectCandidates(leftModel, rightModel)).ToArray();
 
+		/// <summary>
+		/// Create an IntersectAnalysis object to hold the analysis state.
+		/// </summary>
+		/// <param name="leftModel"></param>
+		/// <param name="rightModel"></param>
+		/// <returns></returns>
 		protected virtual IntersectAnalysis CreateAnalysis(TLeftModel leftModel, TRightModel rightModel)
 			=> new IntersectAnalysis(leftModel, rightModel);
 
+		/// <summary>
+		/// Factory to produce the final intersection instance.
+		/// </summary>
+		/// <param name="analysis"></param>
+		/// <returns></returns>
 		protected abstract IIntersection<TLeftModel, TLeftField, TRightModel, TRightField> CreateIntersection(IntersectAnalysis analysis);
 
+		/// <summary>
+		/// Populate the IntersectAnalysis with IntersectFields from valid rules matches from the provided candidates.
+		/// </summary>
+		/// <param name="analysis"></param>
+		/// <param name="intersectCandidates"></param>
 		protected virtual void ApplyValidIntersectionCandidates(IntersectAnalysis analysis, IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>[] intersectCandidates)
 		{
 			foreach (var candidate in intersectCandidates)
@@ -59,6 +87,9 @@ namespace Silk.Data.Modelling.Analysis
 			return CreateIntersection(analysis);
 		}
 
+		/// <summary>
+		/// Analysis state object.
+		/// </summary>
 		protected class IntersectAnalysis
 		{
 			private List<IntersectedFields<TLeftField, TRightField>> _intersectedFields

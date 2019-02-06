@@ -2,6 +2,13 @@
 
 namespace Silk.Data.Modelling.Analysis.Rules
 {
+	/// <summary>
+	/// Intersection rule for matched data types.
+	/// </summary>
+	/// <typeparam name="TLeftModel"></typeparam>
+	/// <typeparam name="TLeftField"></typeparam>
+	/// <typeparam name="TRightModel"></typeparam>
+	/// <typeparam name="TRightField"></typeparam>
 	public class SameDataTypeRule<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
