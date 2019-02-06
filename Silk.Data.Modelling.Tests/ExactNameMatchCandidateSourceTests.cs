@@ -43,6 +43,17 @@ namespace Silk.Data.Modelling.Tests
 			Assert.IsNull(testCandidate, "Intersect candidate with mismatched names found.");
 		}
 
+		[TestMethod]
+		public void GetIntersectCandidates_Stops_At_MaxDepth()
+		{
+			var candidateSource = new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
+			{
+				MaxDepth = 1
+			};
+			var candidates = candidateSource.GetIntersectCandidates(LeftTypeModel, LeftTypeModel);
+			Assert.AreEqual(2, candidates.Count(), "Too many candidates found.");
+		}
+
 		private class LeftModel
 		{
 			public string SameNameProperty { get; set; }
