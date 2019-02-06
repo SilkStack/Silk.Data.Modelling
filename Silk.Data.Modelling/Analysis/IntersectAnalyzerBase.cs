@@ -105,15 +105,11 @@ namespace Silk.Data.Modelling.Analysis
 				RightModel = rightModel;
 			}
 
-			public bool IsLeftFieldAlreadyPaired(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate)
-			{
-				return false;
-			}
+			public virtual bool IsLeftFieldAlreadyPaired(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate)
+				=> _intersectedFields.Any(intersectedFields => ReferenceEquals(intersectedFields.LeftField, intersectCandidate.LeftField));
 
-			public void AddIntersectedFields(IntersectedFields<TLeftField, TRightField> intersectedFields)
-			{
-				_intersectedFields.Add(intersectedFields);
-			}
+			public virtual void AddIntersectedFields(IntersectedFields<TLeftField, TRightField> intersectedFields)
+				=>_intersectedFields.Add(intersectedFields);
 		}
 	}
 }
