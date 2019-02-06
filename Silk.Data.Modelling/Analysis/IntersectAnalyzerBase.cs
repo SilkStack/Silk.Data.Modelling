@@ -56,20 +56,7 @@ namespace Silk.Data.Modelling.Analysis
 				}
 			}
 
-			foreach (var candidate in intersectCandidates)
-			{
-				if (analysis.IsLeftFieldAlreadyPaired(candidate))
-					continue;
-
-				foreach (var rule in IntersectionRules)
-				{
-					if (rule.IsValidIntersection(candidate, out var intersectedFields))
-					{
-						analysis.AddIntersectedFields(intersectedFields);
-						break;
-					}
-				}
-			}
+			ApplyValidIntersectionCandidates(analysis, intersectCandidates);
 		}
 
 		protected virtual void ApplyValidIntersectionCandidates(IntersectAnalysis analysis, IntersectCandidate[] intersectCandidates)
