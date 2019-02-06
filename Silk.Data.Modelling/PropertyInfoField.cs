@@ -22,6 +22,11 @@ namespace Silk.Data.Modelling
 
 		private PropertyInfoField() { }
 
+		/// <summary>
+		/// Create a PropertyInfoField from a PropertyInfo instance.
+		/// </summary>
+		/// <param name="propertyInfo"></param>
+		/// <returns></returns>
 		public static PropertyInfoField CreateFromPropertyInfo(PropertyInfo propertyInfo)
 		{
 			return new PropertyInfoField

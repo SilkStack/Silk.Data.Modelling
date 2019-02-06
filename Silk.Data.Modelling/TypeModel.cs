@@ -12,6 +12,9 @@ namespace Silk.Data.Modelling
 		IReadOnlyList<IField> IModel.Fields => Fields;
 	}
 
+	/// <summary>
+	/// Data model structure of a CLR type.
+	/// </summary>
 	public class TypeModel<T> : TypeModel
 	{
 		private readonly IReadOnlyList<PropertyInfoField> _fields;
