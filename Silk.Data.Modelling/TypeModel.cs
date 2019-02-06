@@ -19,13 +19,11 @@ namespace Silk.Data.Modelling
 	/// </summary>
 	public class TypeModel<T> : TypeModel
 	{
-		private readonly IReadOnlyList<PropertyInfoField> _fields;
-
-		public override IReadOnlyList<PropertyInfoField> Fields => _fields;
+		public override IReadOnlyList<PropertyInfoField> Fields { get; }
 
 		public TypeModel(IReadOnlyList<PropertyInfoField> fields)
 		{
-			_fields = fields;
+			Fields = fields;
 		}
 
 		public override IEnumerable<PropertyInfoField> GetPathFields(IFieldPath<PropertyInfoField> fieldPath)
