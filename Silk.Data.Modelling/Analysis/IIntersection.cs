@@ -14,6 +14,11 @@
 		/// Gets the right model in the relationship.
 		/// </summary>
 		IModel RightModel { get; }
+
+		/// <summary>
+		/// Gets an array of intersected fields.
+		/// </summary>
+		IntersectedFields[] IntersectedFields { get; }
 	}
 
 	/// <summary>
@@ -34,5 +39,10 @@
 		/// Gets the right model in the relationship.
 		/// </summary>
 		new TRightModel RightModel { get; }
+
+		/// <summary>
+		/// Gets an array of intersected fields.
+		/// </summary>
+		new IntersectedFields<TLeftField, TRightField>[] IntersectedFields { get; }
 	}
 }

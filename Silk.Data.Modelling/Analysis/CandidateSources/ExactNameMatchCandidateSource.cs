@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Silk.Data.Modelling.Analysis.CandidateSources
 {
@@ -12,7 +11,19 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	{
 		public IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
 		{
-			throw new NotImplementedException();
+			//  todo: descend the field heirarchy to find exact path matches
+
+			foreach (var leftField in leftModel.Fields)
+			{
+				foreach (var rightField in rightModel.Fields)
+				{
+					if (leftField.FieldName == rightField.FieldName)
+						yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
+							leftModel, leftField,
+							rightModel, rightField
+							);
+				}
+			}
 		}
 	}
 }

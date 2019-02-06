@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = new IntersectedFields<TLeftField, TRightField>();
+			intersectedFields = new IntersectedFields<TLeftField, TRightField>(intersectCandidate.LeftField, intersectCandidate.RightField);
 			return true;
 		}
 	}

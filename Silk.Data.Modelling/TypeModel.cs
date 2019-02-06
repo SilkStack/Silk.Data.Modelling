@@ -3,7 +3,7 @@
 namespace Silk.Data.Modelling
 {
 	/// <summary>
-	/// Data model structure of a CLR type.
+	/// Data model of a CLR type.
 	/// </summary>
 	public abstract partial class TypeModel : IModel<PropertyInfoField>
 	{
@@ -13,7 +13,7 @@ namespace Silk.Data.Modelling
 	}
 
 	/// <summary>
-	/// Data model structure of a CLR type.
+	/// Data model of a CLR type.
 	/// </summary>
 	public class TypeModel<T> : TypeModel
 	{

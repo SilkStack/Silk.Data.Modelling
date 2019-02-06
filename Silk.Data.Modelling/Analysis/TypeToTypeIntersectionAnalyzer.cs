@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Analysis.Rules;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Analysis
 {
@@ -48,7 +49,7 @@ namespace Silk.Data.Modelling.Analysis
 		protected override IIntersection<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateIntersection(
 			IntersectAnalysis analysis)
 		{
-			return new TypeToTypeIntersection(analysis.LeftModel, analysis.RightModel);
+			return new TypeToTypeIntersection(analysis.LeftModel, analysis.RightModel, analysis.IntersectedFields.ToArray());
 		}
 	}
 }

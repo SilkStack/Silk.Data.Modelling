@@ -15,10 +15,16 @@
 
 		IModel IIntersection.RightModel => RightModel;
 
-		protected IntersectionBase(TLeftModel leftModel, TRightModel rightModel)
+		public IntersectedFields<TLeftField, TRightField>[] IntersectedFields { get; }
+
+		IntersectedFields[] IIntersection.IntersectedFields => IntersectedFields;
+
+		protected IntersectionBase(TLeftModel leftModel, TRightModel rightModel,
+			IntersectedFields<TLeftField, TRightField>[] intersectedFields)
 		{
 			LeftModel = leftModel;
 			RightModel = rightModel;
+			IntersectedFields = intersectedFields;
 		}
 	}
 }
