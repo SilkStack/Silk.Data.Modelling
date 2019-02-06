@@ -20,6 +20,21 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		[TestMethod]
+		public void GetIntersectCandidates_Includes_Nested_Candidates_With_Identical_Paths()
+		{
+			var candidateSource = new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidates = candidateSource.GetIntersectCandidates(LeftTypeModel, RightTypeModel);
+			//  should find `Length` or similar fields on `string` from `SomeNameProperty`.
+			var testCandidate = candidates.FirstOrDefault(candidate =>
+				candidate.LeftPath.Fields.Count > 1 &&
+				candidate.LeftPath.Fields.Select(q => q.FieldName).SequenceEqual(
+					candidate.RightPath.Fields.Select(q => q.FieldName)
+					)
+				);
+			Assert.IsNotNull(testCandidate, "No intersect candidate with identical paths found.");
+		}
+
+		[TestMethod]
 		public void GetIntersectCandidates_Excludes_Candidates_With_Different_Names()
 		{
 			var candidateSource = new ExactPathMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();

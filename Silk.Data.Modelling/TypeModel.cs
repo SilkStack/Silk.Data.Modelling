@@ -10,6 +10,8 @@ namespace Silk.Data.Modelling
 		public abstract IReadOnlyList<PropertyInfoField> Fields { get; }
 
 		IReadOnlyList<IField> IModel.Fields => Fields;
+
+		public abstract IEnumerable<PropertyInfoField> GetPathFields(IFieldPath<PropertyInfoField> fieldPath);
 	}
 
 	/// <summary>
@@ -25,5 +27,9 @@ namespace Silk.Data.Modelling
 		{
 			_fields = fields;
 		}
+
+		public override IEnumerable<PropertyInfoField> GetPathFields(IFieldPath<PropertyInfoField> fieldPath)
+			//  todo: if FieldDataType is an enumerable type should the element type be modelled or the the enumerable type?
+			=> GetModelOf(fieldPath.FinalField.FieldDataType).Fields;
 	}
 }

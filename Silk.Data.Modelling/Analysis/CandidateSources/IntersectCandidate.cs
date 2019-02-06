@@ -14,29 +14,36 @@
 		where TRightField : IField
 	{
 		/// <summary>
+		/// Gets the FieldPath for the left-side of the candidate.
+		/// </summary>
+		public FieldPath<TLeftModel, TLeftField> LeftPath { get; }
+
+		/// <summary>
+		/// Gets the FieldPath for the right-side of the candidate.
+		/// </summary>
+		public FieldPath<TRightModel, TRightField> RightPath { get; }
+
+		/// <summary>
 		/// Gets the LeftModel that LeftField is from.
 		/// </summary>
-		public TLeftModel LeftModel { get; }
+		public TLeftModel LeftModel => LeftPath.Model;
 		/// <summary>
 		/// Gets the LeftField of the candidate.
 		/// </summary>
-		public TLeftField LeftField { get; }
+		public TLeftField LeftField => LeftPath.FinalField;
 		/// <summary>
 		/// Gets the RightModel that RightField is from.
 		/// </summary>
-		public TRightModel RightModel { get; }
+		public TRightModel RightModel => RightPath.Model;
 		/// <summary>
 		/// Gets the RightField of the candidate.
 		/// </summary>
-		public TRightField RightField { get; }
+		public TRightField RightField => RightPath.FinalField;
 
-		public IntersectCandidate(TLeftModel leftModel, TLeftField leftField,
-			TRightModel rightModel, TRightField rightField)
+		public IntersectCandidate(FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath)
 		{
-			LeftModel = leftModel;
-			LeftField = leftField;
-			RightModel = rightModel;
-			RightField = rightField;
+			LeftPath = leftPath;
+			RightPath = rightPath;
 		}
 	}
 }

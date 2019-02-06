@@ -16,8 +16,16 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var rule = new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				NullableTypeModel, NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
-				NullableTypeModel, NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue))
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
+					)
 				);
 
 			var result = rule.IsValidIntersection(candidate, out var intersectedFields);
@@ -31,8 +39,16 @@ namespace Silk.Data.Modelling.Tests
 		{
 			var rule = new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				NullableTypeModel, NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
-				NullableTypeModel, NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.Value))
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.Value)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.Value)) }
+					)
 				);
 
 			var result = rule.IsValidIntersection(candidate, out var intersectedFields);

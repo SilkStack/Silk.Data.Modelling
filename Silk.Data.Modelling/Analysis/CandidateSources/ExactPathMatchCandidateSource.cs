@@ -18,17 +18,36 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	{
 		public IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
 		{
-			//  todo: descend the field heirarchy to find exact path matches
+			return SearchFields(
+				leftModel.Fields,
+				rightModel.Fields,
+				new FieldPath<TLeftModel, TLeftField>(leftModel, default(TLeftField), new TLeftField[0]),
+				new FieldPath<TRightModel, TRightField>(rightModel, default(TRightField), new TRightField[0])
+				);
 
-			foreach (var leftField in leftModel.Fields)
+			IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> SearchFields(
+				IEnumerable<TLeftField> leftFields,
+				IEnumerable<TRightField> rightFields,
+				FieldPath<TLeftModel, TLeftField> leftPath,
+				FieldPath<TRightModel, TRightField> rightPath
+				)
 			{
-				foreach (var rightField in rightModel.Fields)
+				foreach (var leftField in leftFields)
 				{
-					if (leftField.FieldName == rightField.FieldName)
-						yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
-							leftModel, leftField,
-							rightModel, rightField
-							);
+					foreach (var rightField in rightFields)
+					{
+						if (leftField.FieldName == rightField.FieldName)
+						{
+							var newLeftPath = leftPath.Concat(leftField);
+							var newRightPath = rightPath.Concat(rightField);
+							yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
+								newLeftPath, newRightPath
+								);
+
+							foreach (var subCandidate in SearchFields(leftModel.GetPathFields(newLeftPath), rightModel.GetPathFields(newRightPath), newLeftPath, newRightPath))
+								yield return subCandidate;
+						}
+					}
 				}
 			}
 		}

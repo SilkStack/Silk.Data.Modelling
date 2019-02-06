@@ -23,5 +23,12 @@ namespace Silk.Data.Modelling
 		/// Gets a collection of fields present in the data structure.
 		/// </summary>
 		new IReadOnlyList<TField> Fields { get; }
+
+		/// <summary>
+		/// Enumerates fields found at the given path relative to the model.
+		/// </summary>
+		/// <param name="fieldPath"></param>
+		/// <returns></returns>
+		IEnumerable<TField> GetPathFields(IFieldPath<TField> fieldPath);
 	}
 }
