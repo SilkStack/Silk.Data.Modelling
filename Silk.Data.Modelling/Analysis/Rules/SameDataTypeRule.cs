@@ -2,12 +2,14 @@
 
 namespace Silk.Data.Modelling.Analysis.Rules
 {
-	public class SameDataTypeRule<TLeftField, TRightField> : IIntersectionRule<TLeftField, TRightField>
+	public class SameDataTypeRule<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
+		where TLeftModel : IModel<TLeftField>
+		where TRightModel : IModel<TRightField>
 		where TLeftField : IField
 		where TRightField : IField
 	{
 		public bool IsValidIntersection(
-			IntersectCandidate intersectCandidate,
+			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate,
 			out IntersectedFields<TLeftField, TRightField> intersectedFields
 			)
 		{

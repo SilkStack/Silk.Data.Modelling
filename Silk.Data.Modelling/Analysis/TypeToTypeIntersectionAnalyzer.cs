@@ -10,20 +10,20 @@ namespace Silk.Data.Modelling.Analysis
 	public class TypeToTypeIntersectionAnalyzer : IntersectAnalyzerBase<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
 	{
 		public TypeToTypeIntersectionAnalyzer(
-			IEnumerable<IIntersectCandidateSource> intersectCandidateSources = null,
-			IEnumerable<IIntersectionRule<PropertyInfoField, PropertyInfoField>> intersectionRules = null
+			IEnumerable<IIntersectCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>> intersectCandidateSources = null,
+			IEnumerable<IIntersectionRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>> intersectionRules = null
 			)
 		{
 			AddCandidateSources(intersectCandidateSources);
 			AddIntersectionRules(intersectionRules);
 		}
 
-		private void AddCandidateSources(IEnumerable<IIntersectCandidateSource> intersectCandidateSources)
+		private void AddCandidateSources(IEnumerable<IIntersectCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>> intersectCandidateSources)
 		{
 			if (intersectCandidateSources == null)
 			{
-				CandidateSources.Add(new ExactNameMatchCandidateSource());
-				CandidateSources.Add(new FlattenedNameMatchCandidateSource());
+				CandidateSources.Add(new ExactNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+				CandidateSources.Add(new FlattenedNameMatchCandidateSource<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 
 				return;
 			}
@@ -32,11 +32,11 @@ namespace Silk.Data.Modelling.Analysis
 				CandidateSources.Add(item);
 		}
 
-		private void AddIntersectionRules(IEnumerable<IIntersectionRule<PropertyInfoField, PropertyInfoField>> intersectionRules)
+		private void AddIntersectionRules(IEnumerable<IIntersectionRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>> intersectionRules)
 		{
 			if (intersectionRules == null)
 			{
-				IntersectionRules.Add(new SameDataTypeRule<PropertyInfoField, PropertyInfoField>());
+				IntersectionRules.Add(new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 
 				return;
 			}

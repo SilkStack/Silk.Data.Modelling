@@ -10,7 +10,7 @@
 	/// <summary>
 	/// Analyzes two models to generate an intersection.
 	/// </summary>
-	public interface IIntersectionAnalyzer<TLeftModel, TLeftField, TRightModel, TRightField>
+	public interface IIntersectionAnalyzer<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersectionAnalyzer
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : IField
