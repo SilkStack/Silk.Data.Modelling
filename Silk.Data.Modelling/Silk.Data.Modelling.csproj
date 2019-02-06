@@ -13,7 +13,8 @@ Part of the SilkStack project.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.1" />
+    <Folder Include="Mapping\" />
+    <Folder Include="Analysis\" />
   </ItemGroup>
 
 </Project>
