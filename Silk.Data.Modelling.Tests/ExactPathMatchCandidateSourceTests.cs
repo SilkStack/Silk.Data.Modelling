@@ -5,7 +5,7 @@ using System.Linq;
 namespace Silk.Data.Modelling.Tests
 {
 	[TestClass]
-	public class ExactNameMatchCandidateSourceTests
+	public class ExactPathMatchCandidateSourceTests
 	{
 		private readonly static TypeModel<LeftModel> LeftTypeModel = TypeModel.GetModelOf<LeftModel>();
 		private readonly static TypeModel<RightModel> RightTypeModel = TypeModel.GetModelOf<RightModel>();
