@@ -12,8 +12,8 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	public interface IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		/// <summary>
 		/// Determine if an intersection candidate matches the rule and provide an IntersectedField if it does.

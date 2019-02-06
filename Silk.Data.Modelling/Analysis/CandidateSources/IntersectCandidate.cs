@@ -10,8 +10,8 @@
 	public class IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		/// <summary>
 		/// Gets the FieldPath for the left-side of the candidate.

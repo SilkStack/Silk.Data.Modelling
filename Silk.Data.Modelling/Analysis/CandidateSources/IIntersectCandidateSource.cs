@@ -8,8 +8,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	public interface IIntersectCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		/// <summary>
 		/// Get an enumerable of intersect candidates between the two provided models.

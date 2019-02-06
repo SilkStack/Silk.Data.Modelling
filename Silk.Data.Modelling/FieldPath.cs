@@ -19,7 +19,7 @@ namespace Silk.Data.Modelling
 		IField FinalField { get; }
 
 		/// <summary>
-		/// Gets an array of fields in the path.
+		/// Gets a collection of fields in the path.
 		/// </summary>
 		IReadOnlyList<IField> Fields { get; }
 	}
@@ -33,7 +33,7 @@ namespace Silk.Data.Modelling
 		new TField FinalField { get; }
 
 		/// <summary>
-		/// Gets an array of fields in the path.
+		/// Gets a collection of fields in the path.
 		/// </summary>
 		new IReadOnlyList<TField> Fields { get; }
 	}
@@ -54,7 +54,7 @@ namespace Silk.Data.Modelling
 	/// <typeparam name="TField"></typeparam>
 	public class FieldPath<TModel, TField> : IFieldPath<TModel, TField>
 		where TModel : IModel<TField>
-		where TField : IField
+		where TField : class, IField
 	{
 		/// <summary>
 		/// Gets the model the path is built on.
@@ -67,7 +67,7 @@ namespace Silk.Data.Modelling
 		public TField FinalField { get; }
 
 		/// <summary>
-		/// Gets an array of fields in the path.
+		/// Gets a collection of fields in the path.
 		/// </summary>
 		public IReadOnlyList<TField> Fields { get; }
 
@@ -75,15 +75,13 @@ namespace Silk.Data.Modelling
 
 		IField IFieldPath.FinalField => FinalField;
 
-		private readonly IField[] _fields;
-		IReadOnlyList<IField> IFieldPath.Fields => _fields;
+		IReadOnlyList<IField> IFieldPath.Fields => Fields;
 
 		public FieldPath(TModel model, TField finalField, TField[] fields)
 		{
 			Model = model;
 			FinalField = finalField;
 			Fields = fields ?? new TField[0];
-			_fields = fields.OfType<IField>().ToArray();
 		}
 
 		/// <summary>
