@@ -10,23 +10,21 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public bool GetBinding(
-			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
-			out IBinding<TFromModel, TFromField, TToModel, TToField> binding)
+		public void CreateBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
 				intersectedFields.LeftField.FieldDataType != intersectedFields.RightField.FieldDataType)
 			{
-				binding = null;
-				return false;
+				return;
 			}
 
 			var builder = new BindingBuilder();
 			intersectedFields.Dispatch(builder);
 
-			binding = builder.Binding;
-			return true;
+			mappingFactoryContext.Bindings.Add(builder.Binding);
 		}
 
 		private class BindingBuilder : IIntersectedFieldsGenericExecutor

@@ -8,9 +8,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		bool GetBinding(
-			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
-			out IBinding<TFromModel, TFromField, TToModel, TToField> binding
+		void CreateBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
 			);
 	}
 }

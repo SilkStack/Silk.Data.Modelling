@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Mapping.Binding;
 
@@ -18,26 +17,32 @@ namespace Silk.Data.Modelling.Mapping
 		public ICollection<IBindingFactory<TFromModel, TFromField, TToModel, TToField>> BindingFactories { get; }
 			= new List<IBindingFactory<TFromModel, TFromField, TToModel, TToField>>();
 
-		protected virtual IBinding<TFromModel, TFromField, TToModel, TToField>[] GetBindings(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
+		protected virtual MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> CreateFactoryContext()
 		{
-			var result = new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
+			return new MappingFactoryContext<TFromModel, TFromField, TToModel, TToField>(this);
+		}
+
+		protected virtual void CreateBindings(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> context,
+			IIntersection<TFromModel, TFromField, TToModel, TToField> intersection
+			)
+		{
 			foreach (var factory in BindingFactories)
 			{
 				foreach (var interesectedFields in intersection.IntersectedFields)
 				{
-					if (factory.GetBinding(interesectedFields, out var binding))
-					{
-						result.Add(binding);
-					}
+					factory.CreateBinding(context, interesectedFields);
 				}
 			}
-			return result.ToArray();
 		}
+
+		protected abstract IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext);
 
 		public IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
 		{
-			var bindings = GetBindings(intersection);
-			throw new NotImplementedException();
+			var context = CreateFactoryContext();
+			CreateBindings(context, intersection);
+			return CreateMapping(context);
 		}
 	}
 }

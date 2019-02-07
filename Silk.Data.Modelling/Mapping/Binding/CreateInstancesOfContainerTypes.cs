@@ -11,15 +11,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public bool GetBinding(
-			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
-			out IBinding<TFromModel, TFromField, TToModel, TToField> binding)
+		public void CreateBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
 		{
 			if (!intersectedFields.RightPath.HasParent || !intersectedFields.RightField.CanWrite ||
 				intersectedFields.RightPath.Parent.FinalField == null)
 			{
-				binding = null;
-				return false;
+				return;
 			}
 
 			var parentPath = intersectedFields.RightPath.Parent;
@@ -27,8 +26,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 			parentPath.FinalField.Dispatch(bindingBuilder);
 
-			binding = bindingBuilder.Binding;
-			return true;
+			mappingFactoryContext.Bindings.Add(bindingBuilder.Binding);
 		}
 
 		private class BindingBuilder : IFieldGenericExecutor
