@@ -15,7 +15,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
 			out IBinding<TFromModel, TFromField, TToModel, TToField> binding)
 		{
-			if (!intersectedFields.RightPath.HasParent)
+			if (!intersectedFields.RightPath.HasParent || !intersectedFields.RightField.CanWrite ||
+				intersectedFields.RightPath.Parent.FinalField == null)
 			{
 				binding = null;
 				return false;
@@ -23,16 +24,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 			var parentPath = intersectedFields.RightPath.Parent;
 			var bindingBuilder = new BindingBuilder(parentPath);
-			if (parentPath.FinalField == null)
-				parentPath.Model.Dispatch(bindingBuilder);
-			else
-				parentPath.FinalField.Dispatch(bindingBuilder);
+
+			parentPath.FinalField.Dispatch(bindingBuilder);
 
 			binding = bindingBuilder.Binding;
 			return true;
 		}
 
-		private class BindingBuilder : IModelGenericExecutor, IFieldGenericExecutor
+		private class BindingBuilder : IFieldGenericExecutor
 		{
 			private readonly IFieldPath<TToModel, TToField> _path;
 
@@ -42,11 +41,6 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			{
 				_path = path;
 			}
-
-			public void Execute<TModel, TField, TData>(TModel model)
-				where TModel : IModel<TField>
-				where TField : class, IField
-				=> CreateBinding<TData>();
 
 			public void Execute<TField, TData>(IField field) where TField : class, IField
 				=> CreateBinding<TData>();
@@ -72,6 +66,19 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			_path = path;
 			_factory = factory;
+		}
+
+		public void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
+		{
+			var destinationReader = destination as IGraphReader<TToModel, TToField>;
+			if (destinationReader != null)
+			{
+				var currentValue = destinationReader.Read<TData>(_path);
+				if (currentValue != null)
+					return;
+			}
+
+			destination.Write(_path, _factory());
 		}
 	}
 }

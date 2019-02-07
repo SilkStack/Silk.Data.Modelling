@@ -10,8 +10,8 @@
 	public interface IMapping<TFromModel, TFromField, TToModel, TToField>
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
-		where TFromField : IField
-		where TToField : IField
+		where TFromField : class, IField
+		where TToField : class, IField
 	{
 		/// <summary>
 		/// Gets the model the mapping maps from.
@@ -22,5 +22,12 @@
 		/// Gets the model the mapping maps to.
 		/// </summary>
 		TToModel ToModel { get; }
+
+		/// <summary>
+		/// Perform the mapping.
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="destination"></param>
+		void Map(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination);
 	}
 }
