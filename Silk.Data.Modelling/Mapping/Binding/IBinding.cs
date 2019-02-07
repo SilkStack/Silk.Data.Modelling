@@ -6,6 +6,10 @@
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
+		TToField ToField { get; }
+
+		TFromField FromField { get; }
+
 		/// <summary>
 		/// Perform the binding.
 		/// </summary>

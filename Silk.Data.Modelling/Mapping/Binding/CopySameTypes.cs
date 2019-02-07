@@ -16,7 +16,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
-				intersectedFields.LeftField.FieldDataType != intersectedFields.RightField.FieldDataType)
+				intersectedFields.LeftField.FieldDataType != intersectedFields.RightField.FieldDataType ||
+				mappingFactoryContext.IsToFieldBound(intersectedFields))
 			{
 				return;
 			}
@@ -52,6 +53,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly IFieldPath<TFromModel, TFromField> _fromPath;
 		private readonly IFieldPath<TToModel, TToField> _toPath;
+
+		public TToField ToField => _toPath.FinalField;
+
+		public TFromField FromField => _fromPath.FinalField;
 
 		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath)
 		{

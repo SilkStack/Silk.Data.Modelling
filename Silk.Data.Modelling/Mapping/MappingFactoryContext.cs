@@ -1,5 +1,7 @@
-﻿using Silk.Data.Modelling.Mapping.Binding;
+﻿using Silk.Data.Modelling.Analysis;
+using Silk.Data.Modelling.Mapping.Binding;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -18,5 +20,8 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			Factory = factory;
 		}
+
+		public bool IsToFieldBound(IntersectedFields intersectedFields)
+			=> Bindings.Any(binding => binding.ToField == intersectedFields.RightField); 
 	}
 }

@@ -16,7 +16,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
 		{
 			if (!intersectedFields.RightPath.HasParent || !intersectedFields.RightField.CanWrite ||
-				intersectedFields.RightPath.Parent.FinalField == null)
+				intersectedFields.RightPath.Parent.FinalField == null ||
+				mappingFactoryContext.IsToFieldBound(intersectedFields))
 			{
 				return;
 			}
@@ -59,6 +60,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	{
 		private readonly IFieldPath<TToModel, TToField> _path;
 		private readonly Func<TData> _factory;
+
+		public TToField ToField => _path.FinalField;
+
+		public TFromField FromField => null;
 
 		public CreateInstanceBinding(IFieldPath<TToModel, TToField> path, Func<TData> factory)
 		{
