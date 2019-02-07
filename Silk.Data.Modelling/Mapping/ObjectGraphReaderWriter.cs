@@ -29,5 +29,11 @@
 			var writer = _propertyAccessor.GetPropertyWriter<T>(fieldPath);
 			writer(Graph, value);
 		}
+
+		public bool CheckPath(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		{
+			var checker = _propertyAccessor.GetPropertyChecker(fieldPath);
+			return checker(Graph);
+		}
 	}
 }

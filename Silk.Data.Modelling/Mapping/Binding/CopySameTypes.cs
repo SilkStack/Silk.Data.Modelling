@@ -51,20 +51,26 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		private readonly IFieldPath<TFromModel, TFromField> _fromPath;
-		private readonly IFieldPath<TToModel, TToField> _toPath;
+		public TToField ToField => ToPath.FinalField;
 
-		public TToField ToField => _toPath.FinalField;
+		public TFromField FromField => FromPath.FinalField;
 
-		public TFromField FromField => _fromPath.FinalField;
+		public IFieldPath<TToModel, TToField> ToPath { get; }
+
+		public IFieldPath<TFromModel, TFromField> FromPath { get; }
 
 		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath)
 		{
-			_fromPath = fromPath;
-			_toPath = toPath;
+			FromPath = fromPath;
+			ToPath = toPath;
 		}
 
 		public void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
-			=> destination.Write<TData>(_toPath, source.Read<TData>(_fromPath));
+		{
+			if (!source.CheckPath(FromPath) || !destination.CheckPath(ToPath))
+				return;
+
+			destination.Write<TData>(ToPath, source.Read<TData>(FromPath));
+		}
 	}
 }

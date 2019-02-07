@@ -8,7 +8,11 @@
 	{
 		TToField ToField { get; }
 
+		IFieldPath<TToModel, TToField> ToPath { get; }
+
 		TFromField FromField { get; }
+
+		IFieldPath<TFromModel, TFromField> FromPath { get; }
 
 		/// <summary>
 		/// Perform the binding.

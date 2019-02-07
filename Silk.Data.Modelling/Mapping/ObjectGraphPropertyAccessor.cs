@@ -35,6 +35,26 @@ namespace Silk.Data.Modelling.Mapping
 			= new Dictionary<string, Delegate>();
 		private readonly Dictionary<string, Delegate> _propertyWriters
 			= new Dictionary<string, Delegate>();
+		private readonly Dictionary<string, Delegate> _propertyCheckers
+			= new Dictionary<string, Delegate>();
+
+		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath)
+		{
+			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+
+			if (_propertyCheckers.TryGetValue(flattenedPath, out var @delegate))
+				return @delegate as Func<TGraph, bool>;
+
+			lock (_propertyCheckers)
+			{
+				if (_propertyCheckers.TryGetValue(flattenedPath, out @delegate))
+					return @delegate as Func<TGraph, bool>;
+
+				@delegate = CreatePropertyChecker(fieldPath);
+				_propertyCheckers.Add(flattenedPath, @delegate);
+				return @delegate as Func<TGraph, bool>;
+			}
+		}
 
 		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath)
 		{
@@ -69,6 +89,45 @@ namespace Silk.Data.Modelling.Mapping
 				@delegate = CreatePropertyWriter<T>(fieldPath);
 				_propertyWriters.Add(flattenedPath, @delegate);
 				return @delegate as Action<TGraph, T>;
+			}
+		}
+
+		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath)
+		{
+			var graph = Expression.Parameter(typeof(TGraph), "graph");
+			var result = Expression.Variable(typeof(bool), "result");
+
+			var ifTree = Expression.IfThen(
+				Expression.NotEqual(graph, Expression.Constant(null)),
+				NextPropertyBranch(fieldPath.Fields, 1)
+				);
+
+			var body = Expression.Block(
+				new[] { result },
+				Expression.Assign(result, Expression.Constant(false)),
+				ifTree,
+				result);
+
+			var lambda = Expression.Lambda<Func<TGraph, bool>>(
+				body, graph
+				);
+			return lambda.Compile();
+
+			Expression NextPropertyBranch(IReadOnlyList<IField> fields, int offset)
+			{
+				if (offset > fields.Count - 1) //  don't check the final field itself, just the property chain ahead of it
+					return Expression.Assign(result, Expression.Constant(true));
+
+				Expression property = graph;
+				for (var i = 0; i < offset; i++)
+				{
+					property = Expression.Property(property, fields[i].FieldName);
+				}
+
+				return Expression.IfThen(
+					Expression.NotEqual(property, Expression.Constant(null)),
+					NextPropertyBranch(fieldPath.Fields, offset + 1)
+				);
 			}
 		}
 

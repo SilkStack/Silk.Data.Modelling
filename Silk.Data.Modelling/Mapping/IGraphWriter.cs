@@ -14,5 +14,12 @@
 		/// <param name="fieldPath"></param>
 		/// <param name="value"></param>
 		void Write<T>(IFieldPath<TModel, TField> fieldPath, T value);
+
+		/// <summary>
+		/// Checks the provided path in the model graph for accessability.
+		/// </summary>
+		/// <param name="fieldPath"></param>
+		/// <returns></returns>
+		bool CheckPath(IFieldPath<TModel, TField> fieldPath);
 	}
 }

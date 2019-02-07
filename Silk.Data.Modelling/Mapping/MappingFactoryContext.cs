@@ -22,6 +22,9 @@ namespace Silk.Data.Modelling.Mapping
 		}
 
 		public bool IsToFieldBound(IntersectedFields intersectedFields)
-			=> Bindings.Any(binding => binding.ToField == intersectedFields.RightField); 
+			=> IsToFieldBound(intersectedFields.RightField);
+
+		public bool IsToFieldBound(IField toField)
+			=> Bindings.Any(binding => binding.ToField == toField);
 	}
 }
