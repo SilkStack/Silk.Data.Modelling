@@ -1,17 +1,15 @@
-﻿using Silk.Data.Modelling.Analysis;
+﻿using Silk.Data.Modelling.Mapping.Binding;
 
 namespace Silk.Data.Modelling.Mapping
 {
 	/// <summary>
 	/// Creates type to type mappings.
 	/// </summary>
-	public class TypeToTypeMappingFactory : IMappingFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
+	public class TypeToTypeMappingFactory : MappingFactoryBase<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
 	{
-		public IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateMapping(
-			IIntersection<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> intersection
-			)
+		public TypeToTypeMappingFactory()
 		{
-			throw new System.NotImplementedException();
+			BindingFactories.Add(new CopySameTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 		}
 	}
 }
