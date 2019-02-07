@@ -30,6 +30,11 @@ namespace Silk.Data.Modelling.Tests
 
 		private class SourceSubModel
 		{
+			public SourceDeepModel DeepModel { get; } = new SourceDeepModel();
+		}
+
+		private class SourceDeepModel
+		{
 			public string PropertyA => "Hello World";
 		}
 
@@ -39,6 +44,11 @@ namespace Silk.Data.Modelling.Tests
 		}
 
 		private class TargetSubModel
+		{
+			public TargetDeepModel DeepModel { get; set; }
+		}
+
+		private class TargetDeepModel
 		{
 			public string PropertyA { get; set; }
 		}

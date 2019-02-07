@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.GenericDispatch;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping.Binding
@@ -48,7 +49,6 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
 			)
 		{
-			//  todo: crawl up the parent path to the root model and make sure all properties along the path are bound if neccessary
 			if (!IsBindingCandidate(mappingFactoryContext, intersectedFields))
 				return;
 
@@ -59,11 +59,24 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (firstDependentBindingIndex < 0)
 				return;
 
-			var bindingBuilder = new BindingBuilder(parentPath, mappingFactoryContext.Bindings[firstDependentBindingIndex].FromPath);
+			//  we know there are objects depending on the graph having containers down to this level now
+			//  check for any that aren't bound and bind to a factory as needed
+			var bindings = new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
+			var dependentPath = mappingFactoryContext.Bindings[firstDependentBindingIndex].FromPath;
 
-			parentPath.FinalField.Dispatch(bindingBuilder);
+			while (parentPath != null && parentPath.HasParent)
+			{
+				if (!mappingFactoryContext.IsToFieldBound(parentPath.FinalField))
+				{
+					var bindingBuilder = new BindingBuilder(parentPath, dependentPath);
+					parentPath.FinalField.Dispatch(bindingBuilder);
+					bindings.Add(bindingBuilder.Binding);
+				}
+				parentPath = parentPath.Parent;
+			}
 
-			mappingFactoryContext.Bindings.Insert(firstDependentBindingIndex, bindingBuilder.Binding);
+			bindings.Reverse();
+			mappingFactoryContext.Bindings.InsertRange(firstDependentBindingIndex, bindings);
 		}
 
 		private class BindingBuilder : IFieldGenericExecutor
@@ -127,8 +140,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			var destinationReader = destination as IGraphReader<TToModel, TToField>;
 			if (destinationReader != null)
 			{
-				var currentValue = destinationReader.Read<TData>(_path);
-				if (currentValue != null)
+				if (!destinationReader.CheckPath(_path) ||
+					destinationReader.Read<TData>(_path) != null)
 					return;
 			}
 
