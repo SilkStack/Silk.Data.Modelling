@@ -12,8 +12,4 @@ Part of the SilkStack project.</Description>
     <Version>0.4.0.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Mapping\" />
-  </ItemGroup>
-
 </Project>
