@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -37,10 +38,34 @@ namespace Silk.Data.Modelling.Mapping
 			= new Dictionary<string, Delegate>();
 		private readonly Dictionary<string, Delegate> _propertyCheckers
 			= new Dictionary<string, Delegate>();
+		private readonly Dictionary<string, Delegate> _containerCreators
+			= new Dictionary<string, Delegate>();
 
-		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath)
+		public Action<TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+
+			if (_containerCreators.TryGetValue(flattenedPath, out var @delegate))
+				return @delegate as Action<TGraph>;
+
+			lock (_containerCreators)
+			{
+				if (_containerCreators.TryGetValue(flattenedPath, out @delegate))
+					return @delegate as Action<TGraph>;
+
+				@delegate = CreateContainerCreator(fieldPath);
+				_containerCreators.Add(flattenedPath, @delegate);
+				return @delegate as Action<TGraph>;
+			}
+		}
+
+		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField)
+		{
+			var pathSource = fieldPath.Fields.Select(field => field.FieldName);
+			if (skipLastField)
+				pathSource = pathSource.Take(fieldPath.Fields.Count - 1);
+
+			var flattenedPath = string.Join(".", pathSource);
 
 			if (_propertyCheckers.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Func<TGraph, bool>;
@@ -50,7 +75,7 @@ namespace Silk.Data.Modelling.Mapping
 				if (_propertyCheckers.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Func<TGraph, bool>;
 
-				@delegate = CreatePropertyChecker(fieldPath);
+				@delegate = CreatePropertyChecker(fieldPath, skipLastField);
 				_propertyCheckers.Add(flattenedPath, @delegate);
 				return @delegate as Func<TGraph, bool>;
 			}
@@ -92,7 +117,33 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath)
+		private static ConstructorInfo GetParameterlessConstructor(Type type)
+		{
+			return type
+				.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+				.FirstOrDefault(ctor => ctor.GetParameters().Length == 0);
+		}
+
+		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
+		{
+			var ctor = GetParameterlessConstructor(fieldPath.FinalField.FieldDataType);
+			if (ctor == null)
+				throw new InvalidOperationException($"{fieldPath.FinalField.FieldDataType.FullName} doesn't have a parameterless constructor.");
+
+			var graph = Expression.Parameter(typeof(TGraph), "graph");
+
+			Expression property = graph;
+
+			foreach (var field in fieldPath.Fields)
+				property = Expression.Property(property, field.FieldName);
+
+			var lambda = Expression.Lambda<Action<TGraph>>(
+				Expression.Assign(property, Expression.New(ctor)), graph
+				);
+			return lambda.Compile();
+		}
+
+		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField)
 		{
 			var graph = Expression.Parameter(typeof(TGraph), "graph");
 			var result = Expression.Variable(typeof(bool), "result");
@@ -115,7 +166,10 @@ namespace Silk.Data.Modelling.Mapping
 
 			Expression NextPropertyBranch(IReadOnlyList<IField> fields, int offset)
 			{
-				if (offset > fields.Count - 1) //  don't check the final field itself, just the property chain ahead of it
+				if (
+					(skipLastField && offset > fields.Count - 1) ||
+					offset > fields.Count
+					)
 					return Expression.Assign(result, Expression.Constant(true));
 
 				Expression property = graph;

@@ -16,6 +16,13 @@
 		T Read<T>(IFieldPath<TModel, TField> fieldPath);
 
 		/// <summary>
+		/// Checks for a valid container at the provided path on the model graph.
+		/// </summary>
+		/// <param name="fieldPath"></param>
+		/// <returns></returns>
+		bool CheckContainer(IFieldPath<TModel, TField> fieldPath);
+
+		/// <summary>
 		/// Checks the provided path in the model graph for accessability.
 		/// </summary>
 		/// <param name="fieldPath"></param>

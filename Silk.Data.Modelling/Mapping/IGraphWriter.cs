@@ -16,6 +16,12 @@
 		void Write<T>(IFieldPath<TModel, TField> fieldPath, T value);
 
 		/// <summary>
+		/// Creates a container at the specified path.
+		/// </summary>
+		/// <param name="fieldPath"></param>
+		void CreateContainer(IFieldPath<TModel, TField> fieldPath);
+
+		/// <summary>
 		/// Checks the provided path in the model graph for accessability.
 		/// </summary>
 		/// <param name="fieldPath"></param>

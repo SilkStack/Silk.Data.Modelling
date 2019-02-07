@@ -32,7 +32,19 @@
 
 		public bool CheckPath(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
-			var checker = _propertyAccessor.GetPropertyChecker(fieldPath);
+			var checker = _propertyAccessor.GetPropertyChecker(fieldPath, skipLastField: true);
+			return checker(Graph);
+		}
+
+		public void CreateContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		{
+			var containerCreator = _propertyAccessor.GetContainerCreator(fieldPath);
+			containerCreator(Graph);
+		}
+
+		public bool CheckContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		{
+			var checker = _propertyAccessor.GetPropertyChecker(fieldPath, skipLastField: false);
 			return checker(Graph);
 		}
 	}

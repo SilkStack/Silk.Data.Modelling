@@ -21,6 +21,11 @@ namespace Silk.Data.Modelling.Tests
 			var sourceGraph = new ObjectGraphReaderWriter<SourceSuperModel>(new SourceSuperModel());
 			var targetGraph = new ObjectGraphReaderWriter<TargetSuperModel>(new TargetSuperModel());
 			mapping.Map(sourceGraph, targetGraph);
+
+			Assert.AreEqual(
+				sourceGraph.Graph.SubModel.DeepModel.PropertyA,
+				targetGraph.Graph.SubModel.DeepModel.PropertyA
+				);
 		}
 
 		private class SourceSuperModel

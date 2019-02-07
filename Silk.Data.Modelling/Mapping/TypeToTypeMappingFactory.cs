@@ -10,7 +10,7 @@ namespace Silk.Data.Modelling.Mapping
 		public TypeToTypeMappingFactory()
 		{
 			BindingFactories.Add(new CopySameTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
-			BindingFactories.Add(new CreateInstancesOfContainerTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+			BindingFactories.Add(new CreateContainersForBoundFieldsFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 		}
 
 		protected override IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateMapping(

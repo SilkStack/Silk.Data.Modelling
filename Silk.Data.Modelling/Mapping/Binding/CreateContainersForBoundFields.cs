@@ -1,6 +1,4 @@
 ﻿using Silk.Data.Modelling.Analysis;
-using Silk.Data.Modelling.GenericDispatch;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +11,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	/// <typeparam name="TFromField"></typeparam>
 	/// <typeparam name="TToModel"></typeparam>
 	/// <typeparam name="TToField"></typeparam>
-	public class CreateInstancesOfContainerTypesFactory<TFromModel, TFromField, TToModel, TToField> :
+	public class CreateContainersForBoundFieldsFactory<TFromModel, TFromField, TToModel, TToField> :
 		IBindingFactory<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
@@ -68,9 +66,11 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			{
 				if (!mappingFactoryContext.IsToFieldBound(parentPath.FinalField))
 				{
-					var bindingBuilder = new BindingBuilder(parentPath, dependentPath);
-					parentPath.FinalField.Dispatch(bindingBuilder);
-					bindings.Add(bindingBuilder.Binding);
+					bindings.Add(
+						new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
+							parentPath, dependentPath
+							)
+						);
 				}
 				parentPath = parentPath.Parent;
 			}
@@ -78,34 +78,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			bindings.Reverse();
 			mappingFactoryContext.Bindings.InsertRange(firstDependentBindingIndex, bindings);
 		}
-
-		private class BindingBuilder : IFieldGenericExecutor
-		{
-			private readonly IFieldPath<TToModel, TToField> _path;
-			private readonly IFieldPath<TFromModel, TFromField> _dependentPath;
-
-			public IBinding<TFromModel, TFromField, TToModel, TToField> Binding { get; private set; }
-
-			public BindingBuilder(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath)
-			{
-				_path = path;
-				_dependentPath = dependentPath;
-			}
-
-			public void Execute<TField, TData>(IField field) where TField : class, IField
-				=> CreateBinding<TData>();
-
-			private void CreateBinding<TData>()
-			{
-				Binding = new CreateInstanceBinding<TFromModel, TFromField, TToModel, TToField, TData>(
-					_path,
-					_dependentPath,
-					TypeFactoryHelper.GetFactory<TData>());
-			}
-		}
 	}
 
-	public class CreateInstanceBinding<TFromModel, TFromField, TToModel, TToField, TData> :
+	public class CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField> :
 		IBinding<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
@@ -118,7 +93,6 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		/// NOT a FromPath, this isn't the source of a binding operation, it's a path that needs checking for nulls before performing the assignment operation.
 		/// </summary>
 		private readonly IFieldPath<TFromModel, TFromField> _dependentPath;
-		private readonly Func<TData> _factory;
 
 		public TToField ToField => _path.FinalField;
 
@@ -128,11 +102,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public IFieldPath<TFromModel, TFromField> FromPath => null;
 
-		public CreateInstanceBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath, Func<TData> factory)
+		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath)
 		{
 			_path = path;
 			_dependentPath = dependentPath;
-			_factory = factory;
 		}
 
 		public void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
@@ -141,7 +114,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (destinationReader != null)
 			{
 				if (!destinationReader.CheckPath(_path) ||
-					destinationReader.Read<TData>(_path) != null)
+					destinationReader.CheckContainer(_path))
 					return;
 			}
 
@@ -153,7 +126,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 					return;
 			}
 
-			destination.Write(_path, _factory());
+			destination.CreateContainer(_path);
 		}
 	}
 }
