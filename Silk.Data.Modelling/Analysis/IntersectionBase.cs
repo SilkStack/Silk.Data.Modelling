@@ -4,8 +4,8 @@
 		IIntersection<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		public TLeftModel LeftModel { get; }
 
@@ -15,12 +15,12 @@
 
 		IModel IIntersection.RightModel => RightModel;
 
-		public IntersectedFields<TLeftField, TRightField>[] IntersectedFields { get; }
+		public IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>[] IntersectedFields { get; }
 
 		IntersectedFields[] IIntersection.IntersectedFields => IntersectedFields;
 
 		protected IntersectionBase(TLeftModel leftModel, TRightModel rightModel,
-			IntersectedFields<TLeftField, TRightField>[] intersectedFields)
+			IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>[] intersectedFields)
 		{
 			LeftModel = leftModel;
 			RightModel = rightModel;

@@ -13,8 +13,8 @@
 	public interface IIntersectionAnalyzer<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersectionAnalyzer
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		/// <summary>
 		/// Create an intersection between two models.

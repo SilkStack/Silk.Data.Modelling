@@ -6,7 +6,7 @@
 	public class TypeToTypeIntersection : IntersectionBase<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
 	{
 		public TypeToTypeIntersection(TypeModel leftModel, TypeModel rightModel,
-			IntersectedFields<PropertyInfoField, PropertyInfoField>[] intersectedFields)
+			IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>[] intersectedFields)
 			: base(leftModel, rightModel, intersectedFields)
 		{
 		}

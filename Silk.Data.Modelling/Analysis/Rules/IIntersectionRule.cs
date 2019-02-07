@@ -23,7 +23,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 		/// <returns></returns>
 		bool IsValidIntersection(
 			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate,
-			out IntersectedFields<TLeftField, TRightField> intersectedFields
+			out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields
 			);
 	}
 }

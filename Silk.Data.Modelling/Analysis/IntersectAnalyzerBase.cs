@@ -92,12 +92,12 @@ namespace Silk.Data.Modelling.Analysis
 		/// </summary>
 		protected class IntersectAnalysis
 		{
-			private List<IntersectedFields<TLeftField, TRightField>> _intersectedFields
-				= new List<IntersectedFields<TLeftField, TRightField>>();
+			private List<IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>> _intersectedFields
+				= new List<IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>>();
 
 			public TLeftModel LeftModel { get; }
 			public TRightModel RightModel { get; }
-			public IReadOnlyList<IntersectedFields<TLeftField, TRightField>> IntersectedFields => _intersectedFields;
+			public IReadOnlyList<IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>> IntersectedFields => _intersectedFields;
 
 			public IntersectAnalysis(TLeftModel leftModel, TRightModel rightModel)
 			{
@@ -108,7 +108,7 @@ namespace Silk.Data.Modelling.Analysis
 			public virtual bool IsLeftFieldAlreadyPaired(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate)
 				=> _intersectedFields.Any(intersectedFields => ReferenceEquals(intersectedFields.LeftField, intersectCandidate.LeftField));
 
-			public virtual void AddIntersectedFields(IntersectedFields<TLeftField, TRightField> intersectedFields)
+			public virtual void AddIntersectedFields(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 				=>_intersectedFields.Add(intersectedFields);
 		}
 	}

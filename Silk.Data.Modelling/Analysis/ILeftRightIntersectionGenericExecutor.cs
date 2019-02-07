@@ -13,8 +13,10 @@
 		/// <typeparam name="TLeftData"></typeparam>
 		/// <typeparam name="TRightData"></typeparam>
 		/// <param name="intersectedFields"></param>
-		void Execute<TLeftField, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftField, TRightField, TLeftData, TRightData> intersectedFields)
-			where TLeftField : IField
-			where TRightField : IField;
+		void Execute<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields)
+			where TLeftField : class, IField
+			where TRightField : class, IField
+			where TLeftModel : IModel<TLeftField>
+			where TRightModel : IModel<TRightField>;
 	}
 }

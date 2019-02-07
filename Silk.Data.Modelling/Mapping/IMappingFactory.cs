@@ -6,8 +6,8 @@ namespace Silk.Data.Modelling.Mapping
 	/// Creates mappings between two models.
 	/// </summary>
 	public interface IMappingFactory<TFromModel, TFromField, TToModel, TToField>
-		where TFromField : IField
-		where TToField : IField
+		where TFromField : class, IField
+		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{

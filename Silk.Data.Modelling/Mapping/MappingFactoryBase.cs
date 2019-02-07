@@ -7,8 +7,8 @@ namespace Silk.Data.Modelling.Mapping
 {
 	public abstract class MappingFactoryBase<TFromModel, TFromField, TToModel, TToField> :
 		IMappingFactory<TFromModel, TFromField, TToModel, TToField>
-		where TFromField : IField
-		where TToField : IField
+		where TFromField : class, IField
+		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
@@ -28,7 +28,6 @@ namespace Silk.Data.Modelling.Mapping
 					if (factory.GetBinding(interesectedFields, out var binding))
 					{
 						result.Add(binding);
-						break;
 					}
 				}
 			}

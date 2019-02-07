@@ -9,6 +9,7 @@ namespace Silk.Data.Modelling.Mapping
 	{
 		public TypeToTypeMappingFactory()
 		{
+			BindingFactories.Add(new CreateInstancesOfContainerTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 			BindingFactories.Add(new CopySameTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 		}
 	}

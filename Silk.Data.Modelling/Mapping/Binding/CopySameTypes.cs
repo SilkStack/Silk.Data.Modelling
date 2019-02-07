@@ -30,9 +30,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			public IBinding Binding { get; private set; }
 
-			public void Execute<TLeftField, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftField, TRightField, TLeftData, TRightData> intersectedFields)
-				where TLeftField : IField
-				where TRightField : IField
+			void ILeftRightIntersectionGenericExecutor.Execute<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields)
 			{
 				Binding = new CopySameTypesBinding<TLeftData, TRightData>();
 			}

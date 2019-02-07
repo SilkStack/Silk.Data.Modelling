@@ -17,7 +17,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	{
 		public bool IsValidIntersection(
 			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate,
-			out IntersectedFields<TLeftField, TRightField> intersectedFields
+			out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields
 			)
 		{
 			if (intersectCandidate.LeftField.FieldDataType != intersectCandidate.RightField.FieldDataType)
@@ -26,7 +26,10 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = IntersectedFields<TLeftField, TRightField>.Create(intersectCandidate.LeftField, intersectCandidate.RightField);
+			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
+				intersectCandidate.LeftField, intersectCandidate.RightField,
+				intersectCandidate.LeftPath, intersectCandidate.RightPath
+				);
 			return true;
 		}
 	}

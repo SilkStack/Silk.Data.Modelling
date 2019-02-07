@@ -27,8 +27,8 @@
 	public interface IIntersection<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersection
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
-		where TLeftField : IField
-		where TRightField : IField
+		where TLeftField : class, IField
+		where TRightField : class, IField
 	{
 		/// <summary>
 		/// Gets the left model in the relationship.
@@ -43,6 +43,6 @@
 		/// <summary>
 		/// Gets an array of intersected fields.
 		/// </summary>
-		new IntersectedFields<TLeftField, TRightField>[] IntersectedFields { get; }
+		new IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>[] IntersectedFields { get; }
 	}
 }
