@@ -3,11 +3,14 @@
 namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public interface IBindingFactory<TFromModel, TFromField, TToModel, TToField>
-		where TFromField : IField
-		where TToField : IField
+		where TFromField : class, IField
+		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		bool GetBinding(IntersectedFields intersectedFields, out IBinding binding);
+		bool GetBinding(
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
+			out IBinding<TFromModel, TFromField, TToModel, TToField> binding
+			);
 	}
 }

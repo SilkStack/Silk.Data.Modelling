@@ -9,6 +9,16 @@ namespace Silk.Data.Modelling
 	public interface IFieldPath
 	{
 		/// <summary>
+		/// Gets a value indicating if the field path has a parent.
+		/// </summary>
+		bool HasParent { get; }
+
+		/// <summary>
+		/// Gets the field path's parent.
+		/// </summary>
+		IFieldPath Parent { get; }
+
+		/// <summary>
 		/// Gets the model the path is built on.
 		/// </summary>
 		IModel Model { get; }
@@ -28,6 +38,11 @@ namespace Silk.Data.Modelling
 		where TField : IField
 	{
 		/// <summary>
+		/// Gets the field path's parent.
+		/// </summary>
+		new IFieldPath<TField> Parent { get; }
+
+		/// <summary>
 		/// Gets the final field found at the end of the path.
 		/// </summary>
 		new TField FinalField { get; }
@@ -42,6 +57,11 @@ namespace Silk.Data.Modelling
 		where TField : IField
 		where TModel : IModel<TField>
 	{
+		/// <summary>
+		/// Gets the field path's parent.
+		/// </summary>
+		new IFieldPath<TModel, TField> Parent { get; }
+
 		/// <summary>
 		/// Gets the model the path is built on.
 		/// </summary>
@@ -77,8 +97,26 @@ namespace Silk.Data.Modelling
 
 		IReadOnlyList<IField> IFieldPath.Fields => Fields;
 
+		private FieldPath<TModel, TField> _parent;
+
+		public bool HasParent => _parent != null;
+
+		public IFieldPath<TModel, TField> Parent => _parent;
+
+		IFieldPath<TField> IFieldPath<TField>.Parent => _parent;
+
+		IFieldPath IFieldPath.Parent => _parent;
+
 		public FieldPath(TModel model, TField finalField, TField[] fields)
 		{
+			Model = model;
+			FinalField = finalField;
+			Fields = fields ?? new TField[0];
+		}
+
+		private FieldPath(FieldPath<TModel, TField> parent, TModel model, TField finalField, TField[] fields)
+		{
+			_parent = parent;
 			Model = model;
 			FinalField = finalField;
 			Fields = fields ?? new TField[0];
@@ -89,10 +127,10 @@ namespace Silk.Data.Modelling
 		/// </summary>
 		/// <param name="field"></param>
 		/// <returns></returns>
-		public FieldPath<TModel, TField> Concat(TField field)
+		public FieldPath<TModel, TField> Child(TField field)
 		{
 			return new FieldPath<TModel, TField>(
-				Model, field,
+				this, Model, field,
 				Fields.Concat(new[] { field }).ToArray()
 				);
 		}

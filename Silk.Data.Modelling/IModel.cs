@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System.Collections.Generic;
 
 namespace Silk.Data.Modelling
 {
@@ -11,6 +12,12 @@ namespace Silk.Data.Modelling
 		/// Gets a collection of fields present in the data structure.
 		/// </summary>
 		IReadOnlyList<IField> Fields { get; }
+
+		/// <summary>
+		/// Dispatch a genericly-typed method call using the models generic type parameters.
+		/// </summary>
+		/// <param name="executor"></param>
+		void Dispatch(IModelGenericExecutor executor);
 	}
 
 	/// <summary>

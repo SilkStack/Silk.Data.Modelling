@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using Silk.Data.Modelling.GenericDispatch;
 
 namespace Silk.Data.Modelling
 {
 	/// <summary>
 	/// Data structure field based on a CLR property.
 	/// </summary>
-	public class PropertyInfoField : IField
+	public abstract class PropertyInfoField : IField
 	{
 		public string FieldName { get; private set; }
 
@@ -20,7 +21,7 @@ namespace Silk.Data.Modelling
 
 		public Type FieldElementType { get; private set; }
 
-		private PropertyInfoField() { }
+		protected PropertyInfoField() { }
 
 		/// <summary>
 		/// Create a PropertyInfoField from a PropertyInfo instance.
@@ -29,14 +30,25 @@ namespace Silk.Data.Modelling
 		/// <returns></returns>
 		public static PropertyInfoField CreateFromPropertyInfo(PropertyInfo propertyInfo)
 		{
-			return new PropertyInfoField
-			{
-				FieldName = propertyInfo.Name,
-				CanRead = propertyInfo.CanRead,
-				CanWrite = propertyInfo.CanWrite,
-				FieldDataType = propertyInfo.PropertyType,
-				FieldElementType = propertyInfo.PropertyType.GetEnumerableElementType()
-			};
+			var ret = Activator.CreateInstance(typeof(PropertyInfoField<>).MakeGenericType(
+				propertyInfo.PropertyType
+				)) as PropertyInfoField;
+
+			ret.FieldName = propertyInfo.Name;
+			ret.CanRead = propertyInfo.CanRead;
+			ret.CanWrite = propertyInfo.CanWrite;
+			ret.FieldDataType = propertyInfo.PropertyType;
+			ret.FieldElementType = propertyInfo.PropertyType.GetEnumerableElementType();
+
+			return ret;
 		}
+
+		public abstract void Dispatch(IFieldGenericExecutor executor);
+	}
+
+	public class PropertyInfoField<T> : PropertyInfoField
+	{
+		public override void Dispatch(IFieldGenericExecutor executor)
+			=> executor.Execute<PropertyInfoField, T>(this);
 	}
 }

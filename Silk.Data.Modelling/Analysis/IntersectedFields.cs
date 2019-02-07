@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling.Analysis
 {
@@ -22,7 +23,7 @@ namespace Silk.Data.Modelling.Analysis
 		/// Execute a generic entry point with the generic type parameters provided by the IntersectedFields implementation.
 		/// </summary>
 		/// <param name="genericEntryPoint"></param>
-		public abstract void ExecuteGenericEntryPoint(ILeftRightIntersectionGenericExecutor genericEntryPoint);
+		public abstract void Dispatch(IIntersectedFieldsGenericExecutor genericEntryPoint);
 	}
 
 	/// <summary>
@@ -35,13 +36,13 @@ namespace Silk.Data.Modelling.Analysis
 		where TRightModel : IModel<TRightField>
 	{
 		public new TLeftField LeftField { get; }
-		public new FieldPath<TLeftModel, TLeftField> LeftPath { get; }
+		public new IFieldPath<TLeftModel, TLeftField> LeftPath { get; }
 
 		public new TRightField RightField { get; }
-		public new FieldPath<TRightModel, TRightField> RightPath { get; }
+		public new IFieldPath<TRightModel, TRightField> RightPath { get; }
 
 		protected IntersectedFields(TLeftField leftField, TRightField rightField,
-			FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath)
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath)
 			: base(leftField, rightField, leftPath, rightPath)
 		{
 			LeftField = leftField;
@@ -57,7 +58,7 @@ namespace Silk.Data.Modelling.Analysis
 		/// <param name="rightField"></param>
 		/// <returns></returns>
 		public static IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> Create(TLeftField leftField, TRightField rightField,
-			FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath)
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath)
 		{
 			return Activator.CreateInstance(
 				typeof(IntersectedFields<,,,,,>)
@@ -79,12 +80,12 @@ namespace Silk.Data.Modelling.Analysis
 		where TRightModel : IModel<TRightField>
 	{
 		public IntersectedFields(TLeftField leftField, TRightField rightField,
-			FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath) :
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath) :
 			base(leftField, rightField, leftPath, rightPath)
 		{
 		}
 
-		public override void ExecuteGenericEntryPoint(ILeftRightIntersectionGenericExecutor genericEntryPoint)
+		public override void Dispatch(IIntersectedFieldsGenericExecutor genericEntryPoint)
 			=> genericEntryPoint.Execute(this);
 	}
 }

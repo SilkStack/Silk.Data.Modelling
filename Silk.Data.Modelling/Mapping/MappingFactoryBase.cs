@@ -18,9 +18,9 @@ namespace Silk.Data.Modelling.Mapping
 		public ICollection<IBindingFactory<TFromModel, TFromField, TToModel, TToField>> BindingFactories { get; }
 			= new List<IBindingFactory<TFromModel, TFromField, TToModel, TToField>>();
 
-		protected virtual IBinding[] GetBindings(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
+		protected virtual IBinding<TFromModel, TFromField, TToModel, TToField>[] GetBindings(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
 		{
-			var result = new List<IBinding>();
+			var result = new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
 			foreach (var factory in BindingFactories)
 			{
 				foreach (var interesectedFields in intersection.IntersectedFields)

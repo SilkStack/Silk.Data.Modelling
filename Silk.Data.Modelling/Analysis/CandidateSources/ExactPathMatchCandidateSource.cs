@@ -49,8 +49,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 					{
 						if (leftField.FieldName == rightField.FieldName)
 						{
-							var newLeftPath = leftPath.Concat(leftField);
-							var newRightPath = rightPath.Concat(rightField);
+							var newLeftPath = leftPath.Child(leftField);
+							var newRightPath = rightPath.Child(rightField);
 							yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
 								newLeftPath, newRightPath
 								);

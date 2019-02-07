@@ -1,15 +1,18 @@
 ﻿using Silk.Data.Modelling.Analysis;
+using Silk.Data.Modelling.GenericDispatch;
 
 namespace Silk.Data.Modelling.Mapping.Binding
 {
 	public class CopySameTypesFactory<TFromModel, TFromField, TToModel, TToField> :
 		IBindingFactory<TFromModel, TFromField, TToModel, TToField>
-		where TFromField : IField
-		where TToField : IField
+		where TFromField : class, IField
+		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public bool GetBinding(IntersectedFields intersectedFields, out IBinding binding)
+		public bool GetBinding(
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields,
+			out IBinding<TFromModel, TFromField, TToModel, TToField> binding)
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
@@ -20,24 +23,29 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			}
 
 			var builder = new BindingBuilder();
-			intersectedFields.ExecuteGenericEntryPoint(builder);
+			intersectedFields.Dispatch(builder);
 
 			binding = builder.Binding;
 			return true;
 		}
 
-		private class BindingBuilder : ILeftRightIntersectionGenericExecutor
+		private class BindingBuilder : IIntersectedFieldsGenericExecutor
 		{
-			public IBinding Binding { get; private set; }
+			public IBinding<TFromModel, TFromField, TToModel, TToField> Binding { get; private set; }
 
-			void ILeftRightIntersectionGenericExecutor.Execute<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields)
+			void IIntersectedFieldsGenericExecutor.Execute<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields)
 			{
-				Binding = new CopySameTypesBinding<TLeftData, TRightData>();
+				Binding = new CopySameTypesBinding<TFromModel, TFromField, TToModel, TToField, TLeftData, TRightData>();
 			}
 		}
 	}
 
-	public class CopySameTypesBinding<TFrom, TTo> : IBinding
+	public class CopySameTypesBinding<TFromModel, TFromField, TToModel, TToField, TFromData, TToData> :
+		IBinding<TFromModel, TFromField, TToModel, TToField>
+		where TFromField : class, IField
+		where TToField : class, IField
+		where TFromModel : IModel<TFromField>
+		where TToModel : IModel<TToField>
 	{
 
 	}

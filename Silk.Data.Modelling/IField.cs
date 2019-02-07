@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling
 {
@@ -36,5 +37,11 @@ namespace Silk.Data.Modelling
 		/// Gets the field's element type if it's an enumerable type.
 		/// </summary>
 		Type FieldElementType { get; }
+
+		/// <summary>
+		/// Dispatch a genericly-typed method call using the fields generic type parameters.
+		/// </summary>
+		/// <param name="executor"></param>
+		void Dispatch(IFieldGenericExecutor executor);
 	}
 }

@@ -1,9 +1,11 @@
-﻿namespace Silk.Data.Modelling.Analysis
+﻿using Silk.Data.Modelling.Analysis;
+
+namespace Silk.Data.Modelling.GenericDispatch
 {
 	/// <summary>
-	/// Interface for executing generic typed code.
+	/// Interface for executing generic typed code from an intersected field.
 	/// </summary>
-	public interface ILeftRightIntersectionGenericExecutor
+	public interface IIntersectedFieldsGenericExecutor
 	{
 		/// <summary>
 		/// Execute generic typed code.
