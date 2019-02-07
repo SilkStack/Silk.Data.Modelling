@@ -17,6 +17,10 @@ namespace Silk.Data.Modelling.Tests
 				);
 			var factory = new TypeToTypeMappingFactory();
 			var mapping = factory.CreateMapping(intersection);
+
+			var sourceGraph = new ObjectGraphReaderWriter<SourceModel>(new SourceModel());
+			var targetGraph = new ObjectGraphReaderWriter<TargetModel>(new TargetModel());
+			mapping.Map(sourceGraph, targetGraph);
 		}
 
 		private class SourceModel
