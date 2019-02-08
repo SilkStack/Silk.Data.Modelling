@@ -81,40 +81,31 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	}
 
 	public class CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField> :
-		IBinding<TFromModel, TFromField, TToModel, TToField>
+		BindingBase<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		private readonly IFieldPath<TToModel, TToField> _path;
 		/// <summary>
 		/// Dependent path.
 		/// NOT a FromPath, this isn't the source of a binding operation, it's a path that needs checking for nulls before performing the assignment operation.
 		/// </summary>
 		private readonly IFieldPath<TFromModel, TFromField> _dependentPath;
 
-		public TToField ToField => _path.FinalField;
-
-		public TFromField FromField => null;
-
-		public IFieldPath<TToModel, TToField> ToPath => _path;
-
-		public IFieldPath<TFromModel, TFromField> FromPath => null;
-
-		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath)
+		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath) :
+			base(null, null, path.FinalField, path)
 		{
-			_path = path;
 			_dependentPath = dependentPath;
 		}
 
-		public void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
+		protected override void RunSingle(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
 			var destinationReader = destination as IGraphReader<TToModel, TToField>;
 			if (destinationReader != null)
 			{
-				if (!destinationReader.CheckPath(_path) ||
-					destinationReader.CheckContainer(_path))
+				if (!destinationReader.CheckPath(ToPath) ||
+					destinationReader.CheckContainer(ToPath))
 					return;
 			}
 
@@ -126,7 +117,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 					return;
 			}
 
-			destination.CreateContainer(_path);
+			destination.CreateContainer(ToPath);
 		}
 	}
 }

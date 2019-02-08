@@ -22,7 +22,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
-				intersectedFields.LeftField.FieldDataType != intersectedFields.RightField.FieldDataType ||
+				intersectedFields.LeftField.RemoveEnumerableType() != intersectedFields.RightField.RemoveEnumerableType() ||
 				!IsAcceptableType(intersectedFields.LeftField.FieldDataType) ||
 				!IsAcceptableType(intersectedFields.RightField.FieldDataType) ||
 				mappingFactoryContext.IsToFieldBound(intersectedFields)
@@ -54,27 +54,18 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	}
 
 	public class CopySameTypesBinding<TFromModel, TFromField, TToModel, TToField, TData> :
-		IBinding<TFromModel, TFromField, TToModel, TToField>
+		BindingBase<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public TToField ToField => ToPath.FinalField;
-
-		public TFromField FromField => FromPath.FinalField;
-
-		public IFieldPath<TToModel, TToField> ToPath { get; }
-
-		public IFieldPath<TFromModel, TFromField> FromPath { get; }
-
-		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath)
+		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath) :
+			base(fromPath.FinalField, fromPath, toPath.FinalField, toPath)
 		{
-			FromPath = fromPath;
-			ToPath = toPath;
 		}
 
-		public void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
+		protected override void RunSingle(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
 			if (!source.CheckPath(FromPath) || !destination.CheckPath(ToPath))
 				return;

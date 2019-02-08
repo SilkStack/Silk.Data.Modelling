@@ -44,4 +44,19 @@ namespace Silk.Data.Modelling
 		/// <param name="executor"></param>
 		void Dispatch(IFieldGenericExecutor executor);
 	}
+
+	public static class FieldExtensions
+	{
+		/// <summary>
+		/// Gets the Type of the field without the generic enumerable type if there is one.
+		/// </summary>
+		/// <param name="field"></param>
+		/// <returns></returns>
+		public static Type RemoveEnumerableType(this IField field)
+		{
+			if (field.IsEnumerableType)
+				return field.FieldElementType;
+			return field.FieldDataType;
+		}
+	}
 }

@@ -20,7 +20,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 			out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields
 			)
 		{
-			if (intersectCandidate.LeftField.FieldDataType != intersectCandidate.RightField.FieldDataType)
+			if (intersectCandidate.LeftField.RemoveEnumerableType() != intersectCandidate.RightField.RemoveEnumerableType())
 			{
 				intersectedFields = null;
 				return false;

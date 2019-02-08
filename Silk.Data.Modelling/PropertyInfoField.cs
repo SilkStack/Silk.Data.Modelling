@@ -30,8 +30,9 @@ namespace Silk.Data.Modelling
 		/// <returns></returns>
 		public static PropertyInfoField CreateFromPropertyInfo(PropertyInfo propertyInfo)
 		{
+			var enumerableElementType = propertyInfo.PropertyType.GetEnumerableElementType();
 			var ret = Activator.CreateInstance(typeof(PropertyInfoField<>).MakeGenericType(
-				propertyInfo.PropertyType
+				enumerableElementType ?? propertyInfo.PropertyType
 				)) as PropertyInfoField;
 
 			ret.FieldName = propertyInfo.Name;
