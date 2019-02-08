@@ -12,7 +12,7 @@ namespace Silk.Data.Modelling.Mapping
 	{
 		public TFromModel FromModel { get; }
 		public TToModel ToModel { get; }
-		public IBinding<TFromModel, TFromField, TToModel, TToField>[] Bindings { get; }
+		public IReadOnlyList<IBinding<TFromModel, TFromField, TToModel, TToField>> Bindings { get; }
 
 		public MappingBase(TFromModel fromModel, TToModel toModel,
 			IEnumerable<IBinding<TFromModel, TFromField, TToModel, TToField>> bindings)
@@ -24,22 +24,33 @@ namespace Silk.Data.Modelling.Mapping
 
 		public void Map(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
-			foreach (var binding in Bindings)
+			using (var enumerator = Bindings.GetEnumerator())
+			while (enumerator.MoveNext())
 			{
-				if (binding.ToField.IsEnumerableType)
-					MapEnumerable(source, destination, binding);
-				else
-					binding.Run(source, destination);
+				RunBinding(source, destination, enumerator);
 			}
 		}
 
-		private void MapEnumerable(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination, IBinding<TFromModel, TFromField, TToModel, TToField> binding)
+		private void RunBinding(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination,
+			IEnumerator<IBinding<TFromModel, TFromField, TToModel, TToField>> enumerator)
 		{
-			using (var enumerator = source.GetEnumerator(binding.FromPath))
-			using (var writeStream = destination.CreateEnumerableStream(binding.ToPath))
-			while (enumerator.MoveNext())
-			{
+			var binding = enumerator.Current;
+			if (binding.ToField.IsEnumerableType)
+				MapEnumerable(source, destination, enumerator);
+			else
+				binding.Run(source, destination);
+		}
 
+		private void MapEnumerable(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination,
+			IEnumerator<IBinding<TFromModel, TFromField, TToModel, TToField>> enumerator)
+		{
+			var binding = enumerator.Current;
+			//  todo: introduce IBinding.DependencyPath to use here instead of FromPath so bindings without a bound source can still enumerate properly
+			using (var readEnumerator = source.GetEnumerator(binding.FromPath))
+			using (var writeStream = destination.CreateEnumerableStream(binding.ToPath))
+			while (readEnumerator.MoveNext())
+			{
+				RunBinding(readEnumerator.Current, writeStream.CreateNew(), enumerator);
 			}
 		}
 	}
