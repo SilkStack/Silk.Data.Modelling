@@ -1,15 +1,21 @@
 ﻿using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling.Mapping.Binding
 {
-	public class CopySameTypesFactory<TFromModel, TFromField, TToModel, TToField> :
+	public class CopySameValueTypesFactory<TFromModel, TFromField, TToModel, TToField> :
 		IBindingFactory<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
+		private bool IsAcceptableType(Type type)
+		{
+			return type == typeof(string) || type.IsValueType;
+		}
+
 		public void CreateBinding(
 			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
@@ -17,7 +23,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
 				intersectedFields.LeftField.FieldDataType != intersectedFields.RightField.FieldDataType ||
-				mappingFactoryContext.IsToFieldBound(intersectedFields))
+				!IsAcceptableType(intersectedFields.LeftField.FieldDataType) ||
+				!IsAcceptableType(intersectedFields.RightField.FieldDataType) ||
+				mappingFactoryContext.IsToFieldBound(intersectedFields)
+				)
 			{
 				return;
 			}
