@@ -2,7 +2,7 @@
 using Silk.Data.Modelling.Analysis.CandidateSources;
 using System.Linq;
 
-namespace Silk.Data.Modelling.Tests
+namespace Silk.Data.Modelling.Tests.Analysis.CandidateSources
 {
 	[TestClass]
 	public class ExactPathMatchCandidateSourceTests

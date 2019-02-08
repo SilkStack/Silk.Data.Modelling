@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Silk.Data.Modelling\Silk.Data.Modelling.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mapping\Binding\" />
+  </ItemGroup>
+
 </Project>

@@ -2,7 +2,7 @@
 using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Mapping;
 
-namespace Silk.Data.Modelling.Tests
+namespace Silk.Data.Modelling.Tests.Mapping
 {
 	[TestClass]
 	public class TypeToTypeMappingFactoryTests

@@ -4,7 +4,7 @@ using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Analysis.Rules;
 using System.Linq;
 
-namespace Silk.Data.Modelling.Tests
+namespace Silk.Data.Modelling.Tests.Analysis
 {
 	[TestClass]
 	public class TypeToTypeIntersectionAnalyzerTests

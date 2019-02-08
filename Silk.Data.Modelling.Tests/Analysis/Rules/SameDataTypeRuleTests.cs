@@ -4,7 +4,7 @@ using Silk.Data.Modelling.Analysis.CandidateSources;
 using System.Linq;
 using System;
 
-namespace Silk.Data.Modelling.Tests
+namespace Silk.Data.Modelling.Tests.Analysis.Rules
 {
 	[TestClass]
 	public class SameDataTypeRuleTests
