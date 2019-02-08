@@ -23,6 +23,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
 				intersectedFields.LeftField.RemoveEnumerableType() != intersectedFields.RightField.RemoveEnumerableType() ||
+				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
 				!IsAcceptableType(intersectedFields.LeftField.FieldDataType) ||
 				!IsAcceptableType(intersectedFields.RightField.FieldDataType) ||
 				mappingFactoryContext.IsToFieldBound(intersectedFields)
@@ -65,7 +66,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 		}
 
-		protected override void RunSingle(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
+		public override void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
 			if (!source.CheckPath(FromPath) || !destination.CheckPath(ToPath))
 				return;

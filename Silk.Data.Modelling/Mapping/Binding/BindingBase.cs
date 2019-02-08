@@ -21,11 +21,6 @@
 			FromPath = fromPath;
 		}
 
-		protected abstract void RunSingle(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination);
-
-		public virtual void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
-		{
-			RunSingle(source, destination);
-		}
+		public abstract void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination);
 	}
 }

@@ -28,7 +28,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 		{
 			var factory = new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				null
+				null, null, null
 				);
 			factory.CreateBinding(
 				factoryContext,
@@ -44,7 +44,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 		{
 			var factory = new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				null
+				null, null, null
 				);
 			factory.CreateBinding(
 				factoryContext,
@@ -60,7 +60,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 		{
 			var factory = new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				null
+				null, null, null
 				);
 			factory.CreateBinding(
 				factoryContext,
@@ -76,7 +76,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 		{
 			var factory = new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				null
+				null, null, null
 				);
 			factory.CreateBinding(
 				factoryContext,

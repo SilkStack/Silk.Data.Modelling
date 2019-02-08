@@ -47,5 +47,15 @@
 			var checker = _propertyAccessor.GetPropertyChecker(fieldPath, skipLastField: false);
 			return checker(Graph);
 		}
+
+		public IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		{
+			throw new System.NotImplementedException();
+		}
 	}
 }

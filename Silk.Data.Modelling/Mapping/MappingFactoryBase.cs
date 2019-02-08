@@ -17,9 +17,10 @@ namespace Silk.Data.Modelling.Mapping
 		public ICollection<IBindingFactory<TFromModel, TFromField, TToModel, TToField>> BindingFactories { get; }
 			= new List<IBindingFactory<TFromModel, TFromField, TToModel, TToField>>();
 
-		protected virtual MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> CreateFactoryContext()
+		protected virtual MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> CreateFactoryContext(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
 		{
-			return new MappingFactoryContext<TFromModel, TFromField, TToModel, TToField>(this);
+			return new MappingFactoryContext<TFromModel, TFromField, TToModel, TToField>(
+				intersection.LeftModel, intersection.RightModel, this);
 		}
 
 		protected virtual void CreateBindings(
@@ -40,7 +41,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
 		{
-			var context = CreateFactoryContext();
+			var context = CreateFactoryContext(intersection);
 			CreateBindings(context, intersection);
 			return CreateMapping(context);
 		}

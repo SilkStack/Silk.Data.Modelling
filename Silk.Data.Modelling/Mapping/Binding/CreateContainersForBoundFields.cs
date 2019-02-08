@@ -99,7 +99,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			_dependentPath = dependentPath;
 		}
 
-		protected override void RunSingle(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
+		public override void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
 			var destinationReader = destination as IGraphReader<TToModel, TToField>;
 			if (destinationReader != null)

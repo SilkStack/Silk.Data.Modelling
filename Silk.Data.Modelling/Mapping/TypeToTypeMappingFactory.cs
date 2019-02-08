@@ -16,6 +16,6 @@ namespace Silk.Data.Modelling.Mapping
 		protected override IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateMapping(
 			MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> mappingFactoryContext
 			)
-			=> new TypeToTypeMapping(mappingFactoryContext.Bindings);
+			=> new TypeToTypeMapping(mappingFactoryContext.FromModel, mappingFactoryContext.ToModel, mappingFactoryContext.Bindings);
 	}
 }

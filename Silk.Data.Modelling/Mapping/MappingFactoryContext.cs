@@ -11,12 +11,18 @@ namespace Silk.Data.Modelling.Mapping
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
+		public TFromModel FromModel { get; }
+		public TToModel ToModel { get; }
+
 		public IMappingFactory<TFromModel, TFromField, TToModel, TToField> Factory { get; }
 
 		public List<IBinding<TFromModel, TFromField, TToModel, TToField>> Bindings { get; }
 			= new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
 
-		public MappingFactoryContext(IMappingFactory<TFromModel, TFromField, TToModel, TToField> factory)
+		public MappingFactoryContext(
+			TFromModel fromModel, TToModel toModel,
+			IMappingFactory<TFromModel, TFromField, TToModel, TToField> factory
+			)
 		{
 			Factory = factory;
 		}
