@@ -17,7 +17,7 @@ namespace Silk.Data.Modelling.Mapping
 		/// <param name="value"></param>
 		void Write<T>(IFieldPath<TModel, TField> fieldPath, T value);
 
-		IGraphWriterStream<TModel, TField> CreateEnumerableStream(IFieldPath<TModel, TField> fieldPath);
+		IGraphWriterStream<TModel, TField> CreateEnumerableStream<T>(IFieldPath<TModel, TField> fieldPath);
 
 		/// <summary>
 		/// Creates a container at the specified path.

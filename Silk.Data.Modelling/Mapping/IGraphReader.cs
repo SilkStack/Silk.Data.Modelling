@@ -22,7 +22,7 @@ namespace Silk.Data.Modelling.Mapping
 		/// </summary>
 		/// <param name="fieldPath"></param>
 		/// <returns></returns>
-		IGraphReaderEnumerator<TModel, TField> GetEnumerator(IFieldPath<TModel, TField> fieldPath);
+		IGraphReaderEnumerator<TModel, TField> GetEnumerator<T>(IFieldPath<TModel, TField> fieldPath);
 
 		/// <summary>
 		/// Checks for a valid container at the provided path on the model graph.

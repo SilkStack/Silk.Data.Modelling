@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Silk.Data.Modelling.Analysis;
+using Silk.Data.Modelling.GenericDispatch;
 using Silk.Data.Modelling.Mapping.Binding;
 
 namespace Silk.Data.Modelling.Mapping
@@ -81,10 +82,13 @@ namespace Silk.Data.Modelling.Mapping
 
 					if (binding.ToField.IsEnumerableType)
 					{
-						yield return new EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField>(
+						var scopeBuilder = new EnumerableScopeBuilder(
 							binding,
-							GetScopes(subPath)
+							GetScopes(subPath),
+							binding.FromField
 							);
+						binding.ToField.Dispatch(scopeBuilder);
+						yield return scopeBuilder.Scope;
 					}
 					else
 					{
@@ -106,6 +110,57 @@ namespace Silk.Data.Modelling.Mapping
 			CreateBindings(context, intersection);
 			var bindingScope = CreateScopedBindings(context);
 			return CreateMapping(context, bindingScope);
+		}
+
+		private class EnumerableScopeBuilder : IFieldGenericExecutor
+		{
+			private readonly IBinding<TFromModel, TFromField, TToModel, TToField> _binding;
+			private readonly IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> _scopes;
+			private readonly TFromField _fromField;
+
+			public BindingScope<TFromModel, TFromField, TToModel, TToField> Scope { get; private set; }
+
+			public EnumerableScopeBuilder(
+				IBinding<TFromModel, TFromField, TToModel, TToField> binding,
+				IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> scopes,
+				TFromField fromField
+				)
+			{
+				_binding = binding;
+				_scopes = scopes;
+				_fromField = fromField;
+			}
+
+			void IFieldGenericExecutor.Execute<TField, TData>(IField field)
+			{
+				var subBuilder = new EnumerableScopeBuilder<TData>(_binding, _scopes);
+				_fromField.Dispatch(subBuilder);
+				Scope = subBuilder.Scope;
+			}
+		}
+
+		private class EnumerableScopeBuilder<TToData> : IFieldGenericExecutor
+		{
+			private readonly IBinding<TFromModel, TFromField, TToModel, TToField> _binding;
+			private readonly IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> _scopes;
+
+			public BindingScope<TFromModel, TFromField, TToModel, TToField> Scope { get; private set; }
+
+			public EnumerableScopeBuilder(
+				IBinding<TFromModel, TFromField, TToModel, TToField> binding,
+				IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> scopes
+				)
+			{
+				_binding = binding;
+				_scopes = scopes;
+			}
+
+			void IFieldGenericExecutor.Execute<TField, TData>(IField field)
+			{
+				Scope = new EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField, TData, TToData>(
+					_binding, _scopes
+					);
+			}
 		}
 	}
 }

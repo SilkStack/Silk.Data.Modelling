@@ -48,14 +48,16 @@
 			return checker(Graph);
 		}
 
-		public IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
-			throw new System.NotImplementedException();
+			var reader = _propertyAccessor.GetEnumerableReader<T>(fieldPath);
+			var enumerable = reader(Graph);
+			return new ObjectGraphReaderEnumerator<TGraph, T>(Graph, enumerable.GetEnumerator());
 		}
 
-		public IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
-			throw new System.NotImplementedException();
+			return new OpenGraphEnumerableStream<T>();
 		}
 	}
 }

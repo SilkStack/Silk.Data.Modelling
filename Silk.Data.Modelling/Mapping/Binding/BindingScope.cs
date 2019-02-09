@@ -63,7 +63,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 	/// <typeparam name="TFromField"></typeparam>
 	/// <typeparam name="TToModel"></typeparam>
 	/// <typeparam name="TToField"></typeparam>
-	public class EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField> :
+	public class EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField, TFromData, TToData> :
 		BindingScope<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
@@ -81,8 +81,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			var binding = Bindings.First();
 			//  todo: use a DependentPath here instead of FromPath
-			using (var readerEnumerator = source.GetEnumerator(binding.FromPath))
-			using (var writerStream = destination.CreateEnumerableStream(binding.ToPath))
+			using (var readerEnumerator = source.GetEnumerator<TFromData>(binding.FromPath))
+			using (var writerStream = destination.CreateEnumerableStream<TToData>(binding.ToPath))
 			while (readerEnumerator.MoveNext())
 			{
 				var scopeSource = readerEnumerator.Current;

@@ -40,6 +40,26 @@ namespace Silk.Data.Modelling.Mapping
 			= new Dictionary<string, Delegate>();
 		private readonly Dictionary<string, Delegate> _containerCreators
 			= new Dictionary<string, Delegate>();
+		private readonly Dictionary<string, Delegate> _enumerableReaders
+			= new Dictionary<string, Delegate>();
+
+		public Func<TGraph, IEnumerable<T>> GetEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		{
+			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+
+			if (_enumerableReaders.TryGetValue(flattenedPath, out var @delegate))
+				return @delegate as Func<TGraph, IEnumerable<T>>;
+
+			lock (_enumerableReaders)
+			{
+				if (_enumerableReaders.TryGetValue(flattenedPath, out @delegate))
+					return @delegate as Func<TGraph, IEnumerable<T>>;
+
+				@delegate = CreateEnumerableReader<T>(fieldPath);
+				_enumerableReaders.Add(flattenedPath, @delegate);
+				return @delegate as Func<TGraph, IEnumerable<T>>;
+			}
+		}
 
 		public Action<TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
 		{
@@ -122,6 +142,22 @@ namespace Silk.Data.Modelling.Mapping
 			return type
 				.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 				.FirstOrDefault(ctor => ctor.GetParameters().Length == 0);
+		}
+
+		private Func<TGraph, IEnumerable<T>> CreateEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		{
+			var graph = Expression.Parameter(typeof(TGraph));
+			Expression body = graph;
+
+			foreach (var field in fieldPath.Fields)
+				body = Expression.Property(body, field.FieldName);
+
+			body = Expression.Convert(body, typeof(IEnumerable<T>));
+
+			var lambda = Expression.Lambda<Func<TGraph, IEnumerable<T>>>(
+				body, graph
+				);
+			return lambda.Compile();
 		}
 
 		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
