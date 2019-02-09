@@ -2,18 +2,17 @@
 
 namespace Silk.Data.Modelling.Mapping
 {
-	public class ObjectGraphReaderEnumerator<TGraph, TData> : IGraphReaderEnumerator<TypeModel, PropertyInfoField>
-		where TGraph : class
+	public class ObjectGraphReaderEnumerator<TData> : IGraphReaderEnumerator<TypeModel, PropertyInfoField>
 	{
 		private readonly IEnumerator<TData> _enumerator;
-		private readonly TGraph _graph;
+		private readonly IFieldPath<TypeModel, PropertyInfoField> _fieldPath;
 
 		public IGraphReader<TypeModel, PropertyInfoField> Current { get; private set; }
 
-		public ObjectGraphReaderEnumerator(TGraph graph, IEnumerator<TData> enumerator)
+		public ObjectGraphReaderEnumerator(IEnumerator<TData> enumerator, IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			_enumerator = enumerator;
-			_graph = graph;
+			_fieldPath = fieldPath;
 		}
 
 		public void Dispose()
@@ -27,8 +26,16 @@ namespace Silk.Data.Modelling.Mapping
 			if (!ok)
 				return false;
 
-			Current = null;
+			Current = new EnumeratorReaderWriter(_enumerator.Current, _fieldPath);
 			return true;
+		}
+
+		private class EnumeratorReaderWriter : ObjectGraphReaderWriterBase<TData>
+		{
+			public EnumeratorReaderWriter(TData graph, IFieldPath<TypeModel, PropertyInfoField> fieldPath) :
+				base(graph, fieldPath)
+			{
+			}
 		}
 	}
 }

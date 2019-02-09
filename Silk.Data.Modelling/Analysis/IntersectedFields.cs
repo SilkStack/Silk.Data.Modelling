@@ -65,7 +65,7 @@ namespace Silk.Data.Modelling.Analysis
 					.MakeGenericType(
 						typeof(TLeftModel), typeof(TLeftField),
 						typeof(TRightModel), typeof(TRightField),
-						leftField.FieldDataType, rightField.FieldDataType
+						leftField.RemoveEnumerableType(), rightField.RemoveEnumerableType()
 						),
 				leftField, rightField, leftPath, rightPath
 				) as IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>;

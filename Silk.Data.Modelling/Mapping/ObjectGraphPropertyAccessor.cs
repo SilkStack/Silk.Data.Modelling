@@ -42,8 +42,28 @@ namespace Silk.Data.Modelling.Mapping
 			= new Dictionary<string, Delegate>();
 		private readonly Dictionary<string, Delegate> _enumerableReaders
 			= new Dictionary<string, Delegate>();
+		private readonly Dictionary<string, Delegate> _enumerableWriters
+			= new Dictionary<string, Delegate>();
 
-		public Func<TGraph, IEnumerable<T>> GetEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		public Action<TGraph, IEnumerable<T>> GetEnumerableWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		{
+			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+
+			if (_enumerableReaders.TryGetValue(flattenedPath, out var @delegate))
+				return @delegate as Action<TGraph, IEnumerable<T>>;
+
+			lock (_enumerableReaders)
+			{
+				if (_enumerableReaders.TryGetValue(flattenedPath, out @delegate))
+					return @delegate as Action<TGraph, IEnumerable<T>>;
+
+				@delegate = CreateEnumerableWriter<T>(fieldPath, pathOffset);
+				_enumerableReaders.Add(flattenedPath, @delegate);
+				return @delegate as Action<TGraph, IEnumerable<T>>;
+			}
+		}
+
+		public Func<TGraph, IEnumerable<T>> GetEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
@@ -55,13 +75,13 @@ namespace Silk.Data.Modelling.Mapping
 				if (_enumerableReaders.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Func<TGraph, IEnumerable<T>>;
 
-				@delegate = CreateEnumerableReader<T>(fieldPath);
+				@delegate = CreateEnumerableReader<T>(fieldPath, pathOffset);
 				_enumerableReaders.Add(flattenedPath, @delegate);
 				return @delegate as Func<TGraph, IEnumerable<T>>;
 			}
 		}
 
-		public Action<TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
+		public Action<TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
@@ -73,17 +93,17 @@ namespace Silk.Data.Modelling.Mapping
 				if (_containerCreators.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Action<TGraph>;
 
-				@delegate = CreateContainerCreator(fieldPath);
+				@delegate = CreateContainerCreator(fieldPath, pathOffset);
 				_containerCreators.Add(flattenedPath, @delegate);
 				return @delegate as Action<TGraph>;
 			}
 		}
 
-		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField)
+		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField, int pathOffset = 0)
 		{
-			var pathSource = fieldPath.Fields.Select(field => field.FieldName);
+			var pathSource = fieldPath.Fields.Select(field => field.FieldName).Skip(pathOffset);
 			if (skipLastField)
-				pathSource = pathSource.Take(fieldPath.Fields.Count - 1);
+				pathSource = pathSource.Take(fieldPath.Fields.Count - 1 - pathOffset);
 
 			var flattenedPath = string.Join(".", pathSource);
 
@@ -95,15 +115,15 @@ namespace Silk.Data.Modelling.Mapping
 				if (_propertyCheckers.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Func<TGraph, bool>;
 
-				@delegate = CreatePropertyChecker(fieldPath, skipLastField);
+				@delegate = CreatePropertyChecker(fieldPath, skipLastField, pathOffset);
 				_propertyCheckers.Add(flattenedPath, @delegate);
 				return @delegate as Func<TGraph, bool>;
 			}
 		}
 
-		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
 		{
-			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
 
 			if (_propertyReaders.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Func<TGraph, T>;
@@ -113,27 +133,27 @@ namespace Silk.Data.Modelling.Mapping
 				if (_propertyReaders.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Func<TGraph, T>;
 
-				@delegate = CreatePropertyReader<T>(fieldPath);
+				@delegate = CreatePropertyReader<T>(fieldPath, pathOffset);
 				_propertyReaders.Add(flattenedPath, @delegate);
 				return @delegate as Func<TGraph, T>;
 			}
 		}
 
-		public Action<TGraph, T> GetPropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath)
+		public Func<TGraph, T, TGraph> GetPropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
 		{
-			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
+			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
 
 			if (_propertyWriters.TryGetValue(flattenedPath, out var @delegate))
-				return @delegate as Action<TGraph, T>;
+				return @delegate as Func<TGraph, T, TGraph>;
 
 			lock (_propertyWriters)
 			{
 				if (_propertyWriters.TryGetValue(flattenedPath, out @delegate))
-					return @delegate as Action<TGraph, T>;
+					return @delegate as Func<TGraph, T, TGraph>;
 
-				@delegate = CreatePropertyWriter<T>(fieldPath);
+				@delegate = CreatePropertyWriter<T>(fieldPath, pathOffset);
 				_propertyWriters.Add(flattenedPath, @delegate);
-				return @delegate as Action<TGraph, T>;
+				return @delegate as Func<TGraph, T, TGraph>;
 			}
 		}
 
@@ -144,12 +164,43 @@ namespace Silk.Data.Modelling.Mapping
 				.FirstOrDefault(ctor => ctor.GetParameters().Length == 0);
 		}
 
-		private Func<TGraph, IEnumerable<T>> CreateEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		private static T[] ConvertToArray<T>(IEnumerable<T> source)
+			=> source.ToArray();
+
+		private static List<T> ConvertToList<T>(IEnumerable<T> source)
+			=> source.ToList();
+
+		private Action<TGraph, IEnumerable<T>> CreateEnumerableWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		{
+			var graph = Expression.Parameter(typeof(TGraph));
+			var enumerable = Expression.Parameter(typeof(IEnumerable<T>));
+			Expression property = graph;
+
+			foreach (var field in fieldPath.Fields.Skip(pathOffset))
+				property = Expression.Property(property, field.FieldName);
+
+			MethodInfo convertMethod;
+			if (fieldPath.FinalField.FieldDataType.IsArray)
+				convertMethod = typeof(ObjectGraphPropertyAccessor<TGraph>).GetMethod("ConvertToArray", BindingFlags.Static | BindingFlags.NonPublic)
+					.MakeGenericMethod(fieldPath.FinalField.FieldElementType);
+			else
+				convertMethod = typeof(ObjectGraphPropertyAccessor<TGraph>).GetMethod("ConvertToList", BindingFlags.Static | BindingFlags.NonPublic)
+					.MakeGenericMethod(fieldPath.FinalField.FieldElementType);
+
+			var assignment = Expression.Assign(property, Expression.Call(convertMethod, enumerable));
+
+			var lambda = Expression.Lambda<Action<TGraph, IEnumerable<T>>>(
+				assignment, graph, enumerable
+				);
+			return lambda.Compile();
+		}
+
+		private Func<TGraph, IEnumerable<T>> CreateEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			Expression body = graph;
 
-			foreach (var field in fieldPath.Fields)
+			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				body = Expression.Property(body, field.FieldName);
 
 			body = Expression.Convert(body, typeof(IEnumerable<T>));
@@ -160,7 +211,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath)
+		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
 			var ctor = GetParameterlessConstructor(fieldPath.FinalField.FieldDataType);
 			if (ctor == null)
@@ -170,7 +221,7 @@ namespace Silk.Data.Modelling.Mapping
 
 			Expression property = graph;
 
-			foreach (var field in fieldPath.Fields)
+			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				property = Expression.Property(property, field.FieldName);
 
 			var lambda = Expression.Lambda<Action<TGraph>>(
@@ -179,14 +230,23 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField)
+		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph), "graph");
 			var result = Expression.Variable(typeof(bool), "result");
 
+			if (fieldPath.Fields.Count - pathOffset < 1 ||
+				(skipLastField && fieldPath.Fields.Count - pathOffset < 2))
+			{
+				var shortLambda = Expression.Lambda<Func<TGraph, bool>>(
+					Expression.Constant(true), graph
+				);
+				return shortLambda.Compile();
+			}
+
 			var ifTree = Expression.IfThen(
 				Expression.NotEqual(graph, Expression.Constant(null)),
-				NextPropertyBranch(fieldPath.Fields, 1)
+				NextPropertyBranch(fieldPath.Fields.Skip(pathOffset).ToArray(), 1)
 				);
 
 			var body = Expression.Block(
@@ -221,12 +281,12 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		private Func<TGraph, T> CreatePropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath)
+		private Func<TGraph, T> CreatePropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			Expression body = graph;
 
-			foreach (var field in fieldPath.Fields)
+			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				body = Expression.Property(body, field.FieldName);
 
 			var lambda = Expression.Lambda<Func<TGraph, T>>(
@@ -235,22 +295,27 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Action<TGraph, T> CreatePropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath)
+		private Func<TGraph, T, TGraph> CreatePropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			var value = Expression.Parameter(typeof(T));
 
 			Expression property = graph;
 
-			foreach (var field in fieldPath.Fields)
+			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				property = Expression.Property(property, field.FieldName);
 
-			var body = Expression.Assign(
+			Expression body = Expression.Assign(
 				property,
 				value
 				);
 
-			var lambda = Expression.Lambda<Action<TGraph, T>>(
+			body = Expression.Block(
+				body,
+				graph
+				);
+
+			var lambda = Expression.Lambda<Func<TGraph, T, TGraph>>(
 				body, graph, value
 				);
 			return lambda.Compile();
