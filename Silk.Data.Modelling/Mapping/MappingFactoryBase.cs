@@ -4,6 +4,13 @@ using Silk.Data.Modelling.Mapping.Binding;
 
 namespace Silk.Data.Modelling.Mapping
 {
+	/// <summary>
+	/// Mapping factory base that utilizes BindingScopes to create mappings.
+	/// </summary>
+	/// <typeparam name="TFromModel"></typeparam>
+	/// <typeparam name="TFromField"></typeparam>
+	/// <typeparam name="TToModel"></typeparam>
+	/// <typeparam name="TToField"></typeparam>
 	public abstract class MappingFactoryBase<TFromModel, TFromField, TToModel, TToField> :
 		IMappingFactory<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
@@ -37,13 +44,39 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		protected abstract IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext);
+		protected abstract IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			BindingScope<TFromModel, TFromField, TToModel, TToField> bindingScope
+			);
+
+		protected virtual BindingScope<TFromModel, TFromField, TToModel, TToField> CreateScopedBindings(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext
+			)
+		{
+			return new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
+				GetBindings(),
+				GetScopes()
+				);
+
+			IEnumerable<IBinding<TFromModel, TFromField, TToModel, TToField>> GetBindings(
+				)
+			{
+				foreach (var binding in mappingFactoryContext.Bindings)
+					yield return binding;
+			}
+
+			IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> GetScopes()
+			{
+				yield break;
+			}
+		}
 
 		public IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(IIntersection<TFromModel, TFromField, TToModel, TToField> intersection)
 		{
 			var context = CreateFactoryContext(intersection);
 			CreateBindings(context, intersection);
-			return CreateMapping(context);
+			var bindingScope = CreateScopedBindings(context);
+			return CreateMapping(context, bindingScope);
 		}
 	}
 }

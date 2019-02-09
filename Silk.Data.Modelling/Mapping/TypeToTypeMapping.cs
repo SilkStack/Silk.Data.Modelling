@@ -1,5 +1,4 @@
 ﻿using Silk.Data.Modelling.Mapping.Binding;
-using System.Collections.Generic;
 
 namespace Silk.Data.Modelling.Mapping
 {
@@ -9,8 +8,8 @@ namespace Silk.Data.Modelling.Mapping
 	public class TypeToTypeMapping : MappingBase<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>
 	{
 		public TypeToTypeMapping(TypeModel fromModel, TypeModel toModel,
-			IEnumerable<IBinding<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>> bindings) :
-			base(fromModel, toModel, bindings)
+			BindingScope<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> bindingScope) :
+			base(fromModel, toModel, bindingScope)
 		{
 		}
 	}
