@@ -75,23 +75,25 @@ namespace Silk.Data.Modelling.Mapping
 				string[] path
 				)
 			{
-				foreach (var binding in mappingFactoryContext.Bindings)
+				foreach (var binding in GetBindings(path))
 				{
-					var toFieldPath = binding.ToPath.Fields.Select(q => q.FieldName);
-					if (toFieldPath.Take(path.Length).SequenceEqual(path))
-					{
-						var subPath = path.Concat(new[] { binding.ToField.FieldName }).ToArray();
-						var subBindings = GetBindings(subPath).ToArray();
-						if (subBindings.Length > 0)
-							yield return new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
-								subBindings.Where(subBinding => !subBinding.ToField.IsEnumerableType), GetScopes(subPath));
+					var subPath = path.Concat(new[] { binding.ToField.FieldName }).ToArray();
 
-						foreach (var subBinding in subBindings.Where(q => q.ToField.IsEnumerableType))
+					if (binding.ToField.IsEnumerableType)
+					{
+						yield return new EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField>(
+							binding,
+							GetScopes(subPath)
+							);
+					}
+					else
+					{
+						var bindings = GetBindings(subPath).Where(q => !q.ToField.IsEnumerableType).ToArray();
+						var scopes = GetScopes(subPath).ToArray();
+						if (bindings.Length > 0 || scopes.Length > 0)
 						{
-							var subEnumPath = subPath.Concat(new[] { subBinding.ToField.FieldName }).ToArray();
-							yield return new EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField>(
-								subBinding, GetScopes(subEnumPath)
-								);
+							yield return new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
+								bindings, scopes);
 						}
 					}
 				}

@@ -25,6 +25,8 @@ namespace Silk.Data.Modelling.Mapping
 			)
 		{
 			Factory = factory;
+			ToModel = toModel;
+			FromModel = fromModel;
 		}
 
 		public bool IsToFieldBound(IntersectedFields intersectedFields)

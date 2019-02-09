@@ -24,8 +24,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				!intersectedFields.RightField.CanWrite ||
 				intersectedFields.LeftField.RemoveEnumerableType() != intersectedFields.RightField.RemoveEnumerableType() ||
 				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
-				!IsAcceptableType(intersectedFields.LeftField.FieldDataType) ||
-				!IsAcceptableType(intersectedFields.RightField.FieldDataType) ||
+				!IsAcceptableType(intersectedFields.LeftField.RemoveEnumerableType()) ||
+				!IsAcceptableType(intersectedFields.RightField.RemoveEnumerableType()) ||
 				mappingFactoryContext.IsToFieldBound(intersectedFields)
 				)
 			{
