@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Mapping.Binding;
 
@@ -54,20 +55,46 @@ namespace Silk.Data.Modelling.Mapping
 			)
 		{
 			return new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
-				GetBindings(),
-				GetScopes()
+				GetBindings(new string[0]).Where(binding => !binding.ToField.IsEnumerableType),
+				GetScopes(new string[0])
 				);
 
 			IEnumerable<IBinding<TFromModel, TFromField, TToModel, TToField>> GetBindings(
+				string[] path
 				)
 			{
 				foreach (var binding in mappingFactoryContext.Bindings)
-					yield return binding;
+				{
+					var toFieldPath = binding.ToPath.Fields.Select(q => q.FieldName).ToArray();
+					if (toFieldPath.Length - 1 == path.Length && toFieldPath.Take(path.Length).SequenceEqual(path))
+						yield return binding;
+				}
 			}
 
-			IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> GetScopes()
+			IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> GetScopes(
+				string[] path
+				)
 			{
-				yield break;
+				foreach (var binding in mappingFactoryContext.Bindings)
+				{
+					var toFieldPath = binding.ToPath.Fields.Select(q => q.FieldName);
+					if (toFieldPath.Take(path.Length).SequenceEqual(path))
+					{
+						var subPath = path.Concat(new[] { binding.ToField.FieldName }).ToArray();
+						var subBindings = GetBindings(subPath).ToArray();
+						if (subBindings.Length > 0)
+							yield return new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
+								subBindings.Where(subBinding => !subBinding.ToField.IsEnumerableType), GetScopes(subPath));
+
+						foreach (var subBinding in subBindings.Where(q => q.ToField.IsEnumerableType))
+						{
+							var subEnumPath = subPath.Concat(new[] { subBinding.ToField.FieldName }).ToArray();
+							yield return new EnumerableBindingScope<TFromModel, TFromField, TToModel, TToField>(
+								subBinding, GetScopes(subEnumPath)
+								);
+						}
+					}
+				}
 			}
 		}
 
