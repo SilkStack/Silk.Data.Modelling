@@ -12,6 +12,8 @@
 		public TFromField FromField { get; }
 		public IFieldPath<TFromModel, TFromField> FromPath { get; }
 
+		public IFieldPath<TFromModel, TFromField> EnumerablePath { get; }
+
 		public BindingBase(TFromField fromField, IFieldPath<TFromModel, TFromField> fromPath,
 			TToField toField, IFieldPath<TToModel, TToField> toPath)
 		{
@@ -19,6 +21,16 @@
 			ToPath = toPath;
 			FromField = fromField;
 			FromPath = fromPath;
+		}
+
+		public BindingBase(TFromField fromField, IFieldPath<TFromModel, TFromField> fromPath,
+			TToField toField, IFieldPath<TToModel, TToField> toPath, IFieldPath<TFromModel, TFromField> enumerablePath)
+		{
+			ToField = toField;
+			ToPath = toPath;
+			FromField = fromField;
+			FromPath = fromPath;
+			EnumerablePath = enumerablePath;
 		}
 
 		public abstract void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination);

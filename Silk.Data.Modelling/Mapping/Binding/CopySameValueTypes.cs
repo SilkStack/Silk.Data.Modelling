@@ -62,7 +62,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TToModel : IModel<TToField>
 	{
 		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath) :
-			base(fromPath.FinalField, fromPath, toPath.FinalField, toPath)
+			base(fromPath.FinalField, fromPath, toPath.FinalField, toPath, fromPath.FinalField.IsEnumerableType ? fromPath : null)
 		{
 		}
 

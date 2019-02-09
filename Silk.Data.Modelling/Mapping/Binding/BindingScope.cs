@@ -80,8 +80,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		public override void RunScope(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
 			var binding = Bindings.First();
-			//  todo: use a DependentPath here instead of FromPath
-			using (var readerEnumerator = source.GetEnumerator<TFromData>(binding.FromPath))
+			using (var readerEnumerator = source.GetEnumerator<TFromData>(binding.EnumerablePath))
 			using (var writerStream = destination.CreateEnumerableStream<TToData>(binding.ToPath))
 			while (readerEnumerator.MoveNext())
 			{

@@ -14,6 +14,8 @@
 
 		IFieldPath<TFromModel, TFromField> FromPath { get; }
 
+		IFieldPath<TFromModel, TFromField> EnumerablePath { get; }
+
 		/// <summary>
 		/// Perform the binding.
 		/// </summary>
