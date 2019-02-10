@@ -1,4 +1,6 @@
-﻿namespace Silk.Data.Modelling.Analysis.CandidateSources
+﻿using System;
+
+namespace Silk.Data.Modelling.Analysis.CandidateSources
 {
 	/// <summary>
 	/// Intersect candidate between two models.
@@ -40,10 +42,17 @@
 		/// </summary>
 		public TRightField RightField => RightPath.FinalField;
 
-		public IntersectCandidate(FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath)
+		/// <summary>
+		/// Gets the Type of the candidate source that created the candidate.
+		/// </summary>
+		public Type CandidateSourceType { get; }
+
+		public IntersectCandidate(FieldPath<TLeftModel, TLeftField> leftPath, FieldPath<TRightModel, TRightField> rightPath,
+			Type candidateSourceType)
 		{
 			LeftPath = leftPath;
 			RightPath = rightPath;
+			CandidateSourceType = candidateSourceType;
 		}
 	}
 }

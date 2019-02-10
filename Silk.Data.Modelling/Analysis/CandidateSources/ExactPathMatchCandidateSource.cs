@@ -52,7 +52,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 							var newLeftPath = leftPath.Child(leftField);
 							var newRightPath = rightPath.Child(rightField);
 							yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
-								newLeftPath, newRightPath
+								newLeftPath, newRightPath,
+								typeof(ExactPathMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>)
 								);
 
 							foreach (var subCandidate in SearchFields(leftModel.GetPathFields(newLeftPath), rightModel.GetPathFields(newRightPath), newLeftPath, newRightPath, depth + 1))

@@ -25,7 +25,8 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 					NullableTypeModel,
 					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
 					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
-					)
+					),
+				null
 				);
 
 			var result = rule.IsValidIntersection(candidate, out var intersectedFields);
@@ -48,7 +49,8 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 					NullableTypeModel,
 					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.Value)),
 					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.Value)) }
-					)
+					),
+				null
 				);
 
 			var result = rule.IsValidIntersection(candidate, out var intersectedFields);

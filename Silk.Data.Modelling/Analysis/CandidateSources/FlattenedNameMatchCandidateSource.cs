@@ -35,7 +35,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 					if (leftField.FlatFieldPath == rightField.FlatFieldPath)
 					{
 						yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
-							leftField.FieldPath, rightField.FieldPath
+							leftField.FieldPath, rightField.FieldPath,
+							typeof(FlattenedNameMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>)
 							);
 					}
 				}
