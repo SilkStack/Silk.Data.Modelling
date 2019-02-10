@@ -41,6 +41,7 @@ namespace Silk.Data.Modelling.Analysis
 				IntersectionRules.Add(new BothNumericTypesRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 				IntersectionRules.Add(new ConvertableWithToStringRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 				IntersectionRules.Add(new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+				IntersectionRules.Add(new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 
 				return;
 			}
