@@ -29,10 +29,12 @@ namespace Silk.Data.Modelling.Mapping
 			FromModel = fromModel;
 		}
 
-		public bool IsToFieldBound(IntersectedFields intersectedFields)
-			=> IsToFieldBound(intersectedFields.RightField);
+		public bool IsToFieldBound(IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
+			=> IsToFieldBound(intersectedFields.RightPath);
 
-		public bool IsToFieldBound(IField toField)
-			=> Bindings.Any(binding => binding.ToField == toField);
+		public bool IsToFieldBound(IFieldPath<TToModel, TToField> toPath)
+			=> Bindings.Any(binding => binding.ToPath.Fields.Select(q => q.FieldName).SequenceEqual(
+				toPath.Fields.Select(q => q.FieldName)
+				));
 	}
 }

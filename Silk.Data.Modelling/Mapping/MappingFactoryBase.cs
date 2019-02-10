@@ -39,7 +39,9 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			foreach (var factory in BindingFactories)
 			{
-				foreach (var interesectedFields in intersection.IntersectedFields)
+				foreach (var interesectedFields in intersection.IntersectedFields.Where(
+					q => !context.IsToFieldBound(q)
+					))
 				{
 					factory.CreateBinding(context, interesectedFields);
 				}

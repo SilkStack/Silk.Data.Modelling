@@ -25,8 +25,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				intersectedFields.LeftField.RemoveEnumerableType() != intersectedFields.RightField.RemoveEnumerableType() ||
 				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
 				!IsAcceptableType(intersectedFields.LeftField.RemoveEnumerableType()) ||
-				!IsAcceptableType(intersectedFields.RightField.RemoveEnumerableType()) ||
-				mappingFactoryContext.IsToFieldBound(intersectedFields)
+				!IsAcceptableType(intersectedFields.RightField.RemoveEnumerableType())
 				)
 			{
 				return;
