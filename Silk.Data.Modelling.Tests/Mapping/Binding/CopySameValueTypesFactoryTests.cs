@@ -33,7 +33,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _subPropertyField, _propertyFieldPath, _subPropertyFieldPath
+					_propertyField, _subPropertyField, _propertyFieldPath, _subPropertyFieldPath, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);
@@ -49,7 +49,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath
+					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
 					)
 				);
 			Assert.AreEqual(1, factoryContext.Bindings.Count);
@@ -65,7 +65,7 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_containerField, _containerField, _containerFieldPath, _containerFieldPath
+					_containerField, _containerField, _containerFieldPath, _containerFieldPath, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);
@@ -81,13 +81,13 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath
+					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
 					)
 				);
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath
+					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
 					)
 				);
 			Assert.AreEqual(1, factoryContext.Bindings.Count);
