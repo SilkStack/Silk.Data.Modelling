@@ -10,13 +10,19 @@ namespace Silk.Data.Modelling.Analysis
 		public IField RightField { get; }
 		public IFieldPath RightPath { get; }
 
+		/// <summary>
+		/// Gets the Type of the intersection rule that created the intersected fields.
+		/// </summary>
+		public Type IntersectionRuleType { get; }
+
 		protected IntersectedFields(IField leftField, IField rightField,
-			IFieldPath leftPath, IFieldPath rightPath)
+			IFieldPath leftPath, IFieldPath rightPath, Type intersectionRuleType)
 		{
 			LeftField = leftField;
 			RightField = rightField;
 			LeftPath = leftPath;
 			RightPath = rightPath;
+			IntersectionRuleType = intersectionRuleType;
 		}
 
 		/// <summary>
@@ -42,8 +48,9 @@ namespace Silk.Data.Modelling.Analysis
 		public new IFieldPath<TRightModel, TRightField> RightPath { get; }
 
 		protected IntersectedFields(TLeftField leftField, TRightField rightField,
-			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath)
-			: base(leftField, rightField, leftPath, rightPath)
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath,
+			Type intersectionRuleType)
+			: base(leftField, rightField, leftPath, rightPath, intersectionRuleType)
 		{
 			LeftField = leftField;
 			RightField = rightField;
@@ -58,7 +65,7 @@ namespace Silk.Data.Modelling.Analysis
 		/// <param name="rightField"></param>
 		/// <returns></returns>
 		public static IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> Create(TLeftField leftField, TRightField rightField,
-			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath)
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath, Type intersectionRuleType)
 		{
 			return Activator.CreateInstance(
 				typeof(IntersectedFields<,,,,,>)
@@ -67,7 +74,7 @@ namespace Silk.Data.Modelling.Analysis
 						typeof(TRightModel), typeof(TRightField),
 						leftField.RemoveEnumerableType(), rightField.RemoveEnumerableType()
 						),
-				leftField, rightField, leftPath, rightPath
+				leftField, rightField, leftPath, rightPath, intersectionRuleType
 				) as IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>;
 		}
 	}
@@ -80,8 +87,9 @@ namespace Silk.Data.Modelling.Analysis
 		where TRightModel : IModel<TRightField>
 	{
 		public IntersectedFields(TLeftField leftField, TRightField rightField,
-			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath) :
-			base(leftField, rightField, leftPath, rightPath)
+			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath,
+			Type intersectionRuleType) :
+			base(leftField, rightField, leftPath, rightPath, intersectionRuleType)
 		{
 		}
 
