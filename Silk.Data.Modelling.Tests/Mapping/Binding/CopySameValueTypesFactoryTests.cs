@@ -71,28 +71,6 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			Assert.AreEqual(0, factoryContext.Bindings.Count);
 		}
 
-		[TestMethod]
-		public void CreateBinding_Binds_Ignores_Already_Bound_Field()
-		{
-			var factory = new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
-				null, null, null
-				);
-			factory.CreateBinding(
-				factoryContext,
-				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
-					)
-				);
-			factory.CreateBinding(
-				factoryContext,
-				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
-					)
-				);
-			Assert.AreEqual(1, factoryContext.Bindings.Count);
-		}
-
 		private class TestModel
 		{
 			public string Property { get; set; }
