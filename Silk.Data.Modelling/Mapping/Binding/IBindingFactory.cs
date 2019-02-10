@@ -12,5 +12,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
 			);
+
+		void PostBindings(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext
+			);
 	}
 }

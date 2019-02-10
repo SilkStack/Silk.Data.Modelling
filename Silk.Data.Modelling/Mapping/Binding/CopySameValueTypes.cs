@@ -38,6 +38,10 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			mappingFactoryContext.Bindings.Add(builder.Binding);
 		}
 
+		public void PostBindings(MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext)
+		{
+		}
+
 		private class BindingBuilder : IIntersectedFieldsGenericExecutor
 		{
 			public IBinding<TFromModel, TFromField, TToModel, TToField> Binding { get; private set; }

@@ -18,65 +18,89 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		private bool IsBindingCandidate(
-			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
-			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
-			)
-		{
-			if (
-				!intersectedFields.RightPath.HasParent || //  field has no parent, ie. no container
-				!intersectedFields.RightField.CanWrite || //  field isn't writeable so can't have a binding, early abort
-				mappingFactoryContext.IsToFieldBound(intersectedFields.RightPath.Parent.FinalField) //  parent is already bound, nothing to do here then
-				)
-				return false;
-			return true;
-		}
-
-		private int FindDependentBindingIndex(
-			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
-			IFieldPath<TToModel, TToField> parentPath
-			)
-		{
-			return mappingFactoryContext.Bindings.FindIndex(
-				binding => binding.ToPath.Fields.Contains(parentPath.FinalField)
-				);
-		}
-
 		public void CreateBinding(
 			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
 			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
 			)
 		{
-			if (!IsBindingCandidate(mappingFactoryContext, intersectedFields))
+		}
+
+		private Node GetNode(List<Node> nodes, IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath)
+		{
+			var node = nodes.FirstOrDefault(q => q.Path.SequenceEqual(path));
+			if (node != null)
+				return node;
+
+			node = new Node(path, fieldPath);
+			nodes.Add(node);
+			return node;
+		}
+
+		private void AddToNodes(List<Node> nodes, IBinding<TFromModel, TFromField, TToModel, TToField> binding)
+		{
+			if (binding.ToField == null || binding.ToPath == null || !binding.ToPath.HasParent)
 				return;
 
-			var parentPath = intersectedFields.RightPath.Parent;
-			var firstDependentBindingIndex = FindDependentBindingIndex(
-				mappingFactoryContext, parentPath
-				);
-			if (firstDependentBindingIndex < 0)
-				return;
-
-			//  we know there are objects depending on the graph having containers down to this level now
-			//  check for any that aren't bound and bind to a factory as needed
-			var bindings = new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
-			var dependentPath = mappingFactoryContext.Bindings[firstDependentBindingIndex].FromPath;
-
-			while (parentPath != null && parentPath.HasParent)
+			var parent = binding.ToPath.Parent;
+			while (parent.HasParent)
 			{
-				if (!mappingFactoryContext.IsToFieldBound(parentPath.FinalField))
-				{
-					bindings.Add(
-						new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
-							parentPath, dependentPath
-							)
-						);
-				}
-				parentPath = parentPath.Parent;
+				var node = GetNode(nodes, parent.Fields.Select(q => q.FieldName), parent);
+				node.Bindings.Add(binding);
+				parent = parent.Parent;
+			}
+		}
+
+		private bool HasBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			string[] path)
+		{
+			return mappingFactoryContext.Bindings.Any(
+				q => q.ToPath != null && q.ToPath.Fields.Select(field => field.FieldName).SequenceEqual(path)
+				);
+		}
+
+		private void EnsureNodesAreBound(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			List<Node> nodes
+			)
+		{
+			foreach (var node in nodes)
+			{
+				if (HasBinding(mappingFactoryContext, node.Path))
+					continue;
+
+				mappingFactoryContext.Bindings.Add(
+					new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
+						node.FieldPath, node.Bindings.Select(q => q.FromPath).ToArray()
+						)
+					);
+			}
+		}
+
+		public void PostBindings(MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext)
+		{
+			//  group each node so that 1 node has multiple value checks for all bound values beneath the node
+			var nodeList = new List<Node>();
+			foreach (var binding in mappingFactoryContext.Bindings)
+			{
+				AddToNodes(nodeList, binding);
 			}
 
-			bindings.Reverse();
-			mappingFactoryContext.Bindings.InsertRange(firstDependentBindingIndex, bindings);
+			EnsureNodesAreBound(mappingFactoryContext, nodeList);
+		}
+
+		private class Node
+		{
+			public string[] Path { get; }
+			public IFieldPath<TToModel, TToField> FieldPath { get; }
+			public List<IBinding<TFromModel, TFromField, TToModel, TToField>> Bindings { get; }
+				= new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
+
+			public Node(IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath)
+			{
+				Path = path.ToArray();
+				FieldPath = fieldPath;
+			}
 		}
 	}
 
@@ -91,12 +115,12 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		/// Dependent path.
 		/// NOT a FromPath, this isn't the source of a binding operation, it's a path that needs checking for nulls before performing the assignment operation.
 		/// </summary>
-		private readonly IFieldPath<TFromModel, TFromField> _dependentPath;
+		private readonly IFieldPath<TFromModel, TFromField>[] _dependentPaths;
 
-		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField> dependentPath) :
+		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField>[] dependentPaths) :
 			base(null, null, path.FinalField, path)
 		{
-			_dependentPath = dependentPath;
+			_dependentPaths = dependentPaths;
 		}
 
 		public override void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
@@ -109,11 +133,20 @@ namespace Silk.Data.Modelling.Mapping.Binding
 					return;
 			}
 
-			if (_dependentPath != null)
+			if (_dependentPaths != null && _dependentPaths.Length > 0)
 			{
+				var foundValidPath = false;
 				//  check dependent path on source graph for accessability
 				//  if it's inaccessible then the container object in the destination graph should be null
-				if (!source.CheckPath(_dependentPath))
+				foreach (var path in _dependentPaths)
+				{
+					if (source.CheckPath(path))
+					{
+						foundValidPath = true;
+						break;
+					}
+				}
+				if (!foundValidPath)
 					return;
 			}
 

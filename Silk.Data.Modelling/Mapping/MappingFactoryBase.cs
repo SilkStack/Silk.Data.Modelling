@@ -44,6 +44,11 @@ namespace Silk.Data.Modelling.Mapping
 					factory.CreateBinding(context, interesectedFields);
 				}
 			}
+
+			foreach (var factory in BindingFactories)
+			{
+				factory.PostBindings(context);
+			}
 		}
 
 		protected abstract IMapping<TFromModel, TFromField, TToModel, TToField> CreateMapping(
