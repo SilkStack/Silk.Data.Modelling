@@ -18,7 +18,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	{
 		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
-			if (intersectCandidate.LeftField.RemoveEnumerableType() != typeof(string) ||
+			if (intersectCandidate.RightField.RemoveEnumerableType() != typeof(string) ||
 				intersectCandidate.LeftField.IsEnumerableType != intersectCandidate.RightField.IsEnumerableType)
 			{
 				intersectedFields = null;
