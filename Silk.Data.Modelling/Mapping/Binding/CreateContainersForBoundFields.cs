@@ -1,4 +1,5 @@
 ﻿using Silk.Data.Modelling.Analysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,18 +26,20 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 		}
 
-		private Node GetNode(List<Node> nodes, IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath)
+		private Node GetNode(List<Node> nodes, IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath,
+			List<EnumerableClaim> enumerableClaims)
 		{
 			var node = nodes.FirstOrDefault(q => q.Path.SequenceEqual(path));
 			if (node != null)
 				return node;
 
-			node = new Node(path, fieldPath);
+			node = new Node(path, fieldPath, enumerableClaims);
 			nodes.Add(node);
 			return node;
 		}
 
-		private void AddToNodes(List<Node> nodes, IBinding<TFromModel, TFromField, TToModel, TToField> binding)
+		private void AddToNodes(List<Node> nodes, IBinding<TFromModel, TFromField, TToModel, TToField> binding,
+			List<EnumerableClaim> enumerableClaims)
 		{
 			if (binding.ToField == null || binding.ToPath == null || !binding.ToPath.HasParent)
 				return;
@@ -44,7 +47,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			var parent = binding.ToPath.Parent;
 			while (parent.HasParent)
 			{
-				var node = GetNode(nodes, parent.Fields.Select(q => q.FieldName), parent);
+				var node = GetNode(nodes, parent.Fields.Select(q => q.FieldName), parent, enumerableClaims);
 				node.Bindings.Add(binding);
 				parent = parent.Parent;
 			}
@@ -69,11 +72,23 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				if (HasBinding(mappingFactoryContext, node.Path))
 					continue;
 
-				mappingFactoryContext.Bindings.Add(
-					new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
-						node.FieldPath, node.Bindings.Select(q => q.FromPath).ToArray()
-						)
-					);
+				if (node.FieldPath.FinalField.IsEnumerableType)
+				{
+					var enumSource = node.GetNextUnclaimedEnumerable();
+					mappingFactoryContext.Bindings.Add(
+						new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
+							node.FieldPath, node.Bindings.Select(q => q.FromPath).ToArray(), enumSource
+							)
+						);
+				}
+				else
+				{
+					mappingFactoryContext.Bindings.Add(
+						new CreateContainersForBoundFieldsBinding<TFromModel, TFromField, TToModel, TToField>(
+							node.FieldPath, node.Bindings.Select(q => q.FromPath).ToArray()
+							)
+						);
+				}
 			}
 		}
 
@@ -81,10 +96,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			//  group each node so that 1 node has multiple value checks for all bound values beneath the node
 			var nodeList = new List<Node>();
+			var enumerableClaims = new List<EnumerableClaim>();
 			foreach (var binding in mappingFactoryContext.Bindings)
 			{
-				AddToNodes(nodeList, binding);
+				AddToNodes(nodeList, binding, enumerableClaims);
 			}
+
+			//  sort the node list by depth, deepest first, for binding to enumerable sources
+			nodeList = nodeList.OrderByDescending(q => q.Path.Length).ToList();
 
 			EnsureNodesAreBound(mappingFactoryContext, nodeList);
 		}
@@ -93,13 +112,57 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			public string[] Path { get; }
 			public IFieldPath<TToModel, TToField> FieldPath { get; }
+
+			private readonly List<EnumerableClaim> _enumerableClaims;
+
 			public List<IBinding<TFromModel, TFromField, TToModel, TToField>> Bindings { get; }
 				= new List<IBinding<TFromModel, TFromField, TToModel, TToField>>();
 
-			public Node(IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath)
+			public Node(IEnumerable<string> path, IFieldPath<TToModel, TToField> fieldPath,
+				List<EnumerableClaim> enumerableClaims)
 			{
 				Path = path.ToArray();
 				FieldPath = fieldPath;
+
+				_enumerableClaims = enumerableClaims;
+			}
+
+			public IFieldPath<TFromModel, TFromField> GetNextUnclaimedEnumerable()
+			{
+				var binding = Bindings.FirstOrDefault();
+				if (binding == null || !binding.FromPath.HasParent)
+					throw new InvalidOperationException("No source enumerable found for mapping.");
+
+				var parent = binding.FromPath.Parent;
+				while (parent.HasParent)
+				{
+					if (!parent.FinalField.IsEnumerableType || IsClaimed(parent))
+						continue;
+
+					var claim = new EnumerableClaim(parent);
+					_enumerableClaims.Add(claim);
+
+					return parent;
+				}
+
+				throw new InvalidOperationException("No source enumerable found for mapping.");
+			}
+
+			private bool IsClaimed(IFieldPath<TFromModel, TFromField> fieldPath)
+			{
+				return _enumerableClaims.Any(
+					q => q.Path.SequenceEqual(fieldPath.Fields.Select(fld => fld.FieldName))
+					);
+			}
+		}
+
+		private class EnumerableClaim
+		{
+			public string[] Path { get; }
+
+			public EnumerableClaim(IFieldPath<TFromModel, TFromField> fieldPath)
+			{
+				Path = fieldPath.Fields.Select(q => q.FieldName).ToArray();
 			}
 		}
 	}
@@ -119,6 +182,13 @@ namespace Silk.Data.Modelling.Mapping.Binding
 
 		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField>[] dependentPaths) :
 			base(null, null, path.FinalField, path)
+		{
+			_dependentPaths = dependentPaths;
+		}
+
+		public CreateContainersForBoundFieldsBinding(IFieldPath<TToModel, TToField> path, IFieldPath<TFromModel, TFromField>[] dependentPaths,
+			IFieldPath<TFromModel, TFromField> enumSource) :
+			base(null, null, path.FinalField, path, enumSource)
 		{
 			_dependentPaths = dependentPaths;
 		}
