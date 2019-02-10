@@ -38,6 +38,7 @@ namespace Silk.Data.Modelling.Analysis
 			if (intersectionRules == null)
 			{
 				IntersectionRules.Add(new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+				IntersectionRules.Add(new BothNumericTypesRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 
 				return;
 			}
