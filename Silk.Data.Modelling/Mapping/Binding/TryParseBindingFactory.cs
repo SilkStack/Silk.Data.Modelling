@@ -55,7 +55,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields
 				)
 			{
-				Binding = new TryParseBinding<TFromModel, TFromField, TToModel, TToField, TLeftData>(
+				Binding = new TryParseBinding<TFromModel, TFromField, TToModel, TToField, TRightData>(
 					intersectedFields.LeftPath as IFieldPath<TFromModel, TFromField>,
 					intersectedFields.RightPath as IFieldPath<TToModel, TToField>,
 					_methodInfo
