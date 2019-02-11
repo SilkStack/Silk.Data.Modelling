@@ -11,6 +11,7 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			BindingFactories.Add(new CopySameValueTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 			BindingFactories.Add(new CreateContainersForBoundFieldsFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+			BindingFactories.Add(new CastNumericTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 		}
 
 		protected override IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateMapping(
