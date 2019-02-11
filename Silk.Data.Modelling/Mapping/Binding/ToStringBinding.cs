@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
-				intersectedFields.LeftField.RemoveEnumerableType() != typeof(string) ||
+				intersectedFields.RightField.RemoveEnumerableType() != typeof(string) ||
 				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
 				intersectedFields.IntersectionRuleType != typeof(ConvertableWithToStringRule<TFromModel, TFromField, TToModel, TToField>)
 				)
