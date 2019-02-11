@@ -94,8 +94,8 @@ namespace Silk.Data.Modelling.Tests.Mapping
 			var targetGraph = new ObjectGraphReaderWriter<TargetEnumerableSuperType>(new TargetEnumerableSuperType());
 			mapping.Map(sourceGraph, targetGraph);
 
-			Assert.IsTrue(sourceGraph.Graph.Sub.Select(q => q.Data).SequenceEqual(
-				targetGraph.Graph.Sub.Select(q => q.Data)
+			Assert.IsTrue(sourceGraph.Graph.Sub.Select(q => q.DataA).SequenceEqual(
+				targetGraph.Graph.Sub.Select(q => q.DataA)
 				));
 		}
 
@@ -191,7 +191,8 @@ namespace Silk.Data.Modelling.Tests.Mapping
 		{
 			private static int _counter;
 
-			public int Data { get; } = _counter++;
+			public int DataA { get; set; } = _counter++;
+			public float DataB { get; set; }
 		}
 
 		private class TargetEnumerableSuperType
@@ -201,7 +202,7 @@ namespace Silk.Data.Modelling.Tests.Mapping
 
 		private class TargetEnumerableSubType
 		{
-			public int Data { get; set; }
+			public int DataA { get; set; }
 		}
 	}
 }
