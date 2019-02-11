@@ -29,8 +29,7 @@ namespace Silk.Data.Modelling
 		}
 
 		public override IEnumerable<PropertyInfoField> GetPathFields(IFieldPath<PropertyInfoField> fieldPath)
-			//  todo: if FieldDataType is an enumerable type should the element type be modelled or the the enumerable type?
-			=> GetModelOf(fieldPath.FinalField.FieldDataType).Fields;
+			=> GetModelOf(fieldPath.FinalField.RemoveEnumerableType()).Fields;
 
 		public override void Dispatch(IModelGenericExecutor executor)
 			=> executor.Execute<TypeModel<T>, PropertyInfoField, T>(this);
