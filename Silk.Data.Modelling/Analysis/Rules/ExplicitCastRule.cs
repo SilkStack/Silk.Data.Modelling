@@ -28,7 +28,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 			if (castMethod == null)
 				castMethod = GetExplicitCast(
 					intersectCandidate.RightField.RemoveEnumerableType(),
-					intersectCandidate.LeftField.RemoveEnumerableType()
+					intersectCandidate.RightField.RemoveEnumerableType()
 					);
 
 			if (castMethod == null ||
