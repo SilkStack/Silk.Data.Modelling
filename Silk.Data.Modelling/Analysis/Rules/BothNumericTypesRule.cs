@@ -33,10 +33,15 @@ namespace Silk.Data.Modelling.Analysis.Rules
 			typeof(double)
 		};
 
+		private static bool IsNumericType(Type type)
+		{
+			return type.IsEnum || _numericTypes.Contains(type);
+		}
+
 		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
-			if (!_numericTypes.Contains(intersectCandidate.LeftField.RemoveEnumerableType()) ||
-				!_numericTypes.Contains(intersectCandidate.RightField.RemoveEnumerableType()) ||
+			if (!IsNumericType(intersectCandidate.LeftField.RemoveEnumerableType()) ||
+				!IsNumericType(intersectCandidate.RightField.RemoveEnumerableType()) ||
 				intersectCandidate.LeftField.IsEnumerableType != intersectCandidate.RightField.IsEnumerableType)
 			{
 				intersectedFields = null;
