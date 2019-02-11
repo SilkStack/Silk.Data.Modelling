@@ -1,4 +1,5 @@
 ﻿using Silk.Data.Modelling.Analysis;
+using Silk.Data.Modelling.Analysis.Rules;
 using Silk.Data.Modelling.GenericDispatch;
 
 namespace Silk.Data.Modelling.Mapping.Binding
@@ -15,7 +16,8 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
 				intersectedFields.LeftField.RemoveEnumerableType() != typeof(string) ||
-				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType
+				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
+				intersectedFields.IntersectionRuleType != typeof(ConvertableWithToStringRule<TFromModel, TFromField, TToModel, TToField>)
 				)
 			{
 				return;
