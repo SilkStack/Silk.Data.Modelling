@@ -1,60 +1,41 @@
-﻿using Silk.Data.Modelling.Mapping;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System.Collections.Generic;
 
 namespace Silk.Data.Modelling
 {
 	/// <summary>
-	/// Base interface for all models.
+	/// Data structure model.
 	/// </summary>
-	/// <remarks>Implementing this interface directly is not supported. Implement <see cref="IModel{TField}"/>.</remarks>
 	public interface IModel
 	{
 		/// <summary>
-		/// Gets an array of fields on the model.
+		/// Gets a collection of fields present in the data structure.
 		/// </summary>
-		IField[] Fields { get; }
+		IReadOnlyList<IField> Fields { get; }
 
 		/// <summary>
-		/// Gets a reference to the root of the model.
+		/// Dispatch a genericly-typed method call using the models generic type parameters.
 		/// </summary>
-		IFieldReference Root { get; }
-
-		/// <summary>
-		/// Performs all relevant calls to the given <see cref="IModelTransformer"/> to transform the model type.
-		/// </summary>
-		/// <param name="transformer"></param>
-		void Transform(IModelTransformer transformer);
-
-		/// <summary>
-		/// Gets a field reference for a source field.
-		/// </summary>
-		/// <param name="sourceField"></param>
-		/// <returns></returns>
-		IFieldReference GetFieldReference(ISourceField sourceField);
-
-		/// <summary>
-		/// Gets a field reference for a target field.
-		/// </summary>
-		/// <param name="targetField"></param>
-		/// <returns></returns>
-		IFieldReference GetFieldReference(ITargetField targetField);
-
-		/// <summary>
-		/// Creates a new field resolver.
-		/// </summary>
-		/// <returns></returns>
-		IFieldResolver CreateFieldResolver();
+		/// <param name="executor"></param>
+		void Dispatch(IModelGenericExecutor executor);
 	}
 
 	/// <summary>
-	/// A model with fields of type <see cref="TField"/>.
+	/// Data structure model.
 	/// </summary>
-	/// <typeparam name="TField">The type of field the model uses.</typeparam>
 	public interface IModel<TField> : IModel
 		where TField : IField
 	{
 		/// <summary>
-		/// Gets an array of fields on the model.
+		/// Gets a collection of fields present in the data structure.
 		/// </summary>
-		new TField[] Fields { get; }
+		new IReadOnlyList<TField> Fields { get; }
+
+		/// <summary>
+		/// Enumerates fields found at the given path relative to the model.
+		/// </summary>
+		/// <param name="fieldPath"></param>
+		/// <returns></returns>
+		IEnumerable<TField> GetPathFields(IFieldPath<TField> fieldPath);
 	}
 }

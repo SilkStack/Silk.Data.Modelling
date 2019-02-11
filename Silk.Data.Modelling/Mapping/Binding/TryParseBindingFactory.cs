@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Reflection;
-using Silk.Data.Modelling.Analysis;
+﻿using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Analysis.Rules;
 using Silk.Data.Modelling.GenericDispatch;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping.Binding
 {
-	public class ExplicitCastBindingFactory<TFromModel, TFromField, TToModel, TToField> :
+	public class TryParseBindingFactory<TFromModel, TFromField, TToModel, TToField> :
 		IBindingFactory<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
@@ -18,8 +19,9 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
+				intersectedFields.LeftField.RemoveEnumerableType() != typeof(string) ||
 				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
-				intersectedFields.IntersectionRuleType != typeof(ExplicitCastRule<TFromModel, TFromField, TToModel, TToField>)
+				intersectedFields.IntersectionRuleType != typeof(ConvertableWithTryParse<TFromModel, TFromField, TToModel, TToField>)
 				)
 			{
 				return;
@@ -53,7 +55,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields
 				)
 			{
-				Binding = new ExplicitCastBinding<TFromModel, TFromField, TToModel, TToField, TLeftData, TRightData>(
+				Binding = new TryParseBinding<TFromModel, TFromField, TToModel, TToField, TRightData>(
 					intersectedFields.LeftPath as IFieldPath<TFromModel, TFromField>,
 					intersectedFields.RightPath as IFieldPath<TToModel, TToField>,
 					_methodInfo
@@ -62,35 +64,50 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		}
 	}
 
-	public class ExplicitCastBinding<TFromModel, TFromField, TToModel, TToField, TFromData, TToData> :
+	public class TryParseBinding<TFromModel, TFromField, TToModel, TToField, TData> :
 		BindingBase<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		private readonly Func<TFromData, TToData> _cast;
+		private delegate bool TryParseMethod(string from, out TData to);
 
-		public ExplicitCastBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath,
-			MethodInfo castMethod) :
+		private readonly TryParseMethod _tryParse;
+
+		public TryParseBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath,
+			MethodInfo tryParseMethod) :
 			base(fromPath.FinalField, fromPath, toPath.FinalField, toPath, fromPath.FinalField.IsEnumerableType ? fromPath : null)
 		{
-			_cast = CreateCastDelegate(castMethod);
+			_tryParse = CreateTryParseMethod(tryParseMethod);
 		}
 
-		private static Func<TFromData, TToData> CreateCastDelegate(MethodInfo castMethod)
+		private TryParseMethod CreateTryParseMethod(MethodInfo parseMethod)
 		{
-			var parameter = Expression.Parameter(typeof(TFromData));
-			var lambda = Expression.Lambda<Func<TFromData, TToData>>(
-				Expression.Call(castMethod, parameter),
-				parameter
-				);
-			return lambda.Compile();
+			var parameters = new List<ParameterExpression>();
+			var fromParameter = Expression.Parameter(typeof(string), "from");
+			parameters.Add(fromParameter);
+
+			var toParameter = Expression.Parameter(typeof(TData).MakeByRefType(), "to");
+			parameters.Add(toParameter);
+
+			Expression body;
+			if (parseMethod.DeclaringType == typeof(Enum))
+				body = Expression.Call(parseMethod, fromParameter, Expression.Constant(false), toParameter);
+			else
+				body = Expression.Call(parseMethod, fromParameter, toParameter);
+
+			return Expression.Lambda<TryParseMethod>(body, parameters).Compile();
 		}
 
 		public override void Run(IGraphReader<TFromModel, TFromField> source, IGraphWriter<TToModel, TToField> destination)
 		{
-			destination.Write<TToData>(ToPath, _cast(source.Read<TFromData>(FromPath)));
+			if (!source.CheckPath(FromPath) || !destination.CheckPath(ToPath))
+				return;
+
+			var strValue = source.Read<string>(FromPath);
+			if (_tryParse(strValue, out var value))
+				destination.Write<TData>(ToPath, value);
 		}
 	}
 }

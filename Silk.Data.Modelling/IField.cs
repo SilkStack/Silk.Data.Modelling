@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling
 {
 	/// <summary>
-	/// A field on a model.
+	/// Data structure field.
 	/// </summary>
-	/// <remarks>Implementing this field directly is not supported, implement <see cref="IField{T}"/>.</remarks>
 	public interface IField
 	{
 		/// <summary>
@@ -14,57 +14,49 @@ namespace Silk.Data.Modelling
 		string FieldName { get; }
 
 		/// <summary>
-		/// Gets the <see cref="Type"/> of the data stored in the field.
-		/// </summary>
-		Type FieldType { get; }
-
-		/// <summary>
-		/// Gets a value indicating if the field can be read from.
+		/// Gets a value indicating if the field is readable.
 		/// </summary>
 		bool CanRead { get; }
 
 		/// <summary>
-		/// Gets a value indicating if the field can be written to.
+		/// Gets a value indicating if the field is writable.
 		/// </summary>
 		bool CanWrite { get; }
 
 		/// <summary>
-		/// Gets a value indicating if <see cref="FieldType"/> is an enumerable type.
+		/// Gets a value indicating if the field's data type is an enumerable type.
 		/// </summary>
-		bool IsEnumerable { get; }
+		bool IsEnumerableType { get; }
 
 		/// <summary>
-		/// When <see cref="IsEnumerable"/> is true returns the <see cref="Type"/> contained in the enumerable type.
+		/// Gets the field's data type.
 		/// </summary>
-		/// <remarks>Returns null when <see cref="IsEnumerable"/> is false.</remarks>
-		Type ElementType { get; }
+		Type FieldDataType { get; }
 
 		/// <summary>
-		/// Gets the <see cref="TypeModel"/> of <see cref="FieldType"/>.
+		/// Gets the field's element type if it's an enumerable type.
 		/// </summary>
-		TypeModel FieldTypeModel { get; }
+		Type FieldElementType { get; }
 
 		/// <summary>
-		/// Gets a <see cref="IModel"/> that is suitable for modelling operations for the field.
+		/// Dispatch a genericly-typed method call using the fields generic type parameters.
 		/// </summary>
-		IModel FieldModel { get; }
-
-		/// <summary>
-		/// Performs all relevant calls to the given <see cref="IModelTransformer"/> as part of the model transformation process.
-		/// </summary>
-		/// <param name="transformer"></param>
-		void Transform(IModelTransformer transformer);
+		/// <param name="executor"></param>
+		void Dispatch(IFieldGenericExecutor executor);
 	}
 
-	/// <summary>
-	/// A field on a model with a <see cref="IField.FieldType"/> of <see cref="T"/>.
-	/// </summary>
-	/// <typeparam name="T">The type of data stored in the field.</typeparam>
-	public interface IField<T> : IField
+	public static class FieldExtensions
 	{
 		/// <summary>
-		/// Gets the <see cref="TypeModel"/> of <see cref="FieldType"/>.
+		/// Gets the Type of the field without the generic enumerable type if there is one.
 		/// </summary>
-		new TypeModel<T> FieldTypeModel { get; }
+		/// <param name="field"></param>
+		/// <returns></returns>
+		public static Type RemoveEnumerableType(this IField field)
+		{
+			if (field.IsEnumerableType)
+				return field.FieldElementType;
+			return field.FieldDataType;
+		}
 	}
 }

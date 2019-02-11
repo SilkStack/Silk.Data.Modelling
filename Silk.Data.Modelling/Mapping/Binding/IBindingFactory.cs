@@ -1,22 +1,20 @@
-﻿namespace Silk.Data.Modelling.Mapping.Binding
+﻿using Silk.Data.Modelling.Analysis;
+
+namespace Silk.Data.Modelling.Mapping.Binding
 {
-	public interface IAssignmentBindingFactory
+	public interface IBindingFactory<TFromModel, TFromField, TToModel, TToField>
+		where TFromField : class, IField
+		where TToField : class, IField
+		where TFromModel : IModel<TFromField>
+		where TToModel : IModel<TToField>
 	{
-		AssignmentBinding CreateBinding<TTo>(IFieldReference toField);
-	}
+		void CreateBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields
+			);
 
-	public interface IAssignmentBindingFactory<T>
-	{
-		AssignmentBinding CreateBinding<TTo>(IFieldReference toField, T bindingOption);
-	}
-
-	public interface IMappingBindingFactory
-	{
-		MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField);
-	}
-
-	public interface IMappingBindingFactory<T>
-	{
-		MappingBinding CreateBinding<TFrom, TTo>(IFieldReference fromField, IFieldReference toField, T bindingOption);
+		void PostBindings(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext
+			);
 	}
 }

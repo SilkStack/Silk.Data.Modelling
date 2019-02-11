@@ -1,23 +1,31 @@
 ﻿using Silk.Data.Modelling.Analysis;
-using Silk.Data.Modelling.Analysis.Rules;
 using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling.Mapping.Binding
 {
-	public class ToStringBindingFactory<TFromModel, TFromField, TToModel, TToField> :
+	public class CopySameValueTypesFactory<TFromModel, TFromField, TToModel, TToField> :
 		IBindingFactory<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public void CreateBinding(MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext, IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
+		private bool IsAcceptableType(Type type)
+		{
+			return type == typeof(string) || type.IsValueType;
+		}
+
+		public void CreateBinding(
+			MappingFactoryContext<TFromModel, TFromField, TToModel, TToField> mappingFactoryContext,
+			IntersectedFields<TFromModel, TFromField, TToModel, TToField> intersectedFields)
 		{
 			if (!intersectedFields.LeftField.CanRead ||
 				!intersectedFields.RightField.CanWrite ||
-				intersectedFields.RightField.RemoveEnumerableType() != typeof(string) ||
+				intersectedFields.LeftField.RemoveEnumerableType() != intersectedFields.RightField.RemoveEnumerableType() ||
 				intersectedFields.LeftField.IsEnumerableType != intersectedFields.RightField.IsEnumerableType ||
-				intersectedFields.IntersectionRuleType != typeof(ConvertableWithToStringRule<TFromModel, TFromField, TToModel, TToField>)
+				!IsAcceptableType(intersectedFields.LeftField.RemoveEnumerableType()) ||
+				!IsAcceptableType(intersectedFields.RightField.RemoveEnumerableType())
 				)
 			{
 				return;
@@ -41,7 +49,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData> intersectedFields
 				)
 			{
-				Binding = new ToStringBinding<TFromModel, TFromField, TToModel, TToField, TLeftData>(
+				Binding = new CopySameTypesBinding<TFromModel, TFromField, TToModel, TToField, TLeftData>(
 					intersectedFields.LeftPath as IFieldPath<TFromModel, TFromField>,
 					intersectedFields.RightPath as IFieldPath<TToModel, TToField>
 					);
@@ -49,14 +57,14 @@ namespace Silk.Data.Modelling.Mapping.Binding
 		}
 	}
 
-	public class ToStringBinding<TFromModel, TFromField, TToModel, TToField, TData> :
+	public class CopySameTypesBinding<TFromModel, TFromField, TToModel, TToField, TData> :
 		BindingBase<TFromModel, TFromField, TToModel, TToField>
 		where TFromField : class, IField
 		where TToField : class, IField
 		where TFromModel : IModel<TFromField>
 		where TToModel : IModel<TToField>
 	{
-		public ToStringBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath) :
+		public CopySameTypesBinding(IFieldPath<TFromModel, TFromField> fromPath, IFieldPath<TToModel, TToField> toPath) :
 			base(fromPath.FinalField, fromPath, toPath.FinalField, toPath, fromPath.FinalField.IsEnumerableType ? fromPath : null)
 		{
 		}
@@ -66,7 +74,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 			if (!source.CheckPath(FromPath) || !destination.CheckPath(ToPath))
 				return;
 
-			destination.Write<string>(ToPath, source.Read<TData>(FromPath).ToString());
+			destination.Write<TData>(ToPath, source.Read<TData>(FromPath));
 		}
 	}
 }
