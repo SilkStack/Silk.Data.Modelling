@@ -14,6 +14,7 @@ namespace Silk.Data.Modelling.Mapping
 			BindingFactories.Add(new CastNumericTypesFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 			BindingFactories.Add(new ToStringBindingFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 			BindingFactories.Add(new TryParseBindingFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
+			BindingFactories.Add(new ExplicitCastBindingFactory<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>());
 		}
 
 		protected override IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> CreateMapping(
