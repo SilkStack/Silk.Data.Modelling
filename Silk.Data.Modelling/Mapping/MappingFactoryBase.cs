@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.GenericDispatch;
@@ -91,7 +92,12 @@ namespace Silk.Data.Modelling.Mapping
 					{
 						var scopeBuilder = new EnumerableScopeBuilder(
 							binding,
-							GetScopes(subPath),
+							new[] {
+								new BranchBindingScope<TFromModel, TFromField, TToModel, TToField>(
+									GetBindings(subPath).Where(subBinding => !subBinding.ToField.IsEnumerableType),
+									GetScopes(subPath)
+								)
+							},
 							binding.EnumerablePath
 							);
 						binding.ToField.Dispatch(scopeBuilder);
@@ -115,6 +121,13 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			var context = CreateFactoryContext(intersection);
 			CreateBindings(context, intersection);
+
+			//  todo: sort the bindings in a more sane way
+			//  sort the bindings so they are created top-down in scopes
+			var bindingsCopy = context.Bindings.ToArray();
+			context.Bindings.Clear();
+			context.Bindings.AddRange(bindingsCopy.OrderBy(q => q.ToPath.Fields.Count));
+
 			var bindingScope = CreateScopedBindings(context);
 			return CreateMapping(context, bindingScope);
 		}
