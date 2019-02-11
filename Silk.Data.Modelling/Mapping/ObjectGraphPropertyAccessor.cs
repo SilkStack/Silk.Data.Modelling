@@ -81,21 +81,21 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Action<TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Func<TGraph, TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
 			if (_containerCreators.TryGetValue(flattenedPath, out var @delegate))
-				return @delegate as Action<TGraph>;
+				return @delegate as Func<TGraph, TGraph>;
 
 			lock (_containerCreators)
 			{
 				if (_containerCreators.TryGetValue(flattenedPath, out @delegate))
-					return @delegate as Action<TGraph>;
+					return @delegate as Func<TGraph, TGraph>;
 
 				@delegate = CreateContainerCreator(fieldPath, pathOffset);
 				_containerCreators.Add(flattenedPath, @delegate);
-				return @delegate as Action<TGraph>;
+				return @delegate as Func<TGraph, TGraph>;
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Func<TGraph, TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
 			var ctor = GetParameterlessConstructor(fieldPath.FinalField.RemoveEnumerableType());
 			if (ctor == null)
@@ -224,8 +224,11 @@ namespace Silk.Data.Modelling.Mapping
 			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				property = Expression.Property(property, field.FieldName);
 
-			var lambda = Expression.Lambda<Action<TGraph>>(
-				Expression.Assign(property, Expression.New(ctor)), graph
+			var lambda = Expression.Lambda<Func<TGraph, TGraph>>(
+				Expression.Block(
+					Expression.Assign(property, Expression.New(ctor)),
+					graph
+					), graph
 				);
 			return lambda.Compile();
 		}

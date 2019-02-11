@@ -47,7 +47,7 @@ namespace Silk.Data.Modelling.Mapping
 		public virtual void CreateContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var containerCreator = _propertyAccessor.GetContainerCreator(fieldPath, _fieldPath?.Fields.Count ?? 0);
-			containerCreator(Graph);
+			Graph = containerCreator(Graph);
 		}
 
 		public virtual bool CheckContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
