@@ -25,46 +25,46 @@ namespace Silk.Data.Modelling.Mapping
 			_fieldPath = fieldPath;
 		}
 
-		public T Read<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual T Read<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var reader = _propertyAccessor.GetPropertyReader<T>(fieldPath, _fieldPath?.Fields.Count ?? 0);
 			return reader(Graph);
 		}
 
-		public void Write<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath, T value)
+		public virtual void Write<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath, T value)
 		{
 			var writer = _propertyAccessor.GetPropertyWriter<T>(fieldPath, _fieldPath?.Fields.Count ?? 0);
 			Graph = writer(Graph, value);
 		}
 
-		public bool CheckPath(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual bool CheckPath(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var checker = _propertyAccessor.GetPropertyChecker(fieldPath, skipLastField: true,
 				pathOffset: _fieldPath?.Fields.Count ?? 0);
 			return checker(Graph);
 		}
 
-		public void CreateContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual void CreateContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var containerCreator = _propertyAccessor.GetContainerCreator(fieldPath, _fieldPath?.Fields.Count ?? 0);
 			containerCreator(Graph);
 		}
 
-		public bool CheckContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual bool CheckContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var checker = _propertyAccessor.GetPropertyChecker(fieldPath, skipLastField: false,
 				pathOffset: _fieldPath?.Fields.Count ?? 0);
 			return checker(Graph);
 		}
 
-		public IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			var reader = _propertyAccessor.GetEnumerableReader<T>(fieldPath, _fieldPath?.Fields.Count ?? 0);
 			var enumerable = reader(Graph);
 			return new ObjectGraphReaderEnumerator<T>(enumerable.GetEnumerator(), fieldPath);
 		}
 
-		public IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+		public virtual IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			return new OpenGraphEnumerableStream<T>(this, fieldPath);
 		}

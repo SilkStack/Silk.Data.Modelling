@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Silk.Data.Modelling.Mapping
 {
-	internal abstract class ObjectGraphPropertyAccessor
+	public abstract class ObjectGraphPropertyAccessor
 	{
 		private static readonly Dictionary<Type, ObjectGraphPropertyAccessor> _cache
 			= new Dictionary<Type, ObjectGraphPropertyAccessor>();
@@ -30,7 +30,7 @@ namespace Silk.Data.Modelling.Mapping
 		}
 	}
 
-	internal class ObjectGraphPropertyAccessor<TGraph> : ObjectGraphPropertyAccessor
+	public class ObjectGraphPropertyAccessor<TGraph> : ObjectGraphPropertyAccessor
 	{
 		private readonly Dictionary<string, Delegate> _propertyReaders
 			= new Dictionary<string, Delegate>();
