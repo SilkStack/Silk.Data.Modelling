@@ -25,8 +25,34 @@ namespace Silk.Data.Modelling.Tests.Mapping
 			mapping.Map(sourceGraph, targetGraph);
 
 			Assert.AreEqual(
-				sourceGraph.Graph.SubModel.DeepModel.PropertyA,
-				targetGraph.Graph.SubModel.DeepModel.PropertyA
+				sourceGraph.Graph.SubModel.DeepModel.CallToString.ToString(),
+				targetGraph.Graph.SubModel.DeepModel.CallToString
+				);
+			Assert.AreEqual(
+				(int)sourceGraph.Graph.SubModel.DeepModel.CastEnum,
+				targetGraph.Graph.SubModel.DeepModel.CastEnum
+				);
+			Assert.AreEqual(
+				(int)sourceGraph.Graph.SubModel.DeepModel.CastNumeric,
+				targetGraph.Graph.SubModel.DeepModel.CastNumeric
+				);
+			Assert.AreEqual(
+				sourceGraph.Graph.SubModel.DeepModel.Copy,
+				targetGraph.Graph.SubModel.DeepModel.Copy
+				);
+			Assert.IsNotNull(
+				targetGraph.Graph.SubModel.DeepModel.ExplicitCastSource
+				);
+			Assert.IsNotNull(
+				targetGraph.Graph.SubModel.DeepModel.ExplicitCastTarget
+				);
+			Assert.AreEqual(
+				sourceGraph.Graph.SubModel.DeepModel.TryParseEnum,
+				targetGraph.Graph.SubModel.DeepModel.TryParseEnum.ToString()
+				);
+			Assert.AreEqual(
+				sourceGraph.Graph.SubModel.DeepModel.TryParseInt,
+				targetGraph.Graph.SubModel.DeepModel.TryParseInt.ToString()
 				);
 		}
 
@@ -77,7 +103,14 @@ namespace Silk.Data.Modelling.Tests.Mapping
 
 		private class SourceDeepModel
 		{
-			public string PropertyA => "Hello World";
+			public string Copy => "Hello World";
+			public int CallToString => 5;
+			public float CastNumeric => 3.0f;
+			public CastableSourceType ExplicitCastSource => new CastableSourceType();
+			public CastableTargetType ExplicitCastTarget => new CastableTargetType();
+			public string TryParseInt => "10";
+			public string TryParseEnum => "SomeValue";
+			public EnumType CastEnum => EnumType.SomeNotValue;
 		}
 
 		private class TargetSuperModel
@@ -92,7 +125,37 @@ namespace Silk.Data.Modelling.Tests.Mapping
 
 		private class TargetDeepModel
 		{
-			public string PropertyA { get; set; }
+			public string Copy { get; set; }
+			public string CallToString { get; set; }
+			public int CastNumeric { get; set; }
+			public CastableTargetType ExplicitCastSource { get; set; }
+			public CastableSourceType ExplicitCastTarget { get; set; }
+			public int TryParseInt { get; set; }
+			public EnumType TryParseEnum { get; set; }
+			public int CastEnum { get; set; }
+		}
+
+		private class CastableSourceType
+		{
+			public static explicit operator CastableTargetType(CastableSourceType a)
+			{
+				return new CastableTargetType();
+			}
+
+			public static explicit operator CastableSourceType(CastableTargetType a)
+			{
+				return new CastableSourceType();
+			}
+		}
+
+		private class CastableTargetType
+		{
+		}
+
+		private enum EnumType
+		{
+			SomeValue = 100,
+			SomeNotValue = 200
 		}
 	}
 }
