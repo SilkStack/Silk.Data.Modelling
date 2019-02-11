@@ -105,7 +105,7 @@ namespace Silk.Data.Modelling.Mapping
 			if (skipLastField)
 				pathSource = pathSource.Take(fieldPath.Fields.Count - 1 - pathOffset);
 
-			var flattenedPath = string.Join(".", pathSource);
+			var flattenedPath = $"{skipLastField}-{string.Join(".", pathSource)}";
 
 			if (_propertyCheckers.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Func<TGraph, bool>;
@@ -213,7 +213,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		private Action<TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
 		{
-			var ctor = GetParameterlessConstructor(fieldPath.FinalField.FieldDataType);
+			var ctor = GetParameterlessConstructor(fieldPath.FinalField.RemoveEnumerableType());
 			if (ctor == null)
 				throw new InvalidOperationException($"{fieldPath.FinalField.FieldDataType.FullName} doesn't have a parameterless constructor.");
 
@@ -235,8 +235,7 @@ namespace Silk.Data.Modelling.Mapping
 			var graph = Expression.Parameter(typeof(TGraph), "graph");
 			var result = Expression.Variable(typeof(bool), "result");
 
-			if (fieldPath.Fields.Count - pathOffset < 1 ||
-				(skipLastField && fieldPath.Fields.Count - pathOffset < 2))
+			if (skipLastField && fieldPath.Fields.Count - pathOffset < 1)
 			{
 				var shortLambda = Expression.Lambda<Func<TGraph, bool>>(
 					Expression.Constant(true), graph
