@@ -92,7 +92,7 @@ namespace Silk.Data.Modelling.Mapping
 						var scopeBuilder = new EnumerableScopeBuilder(
 							binding,
 							GetScopes(subPath),
-							binding.FromField
+							binding.EnumerablePath
 							);
 						binding.ToField.Dispatch(scopeBuilder);
 						yield return scopeBuilder.Scope;
@@ -123,25 +123,25 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			private readonly IBinding<TFromModel, TFromField, TToModel, TToField> _binding;
 			private readonly IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> _scopes;
-			private readonly TFromField _fromField;
+			private readonly IFieldPath<TFromModel, TFromField> _enumerablePath;
 
 			public BindingScope<TFromModel, TFromField, TToModel, TToField> Scope { get; private set; }
 
 			public EnumerableScopeBuilder(
 				IBinding<TFromModel, TFromField, TToModel, TToField> binding,
 				IEnumerable<BindingScope<TFromModel, TFromField, TToModel, TToField>> scopes,
-				TFromField fromField
+				IFieldPath<TFromModel, TFromField> enumerablePath
 				)
 			{
 				_binding = binding;
 				_scopes = scopes;
-				_fromField = fromField;
+				_enumerablePath = enumerablePath;
 			}
 
 			void IFieldGenericExecutor.Execute<TField, TData>(IField field)
 			{
 				var subBuilder = new EnumerableScopeBuilder<TData>(_binding, _scopes);
-				_fromField.Dispatch(subBuilder);
+				_enumerablePath.FinalField.Dispatch(subBuilder);
 				Scope = subBuilder.Scope;
 			}
 		}
