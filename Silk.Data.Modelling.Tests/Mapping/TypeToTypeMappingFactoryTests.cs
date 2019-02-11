@@ -79,6 +79,26 @@ namespace Silk.Data.Modelling.Tests.Mapping
 				));
 		}
 
+		[TestMethod]
+		public void MapNestedEnumerables()
+		{
+			var analyzer = new TypeToTypeIntersectionAnalyzer();
+			var intersection = analyzer.CreateIntersection(
+				TypeModel.GetModelOf<SourceEnumerableSuperType>(),
+				TypeModel.GetModelOf<TargetEnumerableSuperType>()
+				);
+			var factory = new TypeToTypeMappingFactory();
+			var mapping = factory.CreateMapping(intersection);
+
+			var sourceGraph = new ObjectGraphReaderWriter<SourceEnumerableSuperType>(new SourceEnumerableSuperType());
+			var targetGraph = new ObjectGraphReaderWriter<TargetEnumerableSuperType>(new TargetEnumerableSuperType());
+			mapping.Map(sourceGraph, targetGraph);
+
+			Assert.IsTrue(sourceGraph.Graph.Sub.Select(q => q.Data).SequenceEqual(
+				targetGraph.Graph.Sub.Select(q => q.Data)
+				));
+		}
+
 		private class SourceEnumerable
 		{
 			public int[] SourceArray => new[] { 1, 2, 3, 4, 5 };
@@ -156,6 +176,32 @@ namespace Silk.Data.Modelling.Tests.Mapping
 		{
 			SomeValue = 100,
 			SomeNotValue = 200
+		}
+
+		private class SourceEnumerableSuperType
+		{
+			public SourceEnumerableSubType[] Sub { get; } = new[] {
+				new SourceEnumerableSubType(),
+				new SourceEnumerableSubType(),
+				new SourceEnumerableSubType()
+			};
+		}
+
+		private class SourceEnumerableSubType
+		{
+			private static int _counter;
+
+			public int Data { get; } = _counter++;
+		}
+
+		private class TargetEnumerableSuperType
+		{
+			public TargetEnumerableSubType[] Sub { get; set; }
+		}
+
+		private class TargetEnumerableSubType
+		{
+			public int Data { get; set; }
 		}
 	}
 }
