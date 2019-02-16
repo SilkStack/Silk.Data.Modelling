@@ -1,4 +1,5 @@
-﻿using Silk.Data.Modelling.GenericDispatch;
+﻿using Silk.Data.Modelling.Analysis.CandidateSources;
+using Silk.Data.Modelling.GenericDispatch;
 using System;
 
 namespace Silk.Data.Modelling.Analysis
@@ -73,19 +74,39 @@ namespace Silk.Data.Modelling.Analysis
 		/// <param name="leftField"></param>
 		/// <param name="rightField"></param>
 		/// <returns></returns>
-		public static IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> Create(TLeftField leftField, TRightField rightField,
-			IFieldPath<TLeftModel, TLeftField> leftPath, IFieldPath<TRightModel, TRightField> rightPath, Type intersectionRuleType,
+		public static IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> Create(
+			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> candidate, Type intersectionRuleType,
 			object intersectionMetadata = null)
 		{
-			return Activator.CreateInstance(
-				typeof(IntersectedFields<,,,,,>)
-					.MakeGenericType(
-						typeof(TLeftModel), typeof(TLeftField),
-						typeof(TRightModel), typeof(TRightField),
-						leftField.RemoveEnumerableType(), rightField.RemoveEnumerableType()
-						),
-				leftField, rightField, leftPath, rightPath, intersectionRuleType, intersectionMetadata
-				) as IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>;
+			var builder = new FieldBuilder(candidate, intersectionRuleType, intersectionMetadata);
+			candidate.Dispatch(builder);
+			return builder.IntersectedFields;
+		}
+
+		private class FieldBuilder : IIntersectCandidateGenericExecutor
+		{
+			private readonly IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> _candidate;
+			private readonly Type _ruleType;
+			private readonly object _metadata;
+
+			public IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> IntersectedFields { get; private set; }
+
+			public FieldBuilder(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> candidate,
+				Type intersectionRuleType, object intersectionMetadata)
+			{
+				_candidate = candidate;
+				_ruleType = intersectionRuleType;
+				_metadata = intersectionMetadata;
+			}
+
+			void IIntersectCandidateGenericExecutor.Execute<TLeftModel1, TLeftField1, TRightModel1, TRightField1, TLeftData, TRightData>(IntersectCandidate<TLeftModel1, TLeftField1, TRightModel1, TRightField1, TLeftData, TRightData> intersectCandidate)
+			{
+				IntersectedFields = new IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>(
+					_candidate.LeftField, _candidate.RightField,
+					_candidate.LeftPath, _candidate.RightPath,
+					_ruleType, _metadata
+					);
+			}
 		}
 	}
 

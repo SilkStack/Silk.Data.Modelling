@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Silk.Data.Modelling.Analysis;
+using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Mapping;
 using Silk.Data.Modelling.Mapping.Binding;
 using System.Linq;
@@ -30,10 +31,13 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
 				null, null, null
 				);
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, int>(
+				_propertyFieldPath, _subPropertyFieldPath, null
+				);
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _subPropertyField, _propertyFieldPath, _subPropertyFieldPath, null
+					candidate, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);
@@ -46,10 +50,13 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
 				null, null, null
 				);
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, string>(
+				_propertyFieldPath, _propertyFieldPath, null
+				);
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_propertyField, _propertyField, _propertyFieldPath, _propertyFieldPath, null
+					candidate, null
 					)
 				);
 			Assert.AreEqual(1, factoryContext.Bindings.Count);
@@ -62,10 +69,13 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 			var factoryContext = new MappingFactoryContext<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
 				null, null, null
 				);
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, SubModel, SubModel>(
+				_containerFieldPath, _containerFieldPath, null
+				);
 			factory.CreateBinding(
 				factoryContext,
 				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					_containerField, _containerField, _containerFieldPath, _containerFieldPath, null
+					candidate, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);

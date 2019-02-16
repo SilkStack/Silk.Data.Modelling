@@ -50,8 +50,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 			}
 
 			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
-				intersectCandidate.LeftField, intersectCandidate.RightField,
-				intersectCandidate.LeftPath, intersectCandidate.RightPath,
+				intersectCandidate,
 				typeof(BothNumericTypesRule<TLeftModel, TLeftField, TRightModel, TRightField>)
 				);
 			return true;
