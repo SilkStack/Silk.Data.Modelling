@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Analysis.CandidateSources;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Silk.Data.Modelling.Analysis.Rules
@@ -13,13 +14,13 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
 	public class ConvertableWithTryParse<TLeftModel, TLeftField, TRightModel, TRightField> :
-		IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
+		IntersectionRuleBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
 		where TRightField : class, IField
 	{
-		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
+		public override bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
 			if (intersectCandidate.LeftField.FieldDataType == intersectCandidate.RightField.FieldDataType ||
 				intersectCandidate.LeftField.RemoveEnumerableType() != typeof(string) ||
@@ -39,12 +40,24 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
-				intersectCandidate,
-				typeof(ConvertableWithTryParse<TLeftModel, TLeftField, TRightModel, TRightField>),
-				tryParseMethod
-				);
+			intersectedFields = BuildIntersectedFields(intersectCandidate);
 			return true;
+		}
+
+		protected override TryConvertDelegate<TFrom, TTo> TryConvertFactory<TFrom, TTo>()
+		{
+			var tryParseMethod = GetTryParseMethod(typeof(TFrom), typeof(TTo));
+
+			var fromParameter = Expression.Parameter(typeof(TFrom), "from");
+			var toParameter = Expression.Parameter(typeof(TTo).MakeByRefType(), "to");
+
+			Expression body;
+			if (tryParseMethod.DeclaringType == typeof(Enum))
+				body = Expression.Call(tryParseMethod, fromParameter, Expression.Constant(false), toParameter);
+			else
+				body = Expression.Call(tryParseMethod, fromParameter, toParameter);
+
+			return Expression.Lambda<TryConvertDelegate<TFrom,TTo>>(body, fromParameter, toParameter).Compile();
 		}
 
 		private MethodInfo GetTryParseMethod(Type sourceType, Type toType)

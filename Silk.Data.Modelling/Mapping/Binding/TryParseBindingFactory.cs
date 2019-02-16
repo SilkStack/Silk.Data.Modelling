@@ -27,7 +27,7 @@ namespace Silk.Data.Modelling.Mapping.Binding
 				return;
 			}
 
-			var methodInfo = intersectedFields.IntersectionMetadata as MethodInfo;
+			var methodInfo = default(MethodInfo); // intersectedFields.IntersectionMetadata as MethodInfo;
 			if (methodInfo == null)
 				return;
 

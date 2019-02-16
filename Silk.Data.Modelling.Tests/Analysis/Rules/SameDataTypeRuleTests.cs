@@ -3,6 +3,7 @@ using Silk.Data.Modelling.Analysis.Rules;
 using Silk.Data.Modelling.Analysis.CandidateSources;
 using System.Linq;
 using System;
+using Silk.Data.Modelling.Analysis;
 
 namespace Silk.Data.Modelling.Tests.Analysis.Rules
 {
@@ -57,6 +58,34 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 
 			Assert.IsFalse(result, "Rule returned an invalid result.");
 			Assert.IsNull(intersectedFields, "Rule returned an intersected field.");
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True()
+		{
+			var rule = new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, bool, bool>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					NullableTypeModel,
+					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
+					new[] { NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, bool, bool>;
+			var result = typedIntersectedFields.GetConvertDelegate()(false, out var copy);
+
+			Assert.IsTrue(result);
+			Assert.IsFalse(copy);
 		}
 	}
 }

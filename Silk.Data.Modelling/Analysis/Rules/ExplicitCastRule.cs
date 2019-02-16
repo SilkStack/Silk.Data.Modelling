@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Silk.Data.Modelling.Analysis.CandidateSources;
 
@@ -13,13 +14,13 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
 	public class ExplicitCastRule<TLeftModel, TLeftField, TRightModel, TRightField> :
-		IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
+		IntersectionRuleBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
 		where TRightField : class, IField
 	{
-		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
+		public override bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
 			var castMethod = GetExplicitCast(
 				intersectCandidate.LeftField.RemoveEnumerableType(),
@@ -39,12 +40,32 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
-				intersectCandidate,
-				typeof(ExplicitCastRule<TLeftModel, TLeftField, TRightModel, TRightField>),
-				castMethod
-				);
+			intersectedFields = BuildIntersectedFields(intersectCandidate);
 			return true;
+		}
+
+		protected override TryConvertDelegate<TFrom, TTo> TryConvertFactory<TFrom, TTo>()
+		{
+			var castMethod = GetExplicitCast(
+				typeof(TFrom),
+				typeof(TTo)
+				);
+			if (castMethod == null)
+				castMethod = GetExplicitCast(
+					typeof(TTo),
+					typeof(TTo)
+					);
+
+			var fromParameter = Expression.Parameter(typeof(TFrom));
+			var toParameter = Expression.Parameter(typeof(TTo).MakeByRefType());
+
+			var lambda = Expression.Lambda<TryConvertDelegate<TFrom, TTo>>(
+				Expression.Block(
+					Expression.Assign(toParameter, Expression.Call(castMethod, fromParameter)),
+					Expression.Constant(true)
+					), fromParameter, toParameter
+				);
+			return lambda.Compile();
 		}
 
 		private MethodInfo GetExplicitCast(Type fromType, Type toType)

@@ -1,4 +1,6 @@
 ﻿using Silk.Data.Modelling.Analysis.CandidateSources;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace Silk.Data.Modelling.Analysis.Rules
 {
@@ -9,13 +11,14 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	/// <typeparam name="TLeftField"></typeparam>
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
-	public class SameDataTypeRule<TLeftModel, TLeftField, TRightModel, TRightField> : IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
+	public class SameDataTypeRule<TLeftModel, TLeftField, TRightModel, TRightField> :
+		IntersectionRuleBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
 		where TRightField : class, IField
 	{
-		public bool IsValidIntersection(
+		public override bool IsValidIntersection(
 			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate,
 			out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields
 			)
@@ -27,11 +30,22 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
-				intersectCandidate,
-				typeof(SameDataTypeRule<TLeftModel, TLeftField, TRightModel, TRightField>)
-				);
+			intersectedFields = BuildIntersectedFields(intersectCandidate);
 			return true;
+		}
+
+		protected override TryConvertDelegate<TFrom, TTo> TryConvertFactory<TFrom, TTo>()
+		{
+			var fromParameter = Expression.Parameter(typeof(TFrom));
+			var toParameter = Expression.Parameter(typeof(TTo).MakeByRefType());
+
+			var lambda = Expression.Lambda<TryConvertDelegate<TFrom, TTo>>(
+				Expression.Block(
+					Expression.Assign(toParameter, fromParameter),
+					Expression.Constant(true)
+					), fromParameter, toParameter
+				);
+			return lambda.Compile();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Silk.Data.Modelling.Analysis.CandidateSources;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Silk.Data.Modelling.Analysis.Rules
 {
@@ -12,7 +13,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
 	public class BothNumericTypesRule<TLeftModel, TLeftField, TRightModel, TRightField> :
-		IIntersectionRule<TLeftModel, TLeftField, TRightModel, TRightField>
+		IntersectionRuleBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
@@ -38,7 +39,7 @@ namespace Silk.Data.Modelling.Analysis.Rules
 			return type.IsEnum || _numericTypes.Contains(type);
 		}
 
-		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
+		public override bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
 			if (intersectCandidate.LeftField.FieldDataType == intersectCandidate.RightField.FieldDataType ||
 				!IsNumericType(intersectCandidate.LeftField.RemoveEnumerableType()) ||
@@ -49,11 +50,22 @@ namespace Silk.Data.Modelling.Analysis.Rules
 				return false;
 			}
 
-			intersectedFields = IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField>.Create(
-				intersectCandidate,
-				typeof(BothNumericTypesRule<TLeftModel, TLeftField, TRightModel, TRightField>)
-				);
+			intersectedFields = BuildIntersectedFields(intersectCandidate);
 			return true;
+		}
+
+		protected override TryConvertDelegate<TFrom, TTo> TryConvertFactory<TFrom, TTo>()
+		{
+			var fromParameter = Expression.Parameter(typeof(TFrom));
+			var toParameter = Expression.Parameter(typeof(TTo).MakeByRefType());
+
+			var lambda = Expression.Lambda<TryConvertDelegate<TFrom, TTo>>(
+				Expression.Block(
+					Expression.Assign(toParameter, Expression.Convert(fromParameter, typeof(TTo))),
+					Expression.Constant(true)
+					), fromParameter, toParameter
+				);
+			return lambda.Compile();
 		}
 	}
 }

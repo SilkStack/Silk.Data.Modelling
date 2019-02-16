@@ -36,8 +36,10 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 				);
 			factory.CreateBinding(
 				factoryContext,
-				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					candidate, null
+				new IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, int>(
+					candidate.LeftField, candidate.RightField,
+					candidate.LeftPath, candidate.RightPath,
+					null, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);
@@ -55,8 +57,10 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 				);
 			factory.CreateBinding(
 				factoryContext,
-				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					candidate, null
+				new IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, string>(
+					candidate.LeftField, candidate.RightField,
+					candidate.LeftPath, candidate.RightPath,
+					null, null
 					)
 				);
 			Assert.AreEqual(1, factoryContext.Bindings.Count);
@@ -74,8 +78,10 @@ namespace Silk.Data.Modelling.Tests.Mapping.Binding
 				);
 			factory.CreateBinding(
 				factoryContext,
-				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>.Create(
-					candidate, null
+				new IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, SubModel, SubModel>(
+					candidate.LeftField, candidate.RightField,
+					candidate.LeftPath, candidate.RightPath,
+					null, null
 					)
 				);
 			Assert.AreEqual(0, factoryContext.Bindings.Count);

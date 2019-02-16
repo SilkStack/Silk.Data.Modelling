@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Analysis.Rules;
 using System.Linq;
@@ -81,6 +82,62 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 
 			Assert.IsFalse(result, "Rule returned an invalid result.");
 			Assert.IsNull(intersectedFields, "Rule returned an intersected field.");
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True_For_Castable_From_Source_DataTypes()
+		{
+			var rule = new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableSourceType, CastableTargetType>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					LeftTypeModel,
+					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromSource)),
+					new[] { LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromSource)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					RightTypeModel,
+					RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.CastFromSource)),
+					new[] { RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.CastFromSource)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableSourceType, CastableTargetType>;
+			var result = typedIntersectedFields.GetConvertDelegate()(new CastableSourceType(), out var copy);
+
+			Assert.IsTrue(result);
+			Assert.IsNotNull(copy);
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True_For_Castable_From_Target_DataTypes()
+		{
+			var rule = new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableTargetType, CastableSourceType>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					LeftTypeModel,
+					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromTarget)),
+					new[] { LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromTarget)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					RightTypeModel,
+					RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.CastFromTarget)),
+					new[] { RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.CastFromTarget)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableTargetType, CastableSourceType>;
+			var result = typedIntersectedFields.GetConvertDelegate()(new CastableTargetType(), out var copy);
+
+			Assert.IsTrue(result);
+			Assert.IsNotNull(copy);
 		}
 
 		private class LeftModel

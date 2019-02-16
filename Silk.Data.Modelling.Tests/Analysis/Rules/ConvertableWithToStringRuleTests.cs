@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Analysis.Rules;
 using System.Linq;
@@ -57,6 +58,34 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 
 			Assert.IsFalse(result, "Rule returned an invalid result.");
 			Assert.IsNull(intersectedFields, "Rule returned an intersected field.");
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True()
+		{
+			var rule = new ConvertableWithToStringRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, float, string>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					LeftTypeModel,
+					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.Convertable)),
+					new[] { LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.Convertable)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					RightTypeModel,
+					RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.Convertable)),
+					new[] { RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.Convertable)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, float, string>;
+			var result = typedIntersectedFields.GetConvertDelegate()(1.1f, out var copy);
+
+			Assert.IsTrue(result);
+			Assert.AreEqual(1.1f.ToString(), copy);
 		}
 
 		private class LeftModel

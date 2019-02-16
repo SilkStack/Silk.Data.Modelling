@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Silk.Data.Modelling.Analysis;
 using Silk.Data.Modelling.Analysis.CandidateSources;
 using Silk.Data.Modelling.Analysis.Rules;
 using System.Linq;
@@ -81,6 +82,62 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 
 			Assert.IsFalse(result, "Rule returned an invalid result.");
 			Assert.IsNull(intersectedFields, "Rule returned an intersected field.");
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True_Parsing_String_To_Int()
+		{
+			var rule = new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, int>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					LeftTypeModel,
+					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.IntFromString)),
+					new[] { LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.IntFromString)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					RightTypeModel,
+					RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.IntFromString)),
+					new[] { RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.IntFromString)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, int>;
+			var result = typedIntersectedFields.GetConvertDelegate()("1", out var copy);
+
+			Assert.IsTrue(result);
+			Assert.AreEqual(1, copy);
+		}
+
+		[TestMethod]
+		public void IntersectedField_Converter_Returns_True_Parsing_String_To_Enum()
+		{
+			var rule = new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, MyEnum>(
+				new FieldPath<TypeModel, PropertyInfoField>(
+					LeftTypeModel,
+					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.EnumFromString)),
+					new[] { LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.EnumFromString)) }
+					),
+				new FieldPath<TypeModel, PropertyInfoField>(
+					RightTypeModel,
+					RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.EnumFromString)),
+					new[] { RightTypeModel.Fields.First(q => q.FieldName == nameof(RightModel.EnumFromString)) }
+					),
+				null
+				);
+
+			rule.IsValidIntersection(candidate, out var intersectedFields);
+
+			var typedIntersectedFields = intersectedFields as
+				IntersectedFields<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, MyEnum>;
+			var result = typedIntersectedFields.GetConvertDelegate()(nameof(MyEnum.SomeValue), out var copy);
+
+			Assert.IsTrue(result);
+			Assert.AreEqual(MyEnum.SomeValue, copy);
 		}
 
 		private class LeftModel
