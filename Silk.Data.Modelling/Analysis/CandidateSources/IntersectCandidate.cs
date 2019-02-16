@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Silk.Data.Modelling.GenericDispatch;
+using System;
 
 namespace Silk.Data.Modelling.Analysis.CandidateSources
 {
@@ -54,6 +55,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 			RightPath = rightPath;
 			CandidateSourceType = candidateSourceType;
 		}
+
+		public abstract void Dispatch(IIntersectCandidateGenericExecutor executor);
 	}
 
 	public class IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>
@@ -70,5 +73,8 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 			) : base(leftPath, rightPath, candidateSourceType)
 		{
 		}
+
+		public override void Dispatch(IIntersectCandidateGenericExecutor executor)
+			=> executor.Execute(this);
 	}
 }
