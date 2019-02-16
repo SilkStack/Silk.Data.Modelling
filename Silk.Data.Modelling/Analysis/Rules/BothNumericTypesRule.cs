@@ -40,7 +40,8 @@ namespace Silk.Data.Modelling.Analysis.Rules
 
 		public bool IsValidIntersection(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate, out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 		{
-			if (!IsNumericType(intersectCandidate.LeftField.RemoveEnumerableType()) ||
+			if (intersectCandidate.LeftField.FieldDataType == intersectCandidate.RightField.FieldDataType ||
+				!IsNumericType(intersectCandidate.LeftField.RemoveEnumerableType()) ||
 				!IsNumericType(intersectCandidate.RightField.RemoveEnumerableType()) ||
 				intersectCandidate.LeftField.IsEnumerableType != intersectCandidate.RightField.IsEnumerableType)
 			{

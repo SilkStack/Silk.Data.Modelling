@@ -31,7 +31,8 @@ namespace Silk.Data.Modelling.Analysis.Rules
 					intersectCandidate.RightField.RemoveEnumerableType()
 					);
 
-			if (castMethod == null ||
+			if (intersectCandidate.LeftField.FieldDataType == intersectCandidate.RightField.FieldDataType || 
+				castMethod == null ||
 				intersectCandidate.LeftField.IsEnumerableType != intersectCandidate.RightField.IsEnumerableType)
 			{
 				intersectedFields = null;
