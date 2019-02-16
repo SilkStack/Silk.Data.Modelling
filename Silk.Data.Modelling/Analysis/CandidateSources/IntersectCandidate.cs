@@ -9,7 +9,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	/// <typeparam name="TLeftField"></typeparam>
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
-	public class IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>
+	public abstract class IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
@@ -53,6 +53,22 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 			LeftPath = leftPath;
 			RightPath = rightPath;
 			CandidateSourceType = candidateSourceType;
+		}
+	}
+
+	public class IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField, TLeftData, TRightData>
+		: IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>
+		where TLeftModel : IModel<TLeftField>
+		where TRightModel : IModel<TRightField>
+		where TLeftField : class, IField
+		where TRightField : class, IField
+	{
+		public IntersectCandidate(
+			FieldPath<TLeftModel, TLeftField> leftPath,
+			FieldPath<TRightModel, TRightField> rightPath,
+			Type candidateSourceType
+			) : base(leftPath, rightPath, candidateSourceType)
+		{
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_Convertable_DataTypes()
 		{
 			var rule = new ConvertableWithToStringRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, float, string>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.Convertable)),
@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_False_For_Non_Convertable_DataTypes()
 		{
 			var rule = new ConvertableWithToStringRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, object, int>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.NonConvertable)),

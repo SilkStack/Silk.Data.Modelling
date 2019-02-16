@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_Castable_From_Source_DataTypes()
 		{
 			var rule = new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableSourceType, CastableTargetType>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromSource)),
@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_Castable_From_Target_DataTypes()
 		{
 			var rule = new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, CastableTargetType, CastableSourceType>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.CastFromTarget)),
@@ -63,7 +63,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_False_For_Non_Convertable_DataTypes()
 		{
 			var rule = new ExplicitCastRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, object, int>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.NonConvertable)),

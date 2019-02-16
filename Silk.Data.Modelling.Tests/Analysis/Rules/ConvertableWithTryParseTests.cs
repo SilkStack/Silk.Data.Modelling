@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_String_To_Int_DataTypes()
 		{
 			var rule = new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, int>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.IntFromString)),
@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_String_To_Enum_DataTypes()
 		{
 			var rule = new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, MyEnum>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.EnumFromString)),
@@ -63,7 +63,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_False_For_Non_Convertable_DataTypes()
 		{
 			var rule = new ConvertableWithTryParse<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, string, object>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.NonConvertable)),

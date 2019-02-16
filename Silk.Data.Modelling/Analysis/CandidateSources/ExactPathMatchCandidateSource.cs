@@ -10,7 +10,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
 	public class ExactPathMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField> :
-		IIntersectCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>
+		CandidateSourceBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
@@ -22,7 +22,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 		/// </summary>
 		public int MaxDepth { get; set; } = 10;
 
-		public IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
+		public override IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
 		{
 			return SearchFields(
 				leftModel.Fields,
@@ -51,10 +51,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 						{
 							var newLeftPath = leftPath.Child(leftField);
 							var newRightPath = rightPath.Child(rightField);
-							yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
-								newLeftPath, newRightPath,
-								typeof(ExactPathMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>)
-								);
+							yield return BuildIntersectCandidate(newLeftPath, newRightPath);
 
 							foreach (var subCandidate in SearchFields(leftModel.GetPathFields(newLeftPath), rightModel.GetPathFields(newRightPath), newLeftPath, newRightPath, depth + 1))
 								yield return subCandidate;

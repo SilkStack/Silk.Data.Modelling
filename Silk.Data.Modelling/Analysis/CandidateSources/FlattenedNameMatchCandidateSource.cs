@@ -11,7 +11,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 	/// <typeparam name="TRightModel"></typeparam>
 	/// <typeparam name="TRightField"></typeparam>
 	public class FlattenedNameMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField> :
-		IIntersectCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>
+		CandidateSourceBase<TLeftModel, TLeftField, TRightModel, TRightField>
 		where TLeftModel : IModel<TLeftField>
 		where TRightModel : IModel<TRightField>
 		where TLeftField : class, IField
@@ -23,7 +23,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 		/// </summary>
 		public int MaxDepth { get; set; } = 10;
 
-		public IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
+		public override IEnumerable<IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>> GetIntersectCandidates(TLeftModel leftModel, TRightModel rightModel)
 		{
 			var flatLeft = Flatten<TLeftModel, TLeftField>(leftModel).ToArray();
 			var flatRight = Flatten<TRightModel, TRightField>(rightModel).ToArray();
@@ -34,10 +34,7 @@ namespace Silk.Data.Modelling.Analysis.CandidateSources
 				{
 					if (leftField.FlatFieldPath == rightField.FlatFieldPath)
 					{
-						yield return new IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField>(
-							leftField.FieldPath, rightField.FieldPath,
-							typeof(FlattenedNameMatchCandidateSource<TLeftModel, TLeftField, TRightModel, TRightField>)
-							);
+						yield return BuildIntersectCandidate(leftField.FieldPath, rightField.FieldPath);
 					}
 				}
 			}

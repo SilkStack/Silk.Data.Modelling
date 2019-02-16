@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_Same_DataTypes()
 		{
 			var rule = new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, bool, bool>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					NullableTypeModel,
 					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),
@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_False_For_Mismatched_DataTypes()
 		{
 			var rule = new SameDataTypeRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, bool, int>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					NullableTypeModel,
 					NullableTypeModel.Fields.First(q => q.FieldName == nameof(Nullable<int>.HasValue)),

@@ -3,6 +3,8 @@ using System;
 
 namespace Silk.Data.Modelling.Analysis
 {
+	public delegate bool TryConvertDelegate<TFrom, TTo>(TFrom from, out TTo to);
+
 	public abstract class IntersectedFields
 	{
 		public IField LeftField { get; }
@@ -99,6 +101,11 @@ namespace Silk.Data.Modelling.Analysis
 			Type intersectionRuleType, object intersectionMetadata) :
 			base(leftField, rightField, leftPath, rightPath, intersectionRuleType, intersectionMetadata)
 		{
+		}
+
+		public TryConvertDelegate<TLeftData, TRightData> GetConvertDelegate()
+		{
+			return null;
 		}
 
 		public override void Dispatch(IIntersectedFieldsGenericExecutor genericEntryPoint)

@@ -15,7 +15,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_True_For_Numeric_DataTypes()
 		{
 			var rule = new BothNumericTypesRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, float, int>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.Numeric)),
@@ -39,7 +39,7 @@ namespace Silk.Data.Modelling.Tests.Analysis.Rules
 		public void IsValidIntersection_Returns_False_For_Non_Numeric_DataTypes()
 		{
 			var rule = new BothNumericTypesRule<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>();
-			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField>(
+			var candidate = new IntersectCandidate<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField, object, string>(
 				new FieldPath<TypeModel, PropertyInfoField>(
 					LeftTypeModel,
 					LeftTypeModel.Fields.First(q => q.FieldName == nameof(LeftModel.NonNumeric)),
