@@ -5,7 +5,7 @@
     <Authors>John Carruthers</Authors>
     <Company />
     <Product>SilkStack</Product>
-    <Description>Silk.DataModelling is a library for modelling data structures for .NET.
+    <Description>Silk.Data.Modelling is a library for modelling data structures for .NET.
 
 Part of the SilkStack project.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
