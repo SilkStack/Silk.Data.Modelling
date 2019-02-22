@@ -36,6 +36,6 @@ namespace Silk.Data.Modelling
 		}
 
 		public override void Dispatch(IModelGenericExecutor executor)
-			=> executor.Execute<TypeModel<T>, PropertyInfoField, T>(this);
+			=> executor.Execute<TypeModel<T>, PropertyInfoField>(this);
 	}
 }

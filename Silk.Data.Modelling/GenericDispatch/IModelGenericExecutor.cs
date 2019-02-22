@@ -10,9 +10,8 @@
 		/// </summary>
 		/// <typeparam name="TModel"></typeparam>
 		/// <typeparam name="TField"></typeparam>
-		/// <typeparam name="TData"></typeparam>
 		/// <param name="model"></param>
-		void Execute<TModel, TField, TData>(TModel model)
+		void Execute<TModel, TField>(TModel model)
 			where TField : class, IField
 			where TModel : IModel<TField>;
 	}
