@@ -29,7 +29,11 @@ namespace Silk.Data.Modelling
 		}
 
 		public override IEnumerable<PropertyInfoField> GetPathFields(IFieldPath<PropertyInfoField> fieldPath)
-			=> GetModelOf(fieldPath.FinalField.RemoveEnumerableType()).Fields;
+		{
+			if (fieldPath.FinalField == null)
+				return Fields;
+			return GetModelOf(fieldPath.FinalField.RemoveEnumerableType()).Fields;
+		}
 
 		public override void Dispatch(IModelGenericExecutor executor)
 			=> executor.Execute<TypeModel<T>, PropertyInfoField, T>(this);
