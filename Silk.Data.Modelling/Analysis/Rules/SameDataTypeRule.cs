@@ -1,6 +1,6 @@
 ﻿using Silk.Data.Modelling.Analysis.CandidateSources;
+using System;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 namespace Silk.Data.Modelling.Analysis.Rules
 {
@@ -18,12 +18,20 @@ namespace Silk.Data.Modelling.Analysis.Rules
 		where TLeftField : class, IField
 		where TRightField : class, IField
 	{
+		private bool IsReferenceType(Type type)
+		{
+			if (type == typeof(string))
+				return false;
+			return !type.IsValueType;
+		}
+
 		public override bool IsValidIntersection(
 			IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate,
 			out IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields
 			)
 		{
-			if (intersectCandidate.LeftField.RemoveEnumerableType() != intersectCandidate.RightField.RemoveEnumerableType() ||
+			if (IsReferenceType(intersectCandidate.LeftField.RemoveEnumerableType()) ||
+				intersectCandidate.LeftField.RemoveEnumerableType() != intersectCandidate.RightField.RemoveEnumerableType() ||
 				intersectCandidate.LeftField.IsEnumerableType != intersectCandidate.RightField.IsEnumerableType)
 			{
 				intersectedFields = null;
