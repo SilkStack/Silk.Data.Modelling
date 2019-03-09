@@ -21,6 +21,8 @@ namespace Silk.Data.Modelling
 
 		public Type FieldElementType { get; private set; }
 
+		public PropertyInfo Property { get; private set; }
+
 		protected PropertyInfoField() { }
 
 		/// <summary>
@@ -40,6 +42,7 @@ namespace Silk.Data.Modelling
 			ret.CanWrite = propertyInfo.CanWrite;
 			ret.FieldDataType = propertyInfo.PropertyType;
 			ret.FieldElementType = propertyInfo.PropertyType.GetEnumerableElementType();
+			ret.Property = propertyInfo;
 
 			return ret;
 		}
