@@ -21,6 +21,13 @@ namespace Silk.Data.Modelling.Analysis
 			AddIntersectionRules(intersectionRules);
 		}
 
+		public void AddTypeConverters(IEnumerable<ITypeConverter> typeConverters)
+		{
+			IntersectionRules.Add(
+				new TypeConverterRule<TLeftModel, TLeftField, TRightModel, TRightField>(typeConverters)
+				);
+		}
+
 		protected override IIntersection<TLeftModel, TLeftField, TRightModel, TRightField> CreateIntersection(
 			IntersectAnalysis analysis
 			)
