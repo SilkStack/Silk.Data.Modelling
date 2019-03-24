@@ -49,16 +49,16 @@ namespace Silk.Data.Modelling.Mapping
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
-			if (_enumerableReaders.TryGetValue(flattenedPath, out var @delegate))
+			if (_enumerableWriters.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Action<TGraph, IEnumerable<T>>;
 
-			lock (_enumerableReaders)
+			lock (_enumerableWriters)
 			{
-				if (_enumerableReaders.TryGetValue(flattenedPath, out @delegate))
+				if (_enumerableWriters.TryGetValue(flattenedPath, out @delegate))
 					return @delegate as Action<TGraph, IEnumerable<T>>;
 
 				@delegate = CreateEnumerableWriter<T>(fieldPath, pathOffset);
-				_enumerableReaders.Add(flattenedPath, @delegate);
+				_enumerableWriters.Add(flattenedPath, @delegate);
 				return @delegate as Action<TGraph, IEnumerable<T>>;
 			}
 		}
