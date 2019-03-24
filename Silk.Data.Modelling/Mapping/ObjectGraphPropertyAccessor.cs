@@ -123,7 +123,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
-			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
+			var flattenedPath = $"{typeof(T).FullName}::{string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName))}";
 
 			if (_propertyReaders.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Func<TGraph, T>;
@@ -290,6 +290,9 @@ namespace Silk.Data.Modelling.Mapping
 
 			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				body = Expression.Property(body, field.FieldName);
+
+			if (typeof(T) != fieldPath.FinalField.FieldDataType)
+				body = Expression.Convert(body, typeof(T));
 
 			var lambda = Expression.Lambda<Func<TGraph, T>>(
 				body, graph
