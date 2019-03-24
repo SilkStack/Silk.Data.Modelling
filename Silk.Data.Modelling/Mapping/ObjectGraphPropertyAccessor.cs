@@ -45,7 +45,7 @@ namespace Silk.Data.Modelling.Mapping
 		private readonly Dictionary<string, Delegate> _enumerableWriters
 			= new Dictionary<string, Delegate>();
 
-		public Action<TGraph, IEnumerable<T>> GetEnumerableWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Action<TGraph, IEnumerable<T>> GetEnumerableWriter<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
@@ -63,7 +63,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Func<TGraph, IEnumerable<T>> GetEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Func<TGraph, IEnumerable<T>> GetEnumerableReader<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
@@ -81,7 +81,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Func<TGraph, TGraph> GetContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Func<TGraph, TGraph> GetContainerCreator(IFieldPath fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Select(field => field.FieldName));
 
@@ -99,7 +99,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Func<TGraph, bool> GetPropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField, int pathOffset = 0)
+		public Func<TGraph, bool> GetPropertyChecker(IFieldPath fieldPath, bool skipLastField, int pathOffset = 0)
 		{
 			var pathSource = fieldPath.Fields.Select(field => field.FieldName).Skip(pathOffset);
 			if (skipLastField)
@@ -121,7 +121,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Func<TGraph, T> GetPropertyReader<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
 
@@ -139,7 +139,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		public Func<TGraph, T, TGraph> GetPropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset = 0)
+		public Func<TGraph, T, TGraph> GetPropertyWriter<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
 			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
 
@@ -170,7 +170,7 @@ namespace Silk.Data.Modelling.Mapping
 		private static List<T> ConvertToList<T>(IEnumerable<T> source)
 			=> source.ToList();
 
-		private Action<TGraph, IEnumerable<T>> CreateEnumerableWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Action<TGraph, IEnumerable<T>> CreateEnumerableWriter<T>(IFieldPath fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			var enumerable = Expression.Parameter(typeof(IEnumerable<T>));
@@ -195,7 +195,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Func<TGraph, IEnumerable<T>> CreateEnumerableReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Func<TGraph, IEnumerable<T>> CreateEnumerableReader<T>(IFieldPath fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			Expression body = graph;
@@ -211,7 +211,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Func<TGraph, TGraph> CreateContainerCreator(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Func<TGraph, TGraph> CreateContainerCreator(IFieldPath fieldPath, int pathOffset)
 		{
 			var ctor = GetParameterlessConstructor(fieldPath.FinalField.RemoveEnumerableType());
 			if (ctor == null)
@@ -233,7 +233,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath<PropertyInfoField> fieldPath, bool skipLastField, int pathOffset)
+		private Func<TGraph, bool> CreatePropertyChecker(IFieldPath fieldPath, bool skipLastField, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph), "graph");
 			var result = Expression.Variable(typeof(bool), "result");
@@ -283,7 +283,7 @@ namespace Silk.Data.Modelling.Mapping
 			}
 		}
 
-		private Func<TGraph, T> CreatePropertyReader<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Func<TGraph, T> CreatePropertyReader<T>(IFieldPath fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			Expression body = graph;
@@ -297,7 +297,7 @@ namespace Silk.Data.Modelling.Mapping
 			return lambda.Compile();
 		}
 
-		private Func<TGraph, T, TGraph> CreatePropertyWriter<T>(IFieldPath<PropertyInfoField> fieldPath, int pathOffset)
+		private Func<TGraph, T, TGraph> CreatePropertyWriter<T>(IFieldPath fieldPath, int pathOffset)
 		{
 			var graph = Expression.Parameter(typeof(TGraph));
 			var value = Expression.Parameter(typeof(T));
