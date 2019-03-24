@@ -66,7 +66,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public virtual IGraphWriterStream<TypeModel, PropertyInfoField> CreateEnumerableStream<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
-			return new OpenGraphEnumerableStream<T>(this, fieldPath);
+			return new ObjectGraphEnumerableStream<T>(this, fieldPath);
 		}
 
 		public override void CommitEnumerable<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath,

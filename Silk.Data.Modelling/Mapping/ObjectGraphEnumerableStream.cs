@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Silk.Data.Modelling.Mapping
 {
-	public class OpenGraphEnumerableStream<TData> : IGraphWriterStream<TypeModel, PropertyInfoField>
+	public class ObjectGraphEnumerableStream<TData> : IGraphWriterStream<TypeModel, PropertyInfoField>
 	{
 		private readonly List<StreamReaderWriter> _writers
 			= new List<StreamReaderWriter>();
 		private readonly ObjectGraphReaderWriterBase _objectReaderWriter;
 		private readonly IFieldPath<TypeModel, PropertyInfoField> _fieldPath;
 
-		public OpenGraphEnumerableStream(ObjectGraphReaderWriterBase objectReaderWriter,
+		public ObjectGraphEnumerableStream(ObjectGraphReaderWriterBase objectReaderWriter,
 			IFieldPath<TypeModel, PropertyInfoField> fieldPath)
 		{
 			_objectReaderWriter = objectReaderWriter;
