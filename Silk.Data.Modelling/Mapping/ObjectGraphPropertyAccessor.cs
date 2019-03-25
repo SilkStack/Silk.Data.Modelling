@@ -141,7 +141,7 @@ namespace Silk.Data.Modelling.Mapping
 
 		public Func<TGraph, T, TGraph> GetPropertyWriter<T>(IFieldPath fieldPath, int pathOffset = 0)
 		{
-			var flattenedPath = string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName));
+			var flattenedPath = $"{typeof(T).FullName}::{string.Join(".", fieldPath.Fields.Skip(pathOffset).Select(field => field.FieldName))}";
 
 			if (_propertyWriters.TryGetValue(flattenedPath, out var @delegate))
 				return @delegate as Func<TGraph, T, TGraph>;
@@ -310,9 +310,16 @@ namespace Silk.Data.Modelling.Mapping
 			foreach (var field in fieldPath.Fields.Skip(pathOffset))
 				property = Expression.Property(property, field.FieldName);
 
-			Expression body = Expression.Assign(
-				property,
-				value
+			Expression body;
+			if (!fieldPath.FinalField.IsEnumerableType && typeof(T) != fieldPath.FinalField.FieldDataType)
+				body = Expression.Assign(
+					property,
+					Expression.Convert(value, fieldPath.FinalField.FieldDataType)
+				);
+			else
+				body = Expression.Assign(
+					property,
+					value
 				);
 
 			body = Expression.Block(
