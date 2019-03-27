@@ -6,8 +6,7 @@ namespace Silk.Data.Modelling
 		where TModel : IModel<TField>
 		where TField : class, IField
 	{
-		IGraphReader<TModel, TField> CreateGraphReader<T>(T graph)
-			where T : class;
+		IGraphReader<TModel, TField> CreateGraphReader<T>(T graph);
 		IGraphWriter<TModel, TField> CreateGraphWriter<T>(T graph)
 			where T : class;
 	}

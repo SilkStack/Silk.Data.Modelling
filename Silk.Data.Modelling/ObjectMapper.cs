@@ -30,7 +30,6 @@ namespace Silk.Data.Modelling
 		}
 
 		private IMapping<TypeModel, PropertyInfoField, TypeModel, PropertyInfoField> GetMapping<TFrom, TTo>()
-			where TFrom : class
 			where TTo : class
 		{
 			var fromType = typeof(TFrom);
@@ -50,7 +49,6 @@ namespace Silk.Data.Modelling
 		}
 
 		public void Inject<TFrom, TTo>(TFrom from, TTo to)
-			where TFrom : class
 			where TTo : class
 		{
 			var reader = _readerWriterFactory.CreateGraphReader<TFrom>(from);
@@ -60,7 +58,6 @@ namespace Silk.Data.Modelling
 		}
 
 		public void InjectAll<TFrom, TTo>(IEnumerable<TFrom> from, IEnumerable<TTo> to)
-			where TFrom : class
 			where TTo : class
 		{
 			var mapping = GetMapping<TFrom, TTo>();
@@ -78,7 +75,6 @@ namespace Silk.Data.Modelling
 		}
 
 		public TTo Map<TFrom, TTo>(TFrom from)
-			where TFrom : class
 			where TTo : class
 		{
 			var graph = _typeInstanceFactory.CreateInstance<TTo>();
@@ -87,7 +83,6 @@ namespace Silk.Data.Modelling
 		}
 
 		public IEnumerable<TTo> MapAll<TFrom, TTo>(IEnumerable<TFrom> from)
-			where TFrom : class
 			where TTo : class
 		{
 			foreach (var obj in from)
@@ -146,8 +141,7 @@ namespace Silk.Data.Modelling
 		private class DefaultReaderWriterFactory : IReaderWriterFactory<TypeModel, PropertyInfoField>
 		{
 			public IGraphReader<TypeModel, PropertyInfoField> CreateGraphReader<T>(T graph)
-				where T : class
-				=> new ObjectGraphReaderWriter<T>(graph);
+				=> new ObjectGraphReader<T>(graph);
 
 			public IGraphWriter<TypeModel, PropertyInfoField> CreateGraphWriter<T>(T graph)
 				where T : class

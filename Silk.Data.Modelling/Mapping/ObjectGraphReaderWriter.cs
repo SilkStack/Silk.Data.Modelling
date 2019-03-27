@@ -88,4 +88,33 @@ namespace Silk.Data.Modelling.Mapping
 		{
 		}
 	}
+
+	public class ObjectGraphReader<TGraph> : IGraphReader<TypeModel, PropertyInfoField>
+	{
+		private readonly ReaderImpl _reader;
+
+		public ObjectGraphReader(TGraph graph)
+		{
+			_reader = new ReaderImpl(graph);
+		}
+
+		public bool CheckContainer(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+			=> _reader.CheckContainer(fieldPath);
+
+		public bool CheckPath(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+			=> _reader.CheckPath(fieldPath);
+
+		public IGraphReaderEnumerator<TypeModel, PropertyInfoField> GetEnumerator<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+			=> _reader.GetEnumerator<T>(fieldPath);
+
+		public T Read<T>(IFieldPath<TypeModel, PropertyInfoField> fieldPath)
+			=> _reader.Read<T>(fieldPath);
+
+		private class ReaderImpl : ObjectGraphReaderWriterBase<TGraph>
+		{
+			public ReaderImpl(TGraph graph) : base(graph, null)
+			{
+			}
+		}
+	}
 }
