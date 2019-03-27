@@ -246,8 +246,14 @@ namespace Silk.Data.Modelling.Mapping
 				return shortLambda.Compile();
 			}
 
+			var checkExpr = default(Expression);
+			if (typeof(TGraph).IsValueType)
+				checkExpr = Expression.Constant(true);
+			else
+				checkExpr = Expression.NotEqual(graph, Expression.Constant(null));
+
 			var ifTree = Expression.IfThen(
-				Expression.NotEqual(graph, Expression.Constant(null)),
+				checkExpr,
 				NextPropertyBranch(fieldPath.Fields.Skip(pathOffset).ToArray(), 1)
 				);
 
@@ -276,8 +282,13 @@ namespace Silk.Data.Modelling.Mapping
 					property = Expression.Property(property, fields[i].FieldName);
 				}
 
+				var subCheckExpr = default(Expression);
+				if (property.Type.IsValueType)
+					subCheckExpr = Expression.Constant(true);
+				else
+					subCheckExpr = Expression.NotEqual(property, Expression.Constant(null));
 				return Expression.IfThen(
-					Expression.NotEqual(property, Expression.Constant(null)),
+					subCheckExpr,
 					NextPropertyBranch(fieldPath.Fields, offset + 1)
 				);
 			}
