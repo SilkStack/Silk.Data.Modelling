@@ -128,6 +128,7 @@ namespace Silk.Data.Modelling
 						return mapping;
 
 					mapping = CreateMapping<TTo>();
+					_mappings.Add(type, mapping);
 					return mapping;
 				}
 			}
