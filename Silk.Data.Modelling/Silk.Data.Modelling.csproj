@@ -9,11 +9,19 @@
 
 Part of the SilkStack project.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.4.0.4</Version>
-    <PackageLicenseUrl>https://github.com/SilkStack/Silk.Data.Modelling/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <Version>0.4.0.5</Version>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SilkStack/Silk.Data.Modelling/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SilkStack/Silk.Data.Modelling/</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
