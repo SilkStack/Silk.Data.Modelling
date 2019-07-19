@@ -9,7 +9,7 @@
 
 Part of the SilkStack project.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.4.0.5</Version>
+    <Version>0.4.0.6</Version>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SilkStack/Silk.Data.Modelling/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SilkStack/Silk.Data.Modelling/</RepositoryUrl>

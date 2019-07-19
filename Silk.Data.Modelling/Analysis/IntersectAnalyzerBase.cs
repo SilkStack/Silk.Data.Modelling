@@ -106,7 +106,16 @@ namespace Silk.Data.Modelling.Analysis
 			}
 
 			public virtual bool IsLeftFieldAlreadyPaired(IntersectCandidate<TLeftModel, TLeftField, TRightModel, TRightField> intersectCandidate)
-				=> _intersectedFields.Any(intersectedFields => ReferenceEquals(intersectedFields.LeftField, intersectCandidate.LeftField));
+			{
+				foreach (var intersectedFields in _intersectedFields)
+				{
+					var path = intersectedFields.LeftPath.Fields.Select(q => q.FieldName);
+					if (intersectCandidate.LeftPath.Fields.Select(q => q.FieldName).SequenceEqual(path))
+						return true;
+				}
+				return false;
+			}
+			//_intersectedFields.Any(intersectedFields => ReferenceEquals(intersectedFields.LeftField, intersectCandidate.LeftField));
 
 			public virtual void AddIntersectedFields(IntersectedFields<TLeftModel, TLeftField, TRightModel, TRightField> intersectedFields)
 				=>_intersectedFields.Add(intersectedFields);
